@@ -1,0 +1,7 @@
+/node_modules
+/nbproject
+/repos
+/output
+/build
+/env/server.env
+/env/server-state.json
