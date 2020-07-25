@@ -1,18 +1,14 @@
 import {combineReducers} from "redux";
-import deployment from './deployment';
-import deploymentInformation from './deploymentInformation';
-import repo from './repo';
-import task from './task';
-import taskInformation from './taskInformation';
-import worker from './worker';
+import {reducers as crudReducers} from './crud'
 
 const reducer = combineReducers({
-	deployment,
-	deploymentInformation,
-	repo,
-	task,
-	taskInformation,
-	worker,
+	deployment: crudReducers.deployment,
+	deploymentInformation: crudReducers.deploymentInformation,
+	repo: crudReducers.repo,
+	task: crudReducers.task,
+	taskInformation: crudReducers.taskInformation,
+	workers: crudReducers.workers,
+	pendingFiles: crudReducers.pendingFiles,
 });
 
 export type State = ReturnType<typeof reducer>;

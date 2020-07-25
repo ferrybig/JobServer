@@ -4,14 +4,14 @@ import {select, call, put} from "redux-saga/effects";
 import {PersistState} from "../store/types";
 import {CONFIG_PATH} from "../config";
 import {writeFile, readFile} from "../../common/async/fs";
-import {loadState} from "../store/actions";
+import {crudInit} from "../store/actions";
 
 
 function* load() {
 	try {
 
 		const contents: string = yield call(readFile, CONFIG_PATH, 'utf-8');
-		yield put(loadState(JSON.parse(contents)))
+		yield put(crudInit(JSON.parse(contents)))
 	} catch(e) {
 		console.warn(e);
 		const state: PersistState = {
@@ -67,8 +67,9 @@ function* load() {
 				status: 'pending',
 				deploymentInformationId: '1'
 			}],
+			pendingFiles: [],
 		};
-		yield put(loadState(state))
+		yield put(crudInit(state))
 	}
 
 

@@ -47,4 +47,9 @@ export interface PersistState {
 	repo: Repo[],
 	deploymentInformation: DeploymentInformation[],
 	deployment: Deployment[],
+	pendingFiles: PendingUploadedFile[],
+}
+export interface PendingUploadedFile {
+	token: string,
+	outputFile: string | null,
 }

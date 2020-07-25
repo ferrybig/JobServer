@@ -37,7 +37,7 @@ type ActionType = BaseActions<any, any, any>['type'];
 type ActionTypes = Record<ActionType, string | null>;
 
 type FilterOnType<B, T> = B extends T ? B : never;
-type RemapType<A extends {type: any}, T extends Record<A['type'], string | null>> = Pick<A, Exclude<keyof A, 'type'>> & { type: T[A['type']] };
+type RemapType<A extends { type: any }, T extends Record<A['type'], string | null>> = A extends never ? never : Pick<A, Exclude<keyof A, 'type'>> & { type: T[A['type']] };
 type AddTypeFromReturnType<F extends (...args: any) => {type: any}> = F extends (...args: any) => {type: infer T} ? F & { type: T } : never;
 type RemoveNullType<F> = F extends (...args: any) => { type: null } ? never : F;
 
@@ -50,9 +50,12 @@ export interface CrudState<T, I extends ValidKeyof> {
 interface CrudStore<D extends Definition, A extends ActionTypes> {
 	selectors: {
 		get<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], ReturnType<D[M]>> }, module: M, key: ReturnType<D[M]> | null): Parameters<D[M]>[0];
-		getOrNull<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], ReturnType<D[M]>> }, module: M, key: ReturnType<D[M]> | null): Parameters<D[M]>[0];
-		exists<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], ReturnType<D[M]>> }, module: M, key: ReturnType<D[M]> | null): boolean;
-		allKeys<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], ReturnType<D[M]>> }, module: M): ReturnType<D[M]>[];
+		getOrNull<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], ReturnType<D[M]>> }, module: M, key: ReturnType<D[M]> | null): Parameters<D[M]>[0] | null;
+		exists<M extends keyof D>(state: { [S in M]: CrudState<any, ReturnType<D[M]>> }, module: M, key: ReturnType<D[M]> | null): boolean;
+		size<M extends keyof D>(state: { [S in M]: CrudState<any, any> }, module: M): number;
+		allKeys<M extends keyof D>(state: { [S in M]: CrudState<any, ReturnType<D[M]>> }, module: M): ReturnType<D[M]>[];
+		find<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], any> }, module: M, pattern: (input: Parameters<D[M]>[0]) => boolean): Parameters<D[M]>[0] | null;
+		filter<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], any> }, module: M, pattern: (input: Parameters<D[M]>[0]) => boolean): Parameters<D[M]>[0][];
 	},
 	actions: {
 		[K in Exclude<BaseActions<keyof D, any, any>['type'], 'init'>]: AddTypeFromReturnType<RemoveNullType<<M extends keyof D>(
@@ -103,8 +106,28 @@ const DEFAULT_SELECTORS = {
 		const value = key === null ? undefined : state[module].entities[key];
 		return value !== undefined;
 	},
-	allKeys: <M extends ValidKeyof, I extends ValidKeyof>(state: { [S in M]: CrudState<any, I> }, module: M): I[] => {
+	size: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M): number => {
+		return state[module].byId.length;
+	},
+	allKeys: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M): I[] => {
 		return state[module].byId
+	},
+	find: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, pattern: (input: T) => boolean): T | null => {
+		for(const id of state[module].byId) {
+			if (pattern(state[module].entities[id]!)) {
+				return state[module].entities[id]!;
+			}
+		}
+		return null;
+	},
+	filter: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, pattern: (input: T) => boolean): T[] => {
+		const res: T[] = [];
+		for(const id of state[module].byId) {
+			if (pattern(state[module].entities[id]!)) {
+				res.push(state[module].entities[id]!);
+			}
+		}
+		return res;
 	},
 };
 
@@ -135,7 +158,8 @@ function makeReducer<
 			newState.entities[key] = action.payload;
 			return newState;
 		} else if (checkMappedActionType(actionTypes, action, 'delete', module)) {
-			const existingValue = state.entities[action.payload];
+			const key = action.payload as I;
+			const existingValue = state.entities[key];
 			if (existingValue === undefined) {
 				return state;
 			}
@@ -144,12 +168,12 @@ function makeReducer<
 				entities: { ...state.entities },
 				byId: [...state.byId],
 			};
-			const index = newState.byId.indexOf(action.payload);
+			const index = newState.byId.indexOf(key);
 			if (index < 0) {
 				throw new Error('Inconsistent state! key was found in entity map, but not in byId map');
 			}
 			newState.byId.splice(index, 1);
-			delete newState.entities[action.payload];
+			delete newState.entities[key];
 			return newState;
 		} else if (checkMappedActionType(actionTypes, action, 'init', module)) {
 			return action.payload[module] ? {
@@ -158,7 +182,7 @@ function makeReducer<
 				byId: (action.payload[module] as P[]).map(getKey),
 			} : state;
 		} else if (checkMappedActionType(actionTypes, action, 'update', module)) {
-			const key = action.payload.id;
+			const key = action.payload.id as I;
 			const existingValue = state.entities[key];
 			if (existingValue === undefined) {
 				//console.warn('Throwing away');
@@ -171,11 +195,11 @@ function makeReducer<
 			}
 			newState.entities[key] = {
 				...existingValue,
-				...action.payload.data,
+				...(action.payload.data as Partial<P>),
 			} as P
 			return newState;
 		} else if (checkMappedActionType(actionTypes, action, 'concat', module)) {
-			const key = action.payload.id;
+			const key = action.payload.id as I;
 			const existingValue = state.entities[key];
 			if (existingValue === undefined) {
 				//console.warn('Throwing away');
@@ -189,7 +213,17 @@ function makeReducer<
 			newState.entities[key] = {
 				...existingValue,
 				[action.payload.field]: (existingValue as P)[action.payload.field] + action.payload.data,
-			} as P
+			} as P;
+			const newKey = getKey(newState.entities[key]!);
+			if (newKey !== key) {
+				// The key got modified!! Handle just in case
+				const index = newState.byId.indexOf(key);
+				if (index < 0) {
+					throw new Error('Inconsistent state! key was found in entity map, but not in byId map');
+				}
+				newState.byId = [...state.byId];
+				newState.byId[index] = newKey;
+			}
 			return newState;
 		} else {
 			return state;
@@ -202,16 +236,24 @@ function makeAction<F, T>(actionCreator: F, type: T): F & { type: T } {
 	return (actionCreator as F & { type: T });
 }
 
+export const DEFAULT_ACTION_TYPES = {
+	persist: 'persist',
+	delete: 'delete',
+	update: 'update',
+	concat: 'concat',
+	init: 'init',
+} as const
+
 export default function makeCrudModules<D extends Definition, A extends ActionTypes>(definitions: D, actionTypes: A): CrudStore<D, A> {
 	const actions: {
 		[K in Exclude<BaseActions<keyof D, any, any>['type'], 'init'>]: <M extends keyof D>(
 			module: M,
 			payload: FilterOnType<BaseActions<M, ReturnType<D[M]>, Parameters<D[M]>[0]>, { type: K }>['payload']
-		) => RemapType<FilterOnType<BaseActions<M, ReturnType<D[M]>, Parameters<D[M]>[0]>, { type: K }>, A>
+		) => RemapType<FilterOnType<BaseActions<M, ReturnType<D[M]>, Parameters<D[M]>[0]>, { type: K }>, A> & { type: string | null }
 	} & {
 		[K in 'init']: (initMap: {
 			[M in keyof D]: Parameters<D[M]>[0][] | undefined
-		}) => RemapType<FilterOnType<BaseActions<keyof D, Parameters<D[keyof D]>, ReturnType<D[keyof D]>>, { type: 'init' }>, A>
+		}) => RemapType<FilterOnType<BaseActions<keyof D, Parameters<D[keyof D]>, ReturnType<D[keyof D]>>, { type: 'init' }>, A> & { type: string | null }
 	} = {
 		persist: makeAction((module, payload) => ({
 			module,
@@ -246,49 +288,7 @@ export default function makeCrudModules<D extends Definition, A extends ActionTy
 	};
 }
 
-
-const test = makeCrudModules({
-	store: (n: number) => n.toString(),
-	blag: (n: {
-		id: string,
-		test: string,
-		n: number,
-	}) => n.id,
-}, {
-	persist: 'p',
-	delete: 'd',
-	update: 'u',
-	init: 'i',
-	concat: 'c'
-} as const);
-
-test.actions.persist
-type T = Parameters<typeof test.actions.persist>[1];
-
-test.actions.persist('store', 7)
-const v = test.actions.persist('blag', {
-	id: 'ddd',
-	test: 'sss',
-	n: 1234
-})
-
-type V = (typeof v)['type']
-
-
-const t = test.actions.init({
-	blag: [{
-		id: 'ssss',
-		test: 'ss',
-		n: 99
-	}],
-	store: [1,2,3,4],
-})
-t.type
-
-test.actions.concat('blag', {
-	id: '1234',
-	field: 'test',
-	data: '+123'
-})
-
-type Z = (typeof test.actions.concat)
+export function keyByField<F extends ValidKeyof>(field: F): <P extends { [K in F]: ValidKeyof }>() => (entity: P) => P[F] {
+	return () => (entity) => entity[field];
+}
+export const keyById = keyByField('id');
