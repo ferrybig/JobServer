@@ -1,10 +1,11 @@
 import { createServer } from "http";
-import express from "express";
+import express, {Request, Response, NextFunction} from "express";
 import WebSocket from "ws";
 import url from 'url';
 import './polyfill';
 import store from "./store";
 import { connectionWorker, connectionClient } from "./store/actions";
+import uploadPage from "./pages/upload";
 
 
 const app = express();
@@ -36,15 +37,15 @@ const webSocketServer = new WebSocket.Server({
 });
 
 server.on('upgrade', function upgrade(request, socket, head) {
-  const pathname = url.parse(request.url).pathname;
+	const pathname = url.parse(request.url).pathname;
 
-  if (pathname === '/io/' || pathname === '/follow/') {
-    webSocketServer.handleUpgrade(request, socket, head, function done(ws) {
-      webSocketServer.emit('connection', ws, request);
-    });
-  } else {
-    socket.destroy();
-  }
+	if ((pathname || '').startsWith('/worker/') || pathname === '/follow/') {
+		webSocketServer.handleUpgrade(request, socket, head, function done(ws) {
+			webSocketServer.emit('connection', ws, request);
+		});
+	} else {
+		socket.destroy();
+	}
 });
 webSocketServer.on("connection", (webSocket, req) => {
 	if (!req.url) {
@@ -53,13 +54,15 @@ webSocketServer.on("connection", (webSocket, req) => {
 	if (!req.socket.remoteAddress) {
 		throw new Error('Request missing req.socket.remoteAddress');
 	}
-	if (req.url.startsWith('/io/')) {
+	if (req.url.startsWith('/worker/')) {
 		const workerId = req.url.substring('/worker/'.length);
-		if (workerId.length === 0) {
-			store.dispatch(connectionWorker(webSocket, req.socket.remoteAddress, workerId));
+		if (workerId.length !== 0) {
+			store.dispatch(connectionWorker(webSocket, req.socket.remoteAddress, workerId, "http://localhost:5000/"));
 		}
 	}
 	
 });
+
+app.put('/uploads/:token', uploadPage)
 
 server.listen(port, () => console.info(`Server running on port: ${port}`));

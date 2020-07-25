@@ -8,7 +8,7 @@ function* spawnWorker(workerUrl: string, taskRunner: TaskRunner): SagaIterator {
 	yield call(buildSaga, workerUrl, taskRunner);
 }
 function* spawnWorkers(): SagaIterator {
-	const workers = ['http://localhost:5001/worker/SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'];
+	const workers = ['http://localhost:5000/worker/111'];
 	const repoPath = '/home/fernando/Documents/Dev/Private/JobServer/repos';
 	const repoAccessor: RepoAccessor = yield call((repoPath: string) => new RepoAccessor(repoPath), repoPath);
 	const taskRunner: TaskRunner = yield call((repoAccessor: RepoAccessor) => new TaskRunner(repoAccessor), repoAccessor);

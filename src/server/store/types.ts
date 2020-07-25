@@ -9,8 +9,6 @@ export interface Worker {
 
 export interface Task {
 	id: string
-	buildScript: Command[],
-	commit: string,
 	outputFile: string | null,
 	workerId: string | null;
 	status: 'init' | 'approved' | 'running' | 'uploading' | 'success' | 'error' | 'timeout' | 'cancelled',
@@ -30,13 +28,14 @@ export interface Repo {
 }
 export interface Deployment {
 	id: string
+	commit: string,
 	outputDir: string | null,
 	status: 'pending' | 'success' | 'error' | 'cancelled'
 	deploymentInformationId: DeploymentInformation['id']
 }
 export interface DeploymentInformation {
 	id: string
-	branch: string,
+	branch: string | null,
 	outputDir: string | null,
 	repoId: Repo['id'],
 }
@@ -51,5 +50,6 @@ export interface PersistState {
 }
 export interface PendingUploadedFile {
 	token: string,
-	outputFile: string | null,
+	outputFile: string,
+	fileSize: number,
 }

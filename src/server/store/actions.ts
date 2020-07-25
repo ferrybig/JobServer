@@ -3,11 +3,10 @@ import action from "../../common/utils/ActionCreator";
 import {Worker, Task, Repo, Deployment, DeploymentInformation, TaskInformation, PersistState } from './types'
 import {actions as crudActions} from './crud';
 
-export const connectionWorker = action('connectionWorker', (webSocket: NodeWebSocket, ip: string, workerToken: string, ) => ({ webSocket, ip, workerToken }));
+export const connectionWorker = action('connectionWorker', (webSocket: NodeWebSocket, ip: string, workerToken: string, baseUrl: string) => ({ webSocket, ip, workerToken, baseUrl }));
 export const connectionClient = action('connectionClient', (webSocket: NodeWebSocket, ip: string) => ({ webSocket, ip }));
 
 export const workerAwaitsTask = action('workerAwaitsTask', (workerId: Worker['id']) => workerId);
-export const workerAllocatedTask = action('workerAwaitsTask', (workerId: Worker['id']) => workerId);
 export const workerDisconnected = action('workerDisconnected', (workerId: Worker['id']) => workerId);
 
 export const crudPersist = crudActions.persist;

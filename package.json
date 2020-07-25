@@ -9,7 +9,7 @@
   "scripts": {
     "worker-test-1": "tsc src/worker/test.ts --outDir build/ --esModuleInterop --lib dom,dom.iterable,esnext && node build/worker/test.js",
     "worker-run": "tsc src/worker/index.ts --outDir build/ --esModuleInterop --lib dom,dom.iterable,esnext && node build/worker/index.js",
-    "server-run": "tsc src/server/index.ts --outDir build/ --esModuleInterop --lib dom,dom.iterable,esnext && node build/server/index.js"
+    "server-run": "tsc src/server/index.ts --outDir build/ --downlevelIteration true --esModuleInterop --lib dom,dom.iterable,esnext && node build/server/index.js"
   },
   "author": "",
   "license": "ISC",

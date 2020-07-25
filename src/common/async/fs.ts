@@ -7,3 +7,5 @@ export const access = promises.access;
 export const open = promises.open;
 export const read = promises.read;
 export const stat = promises.stat;
+export const truncate = promises.truncate;
+export const mkdir = promises.mkdir;

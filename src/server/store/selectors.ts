@@ -1,7 +1,8 @@
 import { State } from './reducer';
-import { PersistState } from './types';
+import { PersistState, Task } from './types';
 import {selectors as crudSelectors} from './crud'
 import {CrudState} from '../../common/utils/crudStore';
+import {BuildTask} from '../../common/types';
 
 export const get = crudSelectors.get;
 export const getOrNull = crudSelectors.getOrNull;
@@ -24,4 +25,32 @@ export function computePersistState(state: State): PersistState {
 		deployment: map(state.deployment),
 		pendingFiles: map(state.pendingFiles),
 	}
+}
+
+export function taskToBuildTask(state: Pick<State, 'taskInformation' | 'deployment' | 'repo' | 'deploymentInformation'>, task: Task): BuildTask  {
+	const taskInformation = get(state, 'taskInformation', task.taskInformationId);
+	const deployment = get(state, 'deployment', task.deploymentId);
+	const deploymentInformation = get(state, 'deploymentInformation', deployment.deploymentInformationId);
+	const repo = get(state, 'repo', deploymentInformation.repoId);
+	return {
+		id: task.id,
+		buildScript: taskInformation.buildScript,
+		repo: {
+			url: repo.url,
+			commit: deployment.commit,
+			branch: deploymentInformation.branch,
+		}
+	}
+}
+
+export function findNextPendingTask(state: Pick<State, 'task'>): Task | null {
+	const allIds = allKeys(state, 'task');
+	// Newer tasks hould be more important, might want to add a config flag for this
+	for (let i = allIds.length - 1; i >= 0; i--) {
+		const task = get(state, 'task', allIds[i]);
+		if (task.status === 'approved' && task.workerId === null) {
+			return task;
+		}
+	}
+	return null;
 }

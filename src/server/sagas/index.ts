@@ -4,6 +4,7 @@ import handleWorkerConnection from "./worker";
 import {take} from "../../common/utils/effects";
 import {spawn, fork, join, call} from "redux-saga/effects";
 import handlePersist from "./persist";
+import taskDistributer from "./worker/taskDistributer";
 
 function* spawnHelper(toKill: Task | undefined, action: ReturnType<typeof connectionWorker>) {
 	if (toKill) {
@@ -32,4 +33,5 @@ function* startWorkerListener(): SagaIterator {
 export default function* mainSaga(): SagaIterator {
 	yield fork(handlePersist);
 	yield fork(startWorkerListener);
+	yield fork(taskDistributer);
 }

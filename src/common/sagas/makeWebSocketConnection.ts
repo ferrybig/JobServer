@@ -3,7 +3,7 @@ import {Channel, END, SagaIterator, EventChannel, channel, eventChannel} from 'r
 import {takeMaybe, apply, call, spawn} from 'redux-saga/effects';
 import onEvent from '../utils/onEvent';
 
-function* spawnSocketHelper(socket: WebSocket | NodeWebSocket, channel: Channel<string>) {
+function* spawnSocketHelper(socket: NodeWebSocket, channel: Channel<string>) {
 	while (true) {
 		const packet = yield takeMaybe(channel);
 		if (packet === END) {
@@ -11,19 +11,19 @@ function* spawnSocketHelper(socket: WebSocket | NodeWebSocket, channel: Channel<
 			return;
 		} else {
 			console.log('Send: ' + packet);
-			yield apply(socket, socket.send, [packet]);
+			yield call(() => socket.send(packet))
 		}
 	}
 }
 
-export default function* makeWebSocketChannel(url: string | WebSocket | NodeWebSocket): SagaIterator<readonly [EventChannel<string>, Channel<string>]> {
+export default function* makeWebSocketChannel(url: string | NodeWebSocket): SagaIterator<readonly [EventChannel<string>, Channel<string>]> {
 	const outgoing: Channel<string> = yield call(channel);
-	const socket = typeof url === 'string' ? new WebSocket(url) : url;
+	const socket = typeof url === 'string' ? new NodeWebSocket(url) : url;
 	let error: string | null = null;
 	const incoming = eventChannel<string>(emitter => {
 		return onEvent(socket, {
 			close(e) {
-				console.warn('Close', e);
+				console.warn('Close', e.code,  e.reason);
 				error = e.reason;
 				emitter(END); // Close incoming channel
 				outgoing.close(); // Close outging channel

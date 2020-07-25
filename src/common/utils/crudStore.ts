@@ -152,7 +152,7 @@ function makeReducer<
 				...state,
 				entities: { ...state.entities },
 			}
-			if (existingValue !== undefined) {
+			if (existingValue === undefined) {
 				newState.byId = [...state.byId, key]; // This is an insertion, not an update
 			}
 			newState.entities[key] = action.payload;
@@ -176,11 +176,18 @@ function makeReducer<
 			delete newState.entities[key];
 			return newState;
 		} else if (checkMappedActionType(actionTypes, action, 'init', module)) {
-			return action.payload[module] ? {
+			if(!action.payload[module]) {
+				return state;
+			}
+			const newState = {
 				...state,
 				entities: Object.fromEntries((action.payload[module] as P[]).map((e): [I, P] => [getKey(e), e])) as Record<I, P>,
 				byId: (action.payload[module] as P[]).map(getKey),
-			} : state;
+			}
+			if (Object.keys(newState.entities).length !== newState.byId.length) {
+				throw new Error('Dublicate ID detected');
+			}
+			return newState;
 		} else if (checkMappedActionType(actionTypes, action, 'update', module)) {
 			const key = action.payload.id as I;
 			const existingValue = state.entities[key];

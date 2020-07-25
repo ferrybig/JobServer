@@ -67,6 +67,7 @@ export default class UpstreamConnection {
 	private sendMessage(packet: WorkerToServerPacket) {
 		try {
 			if (this.isConnected) {
+				console.debug('S<C: ' + JSON.stringify(packet));
 				this.socket.send(JSON.stringify(packet))
 			}
 		} catch(e) {
@@ -118,6 +119,7 @@ export default class UpstreamConnection {
 			this.sendPacketForState();
 		})
 		connection.addEventListener('message', (e) => {
+			console.debug('S>C: ' + e.data);
 			const packet: ServerToWorkerPacket = JSON.parse(e.data);
 			switch (packet.type) {
 				case 'taskReceived':
@@ -137,7 +139,10 @@ export default class UpstreamConnection {
 					break;
 				case 'taskStartUpload':
 					if (this.state.type === 'uploading') {
-						this.startUpload(packet.payload.offset, packet.payload.url)
+						this.startUpload(packet.payload.offset, packet.payload.url).catch((e) => {
+							console.error('Error during uploading: ', e);
+
+						})
 					} else {
 						throw new Error('Invalid state for received packet');
 					}
@@ -161,6 +166,9 @@ export default class UpstreamConnection {
 
 			}
 		})
+		connection.addEventListener('error', (e) => {
+			console.error(e.type + ': ' + e.message);
+		});
 		connection.addEventListener('close', (e) => {
 			this.isConnected = false;
 			if (this.state.type === 'executing-task') {
@@ -198,10 +206,10 @@ export default class UpstreamConnection {
 				const buf = Buffer.alloc(CHUNK_SIZE);
 				let lastRead: number;
 				for (let currentOffset = offset; currentOffset < state.data.fileSize; currentOffset += lastRead) {
-					const res = await fd.read(buf);
+					const res = await fd.read(buf, 0, buf.length, currentOffset);
 					lastRead = res.bytesRead;
 					if (lastRead !== CHUNK_SIZE && state.data.fileSize - lastRead > currentOffset) {
-						console.warn('Read only red' + lastRead + ' bytes, not the expected ' + CHUNK_SIZE);
+						throw new Error('Read only read ' + lastRead + ' bytes, not the expected ' + CHUNK_SIZE);
 					}
 					const result = await fetch(url, {
 						method: 'put',

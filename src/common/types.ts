@@ -18,5 +18,5 @@ export interface BuildTask {
 export interface RepoDescription {
 	url: string,
 	commit: string,
-	branch: string,
+	branch: string | null,
 }

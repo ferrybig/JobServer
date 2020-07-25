@@ -1,17 +1,18 @@
-import NodeWebSocket from 'ws';
-import {CallEffect, call, fork, put, select} from 'redux-saga/effects';
+import {CallEffect, call, fork, put, select, cancel} from 'redux-saga/effects';
 import {SagaIterator, EventChannel, Channel} from 'redux-saga';
+import {Stats} from 'fs';
+import {v4 as uuid} from 'uuid'
 import {TaskRequest, TaskFinished, TaskError, WorkerToServerPacket, ServerToWorkerPacket, PingPacket} from '../../../common/packets';
-import {Worker, Task} from '../../store/types';
+import {Worker, Task, PendingUploadedFile, Deployment} from '../../store/types';
 import makeWebSocketChannel from '../../../common/sagas/makeWebSocketConnection';
 import timeoutHandler from './timeoutHandler';
-import {workerDisconnected, crudUpdate, crudConcat} from '../../store/actions';
-import {getOrNull, get} from '../../store/selectors';
+import {workerDisconnected, crudUpdate, crudConcat, crudPersist, connectionWorker, crudDelete, workerAwaitsTask} from '../../store/actions';
+import {getOrNull, get, find, filter, taskToBuildTask} from '../../store/selectors';
 import {take} from '../../../common/utils/effects';
 import assertNever from '../../../common/utils/assertNever';
 import {BuildTask} from '../../../common/types';
-import {stat} from '../../../common/async/fs';
-import {Stats} from 'fs';
+import {stat, truncate} from '../../../common/async/fs';
+import actionMatching from '../../../common/utils/actionMatching';
 
 type FilterAway<B, T> = B extends T ? never : B;
 
@@ -29,16 +30,75 @@ function* receivePacket(socket: Socket): SagaIterator<WorkerToServerPacketNoPing
 function* sendPacket(socket: Socket, packet: ServerToWorkerPacket): SagaIterator<void> {
 	yield put(socket.outgoing, JSON.stringify(packet));
 }
-function* getOrCreatePendingFileForTask(task: Task) {
-	if (task.outputFile === null) {
-		throw new Error('Cannot create pending file for null output');
+
+function* pingHandler(socket: Socket): SagaIterator<never> {
+	const packet = yield call(receivePacket, socket);
+	throw new Error('Expected only pong packets at this moment: ' + packet);
+}
+
+function* tryUpdateDeployment(deploymentId: Deployment['id']) {
+	const deployment: Deployment = yield select(get, 'deployment', deploymentId);
+	const subTasks: Task[] = yield select(s => filter(s, 'task', t => t.deploymentId === deploymentId));
+	let newStatus: Deployment['status'] = 'success';
+	taskLoop: for (const task of subTasks) {
+		switch (task.status) {
+			case 'success':
+				// Do nothing
+				break;
+			case 'error':
+			case 'timeout':
+				newStatus = 'error';
+				break taskLoop;
+			case 'cancelled':
+				newStatus = 'cancelled';
+				break taskLoop;
+			case 'init':
+			case 'approved':
+			case 'running':
+			case 'uploading':
+				newStatus = 'pending';
+				break;
+			default:
+				return assertNever(task.status);
+		}
 	}
+	if (newStatus !== deployment.status) {
+		yield put(crudUpdate('deployment', {
+			id: deploymentId,
+			data: {
+				status: newStatus
+			},
+		}));
+	}
+}
+function* getOrCreatePendingFileForFile(outputFile: string, fileSize: number): SagaIterator<PendingUploadedFile> {
+	const pendingFile: PendingUploadedFile | null = yield select(s => find(s, 'pendingFiles', ((file: PendingUploadedFile) => file.outputFile === outputFile)));
+	if (pendingFile) {
+		if (pendingFile.fileSize !== fileSize) {
+			yield put(crudUpdate('pendingFiles', {
+				id: pendingFile.token,
+				data: {
+					fileSize: fileSize,
+				},
+			}));
+			yield call(truncate, outputFile, 0);
+		}
+		return pendingFile;
+	}
+	const newPendingFile: PendingUploadedFile = {
+		token: uuid(),
+		outputFile,
+		fileSize,
+	};
+	yield put(crudPersist('pendingFiles', newPendingFile));
+	return newPendingFile;
 }
 
 interface Socket {
 	incoming: EventChannel<string>,
 	outgoing: Channel<string>,
 	worker: Worker,
+	baseUrl: string,
 }
 function* disconnectInvalidSequence(socket: Socket, packet: WorkerToServerPacket): SagaIterator<never> {
 	throw new Error('Connection for worker ' + socket.worker.id + ' send invalid packet: ' + JSON.stringify(packet))
@@ -50,39 +110,52 @@ function* handlePing(socket: Socket, packet: PingPacket): SagaIterator<void> {
 }
 
 function* handleWaitingForTask(socket: Socket, packet: TaskRequest): SagaIterator<CallEffect> {
+	while(true) {
+		const worker: Worker = yield select(get, 'workers', socket.worker.id);
+		socket.worker = worker;
+		if (worker.currentTask !== null) {
+			break;
+		}
+		yield put(workerAwaitsTask(worker.id));
+
+		const packetHandler = yield fork(pingHandler, socket);
+		try {
+			yield take(actionMatching(crudUpdate, a => a.module === 'workers' && a.payload.id === worker.id));
+		} finally {
+			yield cancel(packetHandler)
+		}
+	}
 	// await
+	const task: Task = yield select(get, 'task', socket.worker.currentTask);
+	const buildTask: BuildTask = yield select(taskToBuildTask, task);
 	yield call(sendPacket, socket, {
 		type: 'taskReceived',
 		payload: {
-			task: {} as unknown as BuildTask, // TODO
-		}
+			task: buildTask, // TODO
+		},
 	});
-	return call(handleRunningTask, socket);
+	return call(handleRunningTask, socket, task);
 
 }
 function* handleRunningTask(socket: Socket, task: Task): SagaIterator<CallEffect> {
-	// TODO update task
-	while(true) {
-		const packet: WorkerToServerPacketNoPing = yield call(receivePacket, socket);
-		switch (packet.type) {
-			case 'taskProgressAppend':
-				yield put(crudConcat('task', {
-					id: task.id,
-					field: 'log',
-					data: packet.payload.logPart,
-				}))
-				break;
-			case 'taskFinished':
-				return call(handleUploadingTask, socket, task, packet);
-			case 'taskError':
-				return call(handleErrorTask, socket, task, packet);
-			case 'taskRequest':
-				return call(disconnectInvalidSequence, socket, packet);
-			default:
-				return assertNever(packet);
-		}
+	const packet: WorkerToServerPacketNoPing = yield call(receivePacket, socket);
+	switch (packet.type) {
+		case 'taskProgressAppend':
+			yield put(crudConcat('task', {
+				id: task.id,
+				field: 'log',
+				data: packet.payload.logPart,
+			}))
+			return call(handleRunningTask, socket, task);
+		case 'taskFinished':
+			return call(handleUploadingTask, socket, task, packet);
+		case 'taskError':
+			return call(handleErrorTask, socket, task, packet);
+		case 'taskRequest':
+			return call(disconnectInvalidSequence, socket, packet);
+		default:
+			return assertNever(packet);
 	}
-
 }
 function* handleUploadingTask(socket: Socket, task: Task, packet: TaskFinished): SagaIterator<CallEffect> {
 	yield put(crudUpdate('task', {
@@ -100,17 +173,38 @@ function* handleUploadingTask(socket: Socket, task: Task, packet: TaskFinished):
 				},
 			}))
 		}
-		const stats: Stats = yield call(stat, task.outputFile);
-		yield call(sendPacket, socket, {
-			type: 'taskStartUpload',
-			payload: {
-				taskId: task.id,
-				offset: stats.size,
-				url: 'http://...',
+		const pendingFile: PendingUploadedFile = yield call(getOrCreatePendingFileForFile, task.outputFile, packet.payload.fileSize);
+		let currentSize: number;
+		try {
+			const stats: Stats = yield call(stat, task.outputFile);
+			currentSize = stats.size;
+		} catch(e) {
+			currentSize = 0;
+		}
+		if (currentSize < pendingFile.fileSize) {
+			yield call(sendPacket, socket, {
+				type: 'taskStartUpload',
+				payload: {
+					taskId: task.id,
+					offset: currentSize,
+					url: socket.baseUrl + 'uploads/' + pendingFile.token,
+				}
+			});
+			const packetHandler = yield fork(pingHandler, socket);
+			try {
+				yield take(actionMatching(crudDelete, (a) => a.module === 'pendingFiles' && a.payload === pendingFile.token));
+			} finally {
+				yield cancel(packetHandler)
 			}
-		});
-		// TODO update task
-		// TODO wait until uploading finishes
+			// Our pending task got deleted, we are done uploading
+			const updatedTask: Task = yield select(get, 'task', task.id);
+			if (updatedTask.status !== 'uploading') {
+				// Task timed out or something else happened!
+				throw new Error('Task got modified beyond our control, status is "' + updatedTask.status + '" while we expected it to be "uploading"');
+			}
+		} else {
+			yield put(crudDelete('pendingFiles', pendingFile.token));
+		}
 	}
 	yield put(crudUpdate('task', {
 		id: task.id,
@@ -127,12 +221,20 @@ function* handleUploadingTask(socket: Socket, task: Task, packet: TaskFinished):
 	yield call(sendPacket, socket, {
 		type: 'taskResultUploaded',
 		payload: {
-			taskId: '0',
+			taskId: task.id,
 		}
 	});
+	yield call(tryUpdateDeployment, task.deploymentId);
 	return call(handleIdleTask, socket);
 }
 function* handleErrorTask(socket: Socket, task: Task, packet: TaskError): SagaIterator<CallEffect> {
+	yield put(crudUpdate('task', {
+		id: task.id,
+		data: {
+			status: 'error',
+			log: packet.payload.log,
+		},
+	}));
 	yield put(crudUpdate('workers', {
 		id: socket.worker.id,
 		data: {
@@ -146,6 +248,7 @@ function* handleErrorTask(socket: Socket, task: Task, packet: TaskError): SagaIt
 			taskId: task.id,
 		}
 	});
+	yield call(tryUpdateDeployment, task.deploymentId);
 	return call(handleIdleTask, {
 		...socket,
 		worker,
@@ -199,7 +302,7 @@ function* handleInitTask(socket: Socket): SagaIterator<CallEffect> {
 	}
 }
 
-export default function* handleWorkerConnection(data: { webSocket: NodeWebSocket, ip: string, workerToken: string }) {
+export default function* handleWorkerConnection(data: ReturnType<typeof connectionWorker>['payload']) {
 	const worker: Worker | undefined = yield select(getOrNull, 'workers', data.workerToken);
 	if (!worker) {
 		data.webSocket.terminate();
@@ -212,12 +315,13 @@ export default function* handleWorkerConnection(data: { webSocket: NodeWebSocket
 			incoming,
 			outgoing,
 			worker,
+			baseUrl: data.baseUrl,
 		});
 		while (handler) {
 			handler = yield handler;
 		}
 	} catch(e) {
-		console.error(e); // todo yield action
+		console.error('Worker error!', e); // todo yield action
 	} finally {
 		yield put(workerDisconnected(data.workerToken));
 		data.webSocket.terminate();
