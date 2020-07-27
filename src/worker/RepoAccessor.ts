@@ -27,14 +27,19 @@ export default class RepoAccessor {
 			logger('Checking out files to ' + cwd + '\n');
 		}
 		try {
+			let success = false;
 			try {
 				await access(cwd);
+				success = true;
 				await runCommand('git', ['fetch', '--all'], { cwd, logger });
-			} catch(_) {
+			} catch(e) {
+				if (success) {
+					throw e;
+				}
 				await runCommand('git', ['clone', url, cwd], { logger });
 			}
 			if (branch) {
-				await runCommand('git', ['checkout', branch], { cwd, logger });
+				await runCommand('git', ['checkout', branch.startsWith('ref/heads/') ? branch.substring('ref/heads/'.length) : branch], { cwd, logger });
 				if (commit) {
 					await runCommand('git', ['reset', '--hard', commit], { cwd, logger });
 				} else {

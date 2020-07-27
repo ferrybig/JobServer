@@ -1,4 +1,4 @@
-import {Command, RepoDescription} from "../../common/types";
+import {Command} from "../../common/types";
 
 export interface Worker {
 	id: string;
@@ -15,31 +15,43 @@ export interface Task {
 	log: string,
 	taskInformationId: TaskInformation['id'],
 	deploymentId: Deployment['id'],
+	startTime: number;
+	buildTime: number;
+	endTime: number;
 }
 export interface TaskInformation {
 	id: string
+	name: string,
 	buildScript: Command[],
-	deploymentInformationId: DeploymentInformation['id']
+	deploymentInformationId: DeploymentInformation['id'];
+	sequenceId: number;
 }
 
 export interface Repo {
 	id: string
 	url: string,
+	secret: string,
+	outputDir: string,
 }
 export interface Deployment {
-	id: string
+	id: string;
 	commit: string,
+	branch: string,
 	outputDir: string | null,
-	status: 'pending' | 'success' | 'error' | 'cancelled'
-	deploymentInformationId: DeploymentInformation['id']
+	status: 'pending' | 'success' | 'error' | 'cancelled';
+	deploymentInformationId: DeploymentInformation['id'];
+	timestamp: number;
+	sequenceId: number;
 }
 export interface DeploymentInformation {
 	id: string
-	branch: string | null,
+	name: string,
+	pattern: string,
 	outputDir: string | null,
 	repoId: Repo['id'],
 }
-export interface PersistState {
+export interface PersistStateV1 {
+	version: 'v1',
 	workers: Worker[],
 	taskInformation: TaskInformation[],
 	task: Task[],
@@ -48,6 +60,7 @@ export interface PersistState {
 	deployment: Deployment[],
 	pendingFiles: PendingUploadedFile[],
 }
+export type PersistState = PersistStateV1;
 export interface PendingUploadedFile {
 	token: string,
 	outputFile: string,

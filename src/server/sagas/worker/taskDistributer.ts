@@ -14,12 +14,13 @@ type EVENTS_CHILD = ReturnType<typeof EVENTS_CHILD[number]>;
 
 function getAny<T>(set: Set<T>): T {
 	for (const e of set) {
+		set.delete(e);
 		return e;
 	}
 	throw new Error('Set is empty');
 }
 
-export default function* taskDistributer() {
+export default function* taskDistributer(timestampService: () => number = () => Date.now()) {
 	const set = new Set<Worker['id']>();
 	let hasNewTasks = true;
 	while (true) {
@@ -52,6 +53,7 @@ export default function* taskDistributer() {
 					data: {
 						status: 'running',
 						workerId: worker,
+						startTime: timestampService(),
 					},
 				}));
 				yield put(crudUpdate('workers', {

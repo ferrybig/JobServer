@@ -12,3 +12,4 @@ function throwIfUndefined<T> (input: T): T extends undefined ? never : T {
 }
 
 export const CONFIG_PATH: string = throwIfUndefined(process.env.CONFIG);
+export const CONFIG_RESET: boolean = throwIfUndefined(process.env.CONFIG_RESET) === 'true';

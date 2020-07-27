@@ -1,26 +1,24 @@
 import {SagaIterator} from "redux-saga";
 import {computePersistState} from "../store/selectors";
-import {select, call, put} from "redux-saga/effects";
-import {PersistState} from "../store/types";
-import {CONFIG_PATH} from "../config";
+import {select, call, put, delay} from "redux-saga/effects";
+import {PersistStateV1} from "../store/types";
+import {CONFIG_PATH, CONFIG_RESET} from "../config";
 import {writeFile, readFile} from "../../common/async/fs";
 import {crudInit} from "../store/actions";
+import {take} from "../../common/utils/effects";
 
 
 function* load() {
-	try {
-
-		const contents: string = yield call(readFile, CONFIG_PATH, 'utf-8');
-		yield put(crudInit(JSON.parse(contents)))
-	} catch(e) {
-		console.warn(e);
-		const state: PersistState = {
+	if (CONFIG_RESET) {
+		const state: PersistStateV1 = {
+			version: 'v1',
 			workers: [{
 				id: '111',
 				currentTask: null,
 			}],
 			taskInformation: [{
 				id: '1',
+				name: 'Test task',
 				buildScript: [
 					'FROM mhart/alpine-node:11 AS build-stage',
 					'WORKDIR /app',
@@ -30,14 +28,17 @@ function* load() {
 					'FROM scratch AS export-stage',
 					'COPY --from=build-stage /app/build / '
 				],
-				deploymentInformationId: '1'
+				deploymentInformationId: '1',
+				sequenceId: 1,
 			}, {
 				id: '2',
+				name: 'Frontend code',
 				buildScript: [
 					'FROM scratch AS export-stage',
 					'COPY /src /'
 				],
-				deploymentInformationId: '2'
+				deploymentInformationId: '2',
+				sequenceId: 1,
 			}],
 			task: [{
 				id: '1',
@@ -47,6 +48,9 @@ function* load() {
 				log: '',
 				taskInformationId: '1',
 				deploymentId: '1',
+				startTime: 0,
+				endTime: 0,
+				buildTime: 0,
 			}, {
 				id: '2',
 				outputFile: 'output/output/repo_2/info_2/dep_2/task_2.tgz',
@@ -55,45 +59,78 @@ function* load() {
 				log: '',
 				taskInformationId: '2',
 				deploymentId: '2',
+				startTime: 0,
+				endTime: 0,
+				buildTime: 0,
 			}],
 			repo: [{
 				id: '1',
-				url: 'git@github.com:ferrybig/meet-app.git'
+				url: 'git@github.com:ferrybig/meet-app.git',
+				secret: '12345',
+				outputDir: 'output/repo_1',
 			},{
 				id: '2',
-				url: 'http://10.248.72.1:5010/.git/'
+				url: 'http://10.248.72.1:5010/.git/',
+				secret: '12345',
+				outputDir: 'output/repo_1',
 			}],
 			deploymentInformation:  [{
 				id: '1',
-				branch: 'master',
+				name: 'Master branch only',
 				outputDir: 'output/repo_1/info_1',
-				repoId: '1'
+				repoId: '1',
+				pattern: 'refs/heads/master',
 			}, {
 				id: '2',
-				branch: 'master',
+				name: 'Master branch only',
 				outputDir: 'output/repo_2/info_2',
-				repoId: '2'
+				repoId: '2',
+				pattern: 'refs/heads/master',
 			}],
 			deployment:  [{
 				commit: '6bb5463193f5ee9434585058c1dcd358517c35a6',
+				branch: 'refs/heads/master',
+				timestamp: 1,
 				id: '1',
 				outputDir: 'output/repo_1/info_1/dep_1',
 				status: 'pending',
-				deploymentInformationId: '1'
+				deploymentInformationId: '1',
+				sequenceId: 1,
 			}, {
 				commit: '6bb5463193f5ee9434585058c1dcd358517c35a6',
+				branch: 'refs/heads/master',
+				timestamp: 1,
 				id: '2',
 				outputDir: 'output/repo_2/info_2/dep_2',
 				status: 'pending',
-				deploymentInformationId: '2'
+				deploymentInformationId: '2',
+				sequenceId: 1,
 			}],
 			pendingFiles: [],
 		};
-		yield put(crudInit(state))
+		yield put(crudInit(state));
+		return;
+	}
+	try {
+
+		const contents: string = yield call(readFile, CONFIG_PATH, 'utf-8');
+		yield put(crudInit(JSON.parse(contents)))
+	} catch(e) {
+		console.warn(e);
+		yield put(crudInit({
+			workers: [],
+			task: [],
+			taskInformation: [],
+			repo: [],
+			deployment: [],
+			deploymentInformation: [],
+			pendingFiles: [],
+		}))
+		
 	}
 }
 function* save() {
-	const state: PersistState = yield select(computePersistState);
+	const state: PersistStateV1 = yield select(computePersistState);
 	yield call(writeFile, CONFIG_PATH, JSON.stringify(state, null, 4));
 }
 
@@ -101,4 +138,9 @@ function* save() {
 export default function* handlePersist(): SagaIterator {
 	yield call(load);
 	yield call(save);
+	while(true) {
+		yield take(() => true);
+		yield delay(1000);
+		yield call(save);
+	}
 }

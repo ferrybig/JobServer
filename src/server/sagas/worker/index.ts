@@ -1,5 +1,6 @@
 import {CallEffect, call, fork, put, select, cancel} from 'redux-saga/effects';
 import {SagaIterator, EventChannel, Channel} from 'redux-saga';
+import crypto from 'crypto';
 import {Stats} from 'fs';
 import {v4 as uuid} from 'uuid'
 import {TaskRequest, TaskFinished, TaskError, WorkerToServerPacket, ServerToWorkerPacket, PingPacket} from '../../../common/packets';
@@ -62,6 +63,7 @@ function* tryUpdateDeployment(deploymentId: Deployment['id']) {
 				return assertNever(task.status);
 		}
 	}
+	// TLDR: If all tasks are success, the deployment is a success, if any task is cancelled/errored/timedout, the deployment is a failure
 	if (newStatus !== deployment.status) {
 		yield put(crudUpdate('deployment', {
 			id: deploymentId,
@@ -157,11 +159,12 @@ function* handleRunningTask(socket: Socket, task: Task): SagaIterator<CallEffect
 			return assertNever(packet);
 	}
 }
-function* handleUploadingTask(socket: Socket, task: Task, packet: TaskFinished): SagaIterator<CallEffect> {
+function* handleUploadingTask(socket: Socket, task: Task, packet: TaskFinished, timestampService: () => number = () => Date.now()): SagaIterator<CallEffect> {
 	yield put(crudUpdate('task', {
 		id: task.id,
 		data: {
 			log: packet.payload.log,
+			buildTime: timestampService(),
 		},
 	}));
 	if (packet.payload.fileSize > 0 && task.outputFile !== null) {
@@ -210,6 +213,7 @@ function* handleUploadingTask(socket: Socket, task: Task, packet: TaskFinished):
 		id: task.id,
 		data: {
 			status: 'success',
+			endTime: timestampService(),
 		},
 	}));
 	yield put(crudUpdate('workers', {
@@ -227,12 +231,14 @@ function* handleUploadingTask(socket: Socket, task: Task, packet: TaskFinished):
 	yield call(tryUpdateDeployment, task.deploymentId);
 	return call(handleIdleTask, socket);
 }
-function* handleErrorTask(socket: Socket, task: Task, packet: TaskError): SagaIterator<CallEffect> {
+function* handleErrorTask(socket: Socket, task: Task, packet: TaskError, timestampService: () => number = () => Date.now()): SagaIterator<CallEffect> {
 	yield put(crudUpdate('task', {
 		id: task.id,
 		data: {
 			status: 'error',
 			log: packet.payload.log,
+			endTime: timestampService(),
+			buildTime: timestampService(),
 		},
 	}));
 	yield put(crudUpdate('workers', {

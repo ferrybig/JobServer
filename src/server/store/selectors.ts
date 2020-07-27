@@ -1,5 +1,5 @@
 import { State } from './reducer';
-import { PersistState, Task } from './types';
+import { PersistStateV1, Task } from './types';
 import {selectors as crudSelectors} from './crud'
 import {CrudState} from '../../common/utils/crudStore';
 import {BuildTask} from '../../common/types';
@@ -12,11 +12,12 @@ export const size = crudSelectors.size;
 export const find = crudSelectors.find;
 export const filter = crudSelectors.filter;
 
-export function computePersistState(state: State): PersistState {
+export function computePersistState(state: State): PersistStateV1 {
 	function map<E, I extends string | number>(state: CrudState<E, I>): E[] {
 		return state.byId.map(i => state.entities[i]!);
 	}
 	return {
+		version: 'v1',
 		workers: map(state.workers),
 		taskInformation: map(state.taskInformation),
 		task: map(state.task),
@@ -38,7 +39,7 @@ export function taskToBuildTask(state: Pick<State, 'taskInformation' | 'deployme
 		repo: {
 			url: repo.url,
 			commit: deployment.commit,
-			branch: deploymentInformation.branch,
+			branch: deployment.branch,
 		}
 	}
 }
