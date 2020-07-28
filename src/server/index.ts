@@ -6,6 +6,7 @@ import './polyfill';
 import store from "./store";
 import { connectionWorker, connectionClient } from "./store/actions";
 import uploadPage from "./pages/upload";
+import webhookPage from "./pages/webhook";
 
 
 const app = express();
@@ -63,6 +64,7 @@ webSocketServer.on("connection", (webSocket, req) => {
 	
 });
 
-app.put('/uploads/:token', uploadPage)
+app.put('/uploads/:token', uploadPage);
+app.post('/webhook/:repo', webhookPage);
 
 server.listen(port, () => console.info(`Server running on port: ${port}`));

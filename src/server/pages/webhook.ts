@@ -90,7 +90,7 @@ export default makeWebhookHandler((req) => {
 				}));
 			}
 
-			res.statusCode = 20;
+			res.statusCode = 200;
 			res.send('Matched deployments: ' + matchedDeploymentInformations.length);
 			break;
 		case '?':

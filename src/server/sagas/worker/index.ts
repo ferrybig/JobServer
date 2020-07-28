@@ -6,7 +6,7 @@ import {v4 as uuid} from 'uuid'
 import {TaskRequest, TaskFinished, TaskError, WorkerToServerPacket, ServerToWorkerPacket, PingPacket} from '../../../common/packets';
 import {Worker, Task, PendingUploadedFile, Deployment} from '../../store/types';
 import makeWebSocketChannel from '../../../common/sagas/makeWebSocketConnection';
-import timeoutHandler from './timeoutHandler';
+import timeoutHandler from '../timeoutHandler';
 import {workerDisconnected, crudUpdate, crudConcat, crudPersist, connectionWorker, crudDelete, workerAwaitsTask} from '../../store/actions';
 import {getOrNull, get, find, filter, taskToBuildTask} from '../../store/selectors';
 import {take} from '../../../common/utils/effects';
@@ -14,6 +14,7 @@ import assertNever from '../../../common/utils/assertNever';
 import {BuildTask} from '../../../common/types';
 import {stat, truncate} from '../../../common/async/fs';
 import actionMatching from '../../../common/utils/actionMatching';
+import pickFirstNonNullCount from '../../../common/utils/pickFirstNonNullCount';
 
 type FilterAway<B, T> = B extends T ? never : B;
 
@@ -40,29 +41,16 @@ function* pingHandler(socket: Socket): SagaIterator<never> {
 function* tryUpdateDeployment(deploymentId: Deployment['id']) {
 	const deployment: Deployment = yield select(get, 'deployment', deploymentId);
 	const subTasks: Task[] = yield select(s => filter(s, 'task', t => t.deploymentId === deploymentId));
-	let newStatus: Deployment['status'] = 'success';
-	taskLoop: for (const task of subTasks) {
-		switch (task.status) {
-			case 'success':
-				// Do nothing
-				break;
-			case 'error':
-			case 'timeout':
-				newStatus = 'error';
-				break taskLoop;
-			case 'cancelled':
-				newStatus = 'cancelled';
-				break taskLoop;
-			case 'init':
-			case 'approved':
-			case 'running':
-			case 'uploading':
-				newStatus = 'pending';
-				break;
-			default:
-				return assertNever(task.status);
-		}
-	}
+	let newStatus: Deployment['status'] = pickFirstNonNullCount(subTasks, 'status', {
+		init: 'pending',
+		success: 'success',
+		error: 'error',
+		cancelled: 'cancelled',
+		approved: 'pending',
+		running: 'pending',
+		uploading: 'pending',
+		timeout: 'error',
+	}, ['error', 'pending', 'cancelled', 'success'] as const, 'pending' as const)[0];
 	// TLDR: If all tasks are success, the deployment is a success, if any task is cancelled/errored/timedout, the deployment is a failure
 	if (newStatus !== deployment.status) {
 		yield put(crudUpdate('deployment', {
@@ -316,7 +304,7 @@ export default function* handleWorkerConnection(data: ReturnType<typeof connecti
 	}
 	const [incoming, outgoing]: [EventChannel<string>, Channel<string>] = yield call(makeWebSocketChannel, data.webSocket);
 	try {
-		yield fork(timeoutHandler, data.webSocket, outgoing);
+		yield fork(timeoutHandler, data.webSocket);
 		let handler = call(handleInitTask, {
 			incoming,
 			outgoing,

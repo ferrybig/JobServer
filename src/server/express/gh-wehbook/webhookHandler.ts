@@ -88,13 +88,12 @@ export default function makeWebhookHandler<T>(
 			body += e;
 		})
 		req.on('end', () => {
-			console.log(body);
 			const expectedSignature = `sha1=${crypto
 				.createHmac('sha1', token)
 				.update(body)
 				.digest('hex')}`;
 			if (expectedSignature !== actualSignature) {
-				// Todo, add a config flag for this
+				// Todo, add a config flag for this warning
 				console.warn('signatures do not match: ', expectedSignature, actualSignature);
 				// Send a 404, so the other side does not realise this mistake
 				res.statusCode = 404;

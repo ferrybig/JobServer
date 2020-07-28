@@ -35,7 +35,7 @@ export default function uploadPage(req: Request, res: Response, next: NextFuncti
 			fd.close();
 			if (offset > file.fileSize) {
 				res.statusCode = 400;
-				res.send('To many bytes written! ' + offset + ' vs ' + file.fileSize);
+				res.send('Too many bytes written! ' + offset + ' vs ' + file.fileSize);
 			} else {
 				res.statusCode = 204;
 				res.send();

@@ -22,8 +22,10 @@ function* load() {
 				buildScript: [
 					'FROM mhart/alpine-node:11 AS build-stage',
 					'WORKDIR /app',
-					'COPY . .',
+					'COPY package.json .',
+					'COPY package-lock.json .',
 					'RUN npm install',
+					'COPY . .',
 					'RUN npm run client-build',
 					'FROM scratch AS export-stage',
 					'COPY --from=build-stage /app/build / '
@@ -39,6 +41,23 @@ function* load() {
 				],
 				deploymentInformationId: '2',
 				sequenceId: 1,
+			}, {
+				id: '3',
+				name: 'Frontend build',
+				buildScript: [
+					'FROM mhart/alpine-node:11 AS build-stage',
+					'WORKDIR /app',
+					'COPY package.json .',
+					'COPY package-lock.json .',
+					'RUN npm install',
+					'COPY . .',
+					'RUN npm install',
+					'RUN npm run client-build',
+					'FROM scratch AS export-stage',
+					'COPY --from=build-stage /app/build / '
+				],
+				deploymentInformationId: '2',
+				sequenceId: 2,
 			}],
 			task: [{
 				id: '1',
@@ -48,17 +67,6 @@ function* load() {
 				log: '',
 				taskInformationId: '1',
 				deploymentId: '1',
-				startTime: 0,
-				endTime: 0,
-				buildTime: 0,
-			}, {
-				id: '2',
-				outputFile: 'output/output/repo_2/info_2/dep_2/task_2.tgz',
-				workerId: null,
-				status: 'approved',
-				log: '',
-				taskInformationId: '2',
-				deploymentId: '2',
 				startTime: 0,
 				endTime: 0,
 				buildTime: 0,
