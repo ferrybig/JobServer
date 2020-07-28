@@ -72,7 +72,7 @@ export default function makeWebhookHandler<T>(
 		}
 		const secret = getSecret(req);
 		if (!secret) {
-			// Send error after consuming the body, this way the other side does not know the difference between signature failure and a missing signature;
+			// Send error after consuming the body, this way the other side does not know the difference between signature failure and a missing secret;
 			req.on('end', () => {
 				res.statusCode = 404;
 				res.send('');
@@ -86,7 +86,7 @@ export default function makeWebhookHandler<T>(
 		req.setEncoding('utf-8')
 		req.on('data', (e: string) => {
 			body += e;
-		})
+		});
 		req.on('end', () => {
 			const expectedSignature = `sha1=${crypto
 				.createHmac('sha1', token)
@@ -100,14 +100,13 @@ export default function makeWebhookHandler<T>(
 				res.send('');
 				return;
 			}
-			const webhook = makeWebhookData(eventType, JSON.parse(body));
 			handleWebhook({
-				body: webhook,
+				body: makeWebhookData(eventType, JSON.parse(body)),
 				secret: token,
 				extra,
 				deliveryUUID,
 				signature: actualSignature,
 			}, req, res, next);
-		})
+		});
 	}
 }

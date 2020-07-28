@@ -9,6 +9,7 @@ const reducer = combineReducers({
 	taskInformation: crudReducers.taskInformation,
 	workers: crudReducers.workers,
 	pendingFiles: crudReducers.pendingFiles,
+	site: crudReducers.site,
 });
 
 export type State = ReturnType<typeof reducer>;

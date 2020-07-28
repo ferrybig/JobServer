@@ -32,6 +32,12 @@ function* load() {
 				],
 				deploymentInformationId: '1',
 				sequenceId: 1,
+				deploymentDir: 'output/repo_1/1/deployments/1',
+				deploymentType: 'static-extract',
+				deploymentInstructions: '',
+				deleted: false,
+				sitePath: '/ttt',
+				siteId: '1',
 			}, {
 				id: '2',
 				name: 'Frontend code',
@@ -41,7 +47,13 @@ function* load() {
 				],
 				deploymentInformationId: '2',
 				sequenceId: 1,
-			}, {
+				deploymentDir: 'output/repo_2/2/deployments/1',
+				deploymentType: 'static-extract',
+				deploymentInstructions: '',
+				deleted: false,
+				sitePath: '/test',
+				siteId: '1',
+			}/*, {
 				id: '3',
 				name: 'Frontend build',
 				buildScript: [
@@ -58,10 +70,10 @@ function* load() {
 				],
 				deploymentInformationId: '2',
 				sequenceId: 2,
-			}],
+			}*/],
 			task: [{
 				id: '1',
-				outputFile: 'output/output/repo_1/info_1/dep_1/task_1.tgz',
+				outputFile: 'output/repo_1/info_1/dep_1/task_1.tgz',
 				workerId: null,
 				status: 'approved',
 				log: '',
@@ -80,7 +92,7 @@ function* load() {
 				id: '2',
 				url: 'http://10.248.72.1:5010/.git/',
 				secret: '12345',
-				outputDir: 'output/repo_1',
+				outputDir: 'output/repo_2',
 			}],
 			deploymentInformation:  [{
 				id: '1',
@@ -88,12 +100,14 @@ function* load() {
 				outputDir: 'output/repo_1/info_1',
 				repoId: '1',
 				pattern: 'refs/heads/master',
+				deleted: false,
 			}, {
 				id: '2',
 				name: 'Master branch only',
 				outputDir: 'output/repo_2/info_2',
 				repoId: '2',
 				pattern: 'refs/heads/master',
+				deleted: false,
 			}],
 			deployment:  [{
 				commit: '6bb5463193f5ee9434585058c1dcd358517c35a6',
@@ -104,6 +118,7 @@ function* load() {
 				status: 'pending',
 				deploymentInformationId: '1',
 				sequenceId: 1,
+				deployed: false,
 			}, {
 				commit: '6bb5463193f5ee9434585058c1dcd358517c35a6',
 				branch: 'refs/heads/master',
@@ -113,6 +128,15 @@ function* load() {
 				status: 'pending',
 				deploymentInformationId: '2',
 				sequenceId: 1,
+				deployed: false,
+			}],
+			site: [{
+				id: '1',
+				name: 'localhost',
+				configBlob: '',
+				aliasses: [],
+				type: 'any-ssl',
+				default: true,
 			}],
 			pendingFiles: [],
 		};
@@ -133,6 +157,7 @@ function* load() {
 			deployment: [],
 			deploymentInformation: [],
 			pendingFiles: [],
+			site: [],
 		}))
 		
 	}

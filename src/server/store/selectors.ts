@@ -25,6 +25,7 @@ export function computePersistState(state: State): PersistStateV1 {
 		deploymentInformation: map(state.deploymentInformation),
 		deployment: map(state.deployment),
 		pendingFiles: map(state.pendingFiles),
+		site: map(state.site),
 	}
 }
 

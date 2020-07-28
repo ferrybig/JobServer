@@ -61,6 +61,7 @@ export default makeWebhookHandler((req) => {
 					deploymentInformationId: matched.id,
 					timestamp: Date.now(),
 					sequenceId,
+					deployed: false,
 				}
 				store.dispatch(crudPersist('deployment', newDeployment));
 				for (const taskInformation of taskInformations) {

@@ -25,6 +25,12 @@ export interface TaskInformation {
 	buildScript: Command[],
 	deploymentInformationId: DeploymentInformation['id'];
 	sequenceId: number;
+	deploymentDir: string | null;
+	deploymentType: /*'static' |*/ 'static-extract' /*| 'docker'*/
+	deploymentInstructions: string;
+	deleted: boolean;
+	sitePath: string,
+	siteId: Site['id'] | null,
 }
 
 export interface Repo {
@@ -42,6 +48,7 @@ export interface Deployment {
 	deploymentInformationId: DeploymentInformation['id'];
 	timestamp: number;
 	sequenceId: number;
+	deployed: boolean;
 }
 export interface DeploymentInformation {
 	id: string
@@ -49,7 +56,17 @@ export interface DeploymentInformation {
 	pattern: string,
 	outputDir: string | null,
 	repoId: Repo['id'],
+	deleted: boolean;
 }
+export interface Site {
+	id: string
+	name: string,
+	configBlob: string,
+	aliasses: string[],
+	type: 'no-ssl' | 'ssl' | 'any-ssl',
+	default: boolean;
+}
+// TODO: Deployment agent log file entity
 export interface PersistStateV1 {
 	version: 'v1',
 	workers: Worker[],
@@ -59,6 +76,7 @@ export interface PersistStateV1 {
 	deploymentInformation: DeploymentInformation[],
 	deployment: Deployment[],
 	pendingFiles: PendingUploadedFile[],
+	site: Site[],
 }
 export type PersistState = PersistStateV1;
 export interface PendingUploadedFile {
