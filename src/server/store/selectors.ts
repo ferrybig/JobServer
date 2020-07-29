@@ -3,6 +3,7 @@ import { PersistStateV1, Task } from './types';
 import {selectors as crudSelectors} from './crud'
 import {CrudState} from '../../common/utils/crudStore';
 import {BuildTask} from '../../common/types';
+import {DeploymentData, RawDeploymentData, rawDeploymentDataIsDeploymentData} from '../deployment/deploymentService';
 
 export const get = crudSelectors.get;
 export const getOrNull = crudSelectors.getOrNull;
@@ -10,6 +11,7 @@ export const exists = crudSelectors.exists;
 export const allKeys = crudSelectors.allKeys;
 export const size = crudSelectors.size;
 export const find = crudSelectors.find;
+export const findLatest = crudSelectors.findLatest;
 export const filter = crudSelectors.filter;
 
 export function computePersistState(state: State): PersistStateV1 {
@@ -46,13 +48,39 @@ export function taskToBuildTask(state: Pick<State, 'taskInformation' | 'deployme
 }
 
 export function findNextPendingTask(state: Pick<State, 'task'>): Task | null {
-	const allIds = allKeys(state, 'task');
 	// Newer tasks hould be more important, might want to add a config flag for this
-	for (let i = allIds.length - 1; i >= 0; i--) {
-		const task = get(state, 'task', allIds[i]);
-		if (task.status === 'approved' && task.workerId === null) {
-			return task;
-		}
-	}
-	return null;
+	const selector = findLatest;
+	return selector(state, 'task', {
+		status: 'approved',
+		workerId: null,
+	});
+}
+
+export function taskToDeploymentData(state: Pick<State, 'taskInformation' | 'deployment' | 'deploymentInformation'>, task: Task): DeploymentData | null {
+	const taskInformation = get(state, 'taskInformation', task.taskInformationId);
+	const deployment = get(state, 'deployment', task.deploymentId);
+	const raw: RawDeploymentData = {
+		taskInformation,
+		task,
+		deployment,
+		deploymentInformation: get(state, 'deploymentInformation', deployment.deploymentInformationId)
+	};
+	return rawDeploymentDataIsDeploymentData(raw) ? raw : null;
+}
+
+function notNull<T>(input: T): input is NonNullable<T> {
+	return input !== undefined && input !== null;
+}
+
+export function computeDeployment(state: Pick<State, 'taskInformation' | 'task' | 'deployment' | 'deploymentInformation'>): {
+	toDelete: DeploymentData[],
+	toCreate: DeploymentData[],
+	newSituation: DeploymentData[],
+} {
+	const existingDeployments: DeploymentData[] = filter(state, 'deployment', {
+		deployed: true,
+	}).flatMap(d => filter(state, 'task', {deploymentId: d.id})).map(t => taskToDeploymentData(state, t)).filter(notNull);
+	const newSituation: DeploymentData[] = filter(state, 'deploymentInformation', {
+		deleted: false,
+	}).map(e => ).flatMap(d => filter(state, 'task', {deploymentId: d.id})).map(t => taskToDeploymentData(state, t)).filter(notNull);
 }

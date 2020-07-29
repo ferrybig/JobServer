@@ -54,8 +54,9 @@ interface CrudStore<D extends Definition, A extends ActionTypes> {
 		exists<M extends keyof D>(state: { [S in M]: CrudState<any, ReturnType<D[M]>> }, module: M, key: ReturnType<D[M]> | null): boolean;
 		size<M extends keyof D>(state: { [S in M]: CrudState<any, any> }, module: M): number;
 		allKeys<M extends keyof D>(state: { [S in M]: CrudState<any, ReturnType<D[M]>> }, module: M): ReturnType<D[M]>[];
-		find<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], any> }, module: M, pattern: (input: Parameters<D[M]>[0]) => boolean): Parameters<D[M]>[0] | null;
-		filter<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], any> }, module: M, pattern: (input: Parameters<D[M]>[0]) => boolean): Parameters<D[M]>[0][];
+		find<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], any> }, module: M, pattern: Partial<Parameters<D[M]>[0]> | ((input: Parameters<D[M]>[0]) => boolean)): Parameters<D[M]>[0] | null;
+		findLatest<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], any> }, module: M, pattern: Partial<Parameters<D[M]>[0]> | ((input: Parameters<D[M]>[0]) => boolean)): Parameters<D[M]>[0] | null;
+		filter<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], any> }, module: M, pattern: Partial<Parameters<D[M]>[0]> | ((input: Parameters<D[M]>[0]) => boolean)): Parameters<D[M]>[0][];
 	},
 	actions: {
 		[K in Exclude<BaseActions<keyof D, any, any>['type'], 'init'>]: AddTypeFromReturnType<RemoveNullType<<M extends keyof D>(
@@ -80,6 +81,17 @@ function checkMappedActionType<M extends ValidKeyof, P, I extends ValidKeyof, T 
 		return true;
 	}
 	return false;
+}
+
+function makeFilter<T>(pattern: Partial<T> | ((input: T) => boolean)): (input: T) => boolean {
+	return 'apply' in pattern ? pattern : (subject: T): boolean => {
+		for (const key of Object.keys(pattern) as (keyof T)[]) {
+			if (pattern[key] !== subject[key]) {
+				return false;
+			}
+		}
+		return true;
+	};
 }
 
 const DEFAULT_STATE: CrudState<any, any> = {
@@ -112,18 +124,29 @@ const DEFAULT_SELECTORS = {
 	allKeys: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M): I[] => {
 		return state[module].byId
 	},
-	find: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, pattern: (input: T) => boolean): T | null => {
+	find: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, pattern: Partial<T> | ((input: T) => boolean)): T | null => {
+		const filter = makeFilter(pattern);
 		for(const id of state[module].byId) {
-			if (pattern(state[module].entities[id]!)) {
+			if (filter(state[module].entities[id]!)) {
 				return state[module].entities[id]!;
 			}
 		}
 		return null;
 	},
-	filter: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, pattern: (input: T) => boolean): T[] => {
+	findLatest: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, pattern: Partial<T> | ((input: T) => boolean)): T | null => {
+		const filter = makeFilter(pattern);
+		for (let i = state[module].byId.length - 1; i >= 0; i--) {
+			if (filter(state[module].entities[state[module].byId[i]]!)) {
+				return state[module].entities[state[module].byId[i]]!;
+			}
+		}
+		return null;
+	},
+	filter: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, pattern: Partial<T> | ((input: T) => boolean)): T[] => {
+		const filter = makeFilter(pattern);
 		const res: T[] = [];
 		for(const id of state[module].byId) {
-			if (pattern(state[module].entities[id]!)) {
+			if (filter(state[module].entities[id]!)) {
 				res.push(state[module].entities[id]!);
 			}
 		}
@@ -204,6 +227,19 @@ function makeReducer<
 				...existingValue,
 				...(action.payload.data as Partial<P>),
 			} as P
+			const newKey = getKey(newState.entities[key]!);
+			if (newKey !== key) {
+				const entity = newState.entities[key]
+				delete newState.entities[key];
+				newState.entities[newKey] = entity;
+				// The key got modified!! Handle just in case
+				const index = newState.byId.indexOf(key);
+				if (index < 0) {
+					throw new Error('Inconsistent state! key was found in entity map, but not in byId map');
+				}
+				newState.byId = [...state.byId];
+				newState.byId[index] = newKey;
+			}
 			return newState;
 		} else if (checkMappedActionType(actionTypes, action, 'concat', module)) {
 			const key = action.payload.id as I;
@@ -223,6 +259,9 @@ function makeReducer<
 			} as P;
 			const newKey = getKey(newState.entities[key]!);
 			if (newKey !== key) {
+				const entity = newState.entities[key]
+				delete newState.entities[key];
+				newState.entities[newKey] = entity;
 				// The key got modified!! Handle just in case
 				const index = newState.byId.indexOf(key);
 				if (index < 0) {

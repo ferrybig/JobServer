@@ -8,15 +8,24 @@ type MarkFieldAsNonNull<T, F extends keyof T> = {
 /**
  * Sequence of operations:
  * newService.preStart()
+ * newService.generateConfigBlob();
+ * configService.checkConfig();
  * oldService.stop()
  * newService.start()
  * oldService.afterStop()
  */
- interface DeploymentData {
+ export interface RawDeploymentData {
+	 taskInformation: TaskInformation;
+	 task: Task;
+	 deployment: Deployment;
+	 deploymentInformation: DeploymentInformation;
+
+ }
+ export interface DeploymentData {
 	 taskInformation: MarkFieldAsNonNull<TaskInformation, 'deploymentDir'>;
 	 task: MarkFieldAsNonNull<Task, 'outputFile'>;
-	 deployment: MarkFieldAsNonNull<Deployment, 'outputDir'>;
-	 deploymentInformation: MarkFieldAsNonNull<DeploymentInformation, 'outputDir'>;
+	 deployment: Deployment;
+	 deploymentInformation: DeploymentInformation;
 
  }
 
@@ -44,9 +53,13 @@ export interface DeploymentService {
 	/**
 	 * Generates a config blob for NGINX
 	 */
-	generateConfigBlob(data: DeploymentData, path: string, site: Site): Promise<string>
+	generateConfigBlob(data: DeploymentData, path: string, site: Site): Promise<string> | string
 }
 
 export type DeploymentServiceForTask = {
 	[K in keyof DeploymentService]: DeploymentService[K] extends (data: DeploymentData, ...args: infer A) => infer R ? (...args: A) => R : DeploymentService[K];
+}
+
+export function rawDeploymentDataIsDeploymentData(a: RawDeploymentData): a is DeploymentData {
+	return a.taskInformation.deploymentDir !== null && a.task.outputFile !== null
 }
