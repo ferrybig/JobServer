@@ -10,6 +10,7 @@ const reducer = combineReducers({
 	workers: crudReducers.workers,
 	pendingFiles: crudReducers.pendingFiles,
 	site: crudReducers.site,
+	nginxConfig: crudReducers.nginxConfig,
 });
 
 export type State = ReturnType<typeof reducer>;

@@ -130,6 +130,7 @@ function* load() {
 				sequenceId: 1,
 				deployed: false,
 			}],
+			pendingFiles: [],
 			site: [{
 				id: '1',
 				name: 'localhost',
@@ -137,14 +138,21 @@ function* load() {
 				aliasses: [],
 				type: 'any-ssl',
 				default: true,
+				includesBefore: '1',
+				includesAfter: null,
 			}],
-			pendingFiles: [],
+			nginxConfig: [{
+				id: '1',
+				name: 'Base site config',
+				configBlob: '',
+				includesBefore: null,
+				includesAfter: null,
+			}]
 		};
 		yield put(crudInit(state));
 		return;
 	}
 	try {
-
 		const contents: string = yield call(readFile, CONFIG_PATH, 'utf-8');
 		yield put(crudInit(JSON.parse(contents)))
 	} catch(e) {
@@ -158,8 +166,8 @@ function* load() {
 			deploymentInformation: [],
 			pendingFiles: [],
 			site: [],
-		}))
-		
+			nginxConfig: [],
+		}));
 	}
 }
 function* save() {

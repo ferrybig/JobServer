@@ -22,10 +22,10 @@ type MarkFieldAsNonNull<T, F extends keyof T> = {
 
  }
  export interface DeploymentData {
-	 taskInformation: MarkFieldAsNonNull<TaskInformation, 'deploymentDir'>;
-	 task: MarkFieldAsNonNull<Task, 'outputFile'>;
-	 deployment: Deployment;
-	 deploymentInformation: DeploymentInformation;
+	taskInformation: MarkFieldAsNonNull<TaskInformation, 'deploymentDir'>;
+	task: MarkFieldAsNonNull<Task, 'outputFile'>;
+	deployment: Deployment;
+	deploymentInformation: DeploymentInformation;
 
  }
 
@@ -58,7 +58,7 @@ export interface DeploymentService {
 
 export type DeploymentServiceForTask = {
 	[K in keyof DeploymentService]: DeploymentService[K] extends (data: DeploymentData, ...args: infer A) => infer R ? (...args: A) => R : DeploymentService[K];
-}
+} & { data: DeploymentData }
 
 export function rawDeploymentDataIsDeploymentData(a: RawDeploymentData): a is DeploymentData {
 	return a.taskInformation.deploymentDir !== null && a.task.outputFile !== null

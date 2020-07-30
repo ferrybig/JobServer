@@ -1,5 +1,5 @@
 import makeCrudModules, {DEFAULT_ACTION_TYPES, keyById} from "../../common/utils/crudStore";
-import {Worker, Task, TaskInformation, Repo, Deployment, DeploymentInformation, PendingUploadedFile, Site} from './types';
+import {Worker, Task, TaskInformation, Repo, Deployment, DeploymentInformation, PendingUploadedFile, Site, NginxConfig} from './types';
 
 export const {
 	selectors,
@@ -14,4 +14,5 @@ export const {
 	deploymentInformation: keyById<DeploymentInformation>(),
 	pendingFiles: (file: PendingUploadedFile) => file.token,
 	site: keyById<Site>(),
+	nginxConfig: keyById<NginxConfig>(),
 }, DEFAULT_ACTION_TYPES);

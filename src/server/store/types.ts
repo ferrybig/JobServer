@@ -65,6 +65,15 @@ export interface Site {
 	aliasses: string[],
 	type: 'no-ssl' | 'ssl' | 'any-ssl',
 	default: boolean;
+	includesBefore: NginxConfig['id'] | null,
+	includesAfter: NginxConfig['id'] | null,
+}
+export interface NginxConfig {
+	id: string
+	name: string,
+	configBlob: string,
+	includesBefore: NginxConfig['id'] | null,
+	includesAfter: NginxConfig['id'] | null,
 }
 // TODO: Deployment agent log file entity
 export interface PersistStateV1 {
@@ -77,6 +86,7 @@ export interface PersistStateV1 {
 	deployment: Deployment[],
 	pendingFiles: PendingUploadedFile[],
 	site: Site[],
+	nginxConfig: NginxConfig[],
 }
 export type PersistState = PersistStateV1;
 export interface PendingUploadedFile {

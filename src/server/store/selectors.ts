@@ -1,9 +1,10 @@
 import { State } from './reducer';
-import { PersistStateV1, Task } from './types';
+import { PersistStateV1, Task, Deployment } from './types';
 import {selectors as crudSelectors} from './crud'
 import {CrudState} from '../../common/utils/crudStore';
 import {BuildTask} from '../../common/types';
 import {DeploymentData, RawDeploymentData, rawDeploymentDataIsDeploymentData} from '../deployment/deploymentService';
+import sortByKey from '../../common/utils/sortByKey';
 
 export const get = crudSelectors.get;
 export const getOrNull = crudSelectors.getOrNull;
@@ -28,6 +29,7 @@ export function computePersistState(state: State): PersistStateV1 {
 		deployment: map(state.deployment),
 		pendingFiles: map(state.pendingFiles),
 		site: map(state.site),
+		nginxConfig: map(state.nginxConfig),
 	}
 }
 
@@ -72,15 +74,32 @@ function notNull<T>(input: T): input is NonNullable<T> {
 	return input !== undefined && input !== null;
 }
 
+function deploymentToDeploymentData(state: Pick<State, 'task' | 'taskInformation' | 'deployment' | 'deploymentInformation'>, deployment: Deployment) {
+	return filter(state, 'task', {deploymentId: deployment.id, status: 'success'}).map(t => taskToDeploymentData(state, t)).filter(notNull);
+}
+
 export function computeDeployment(state: Pick<State, 'taskInformation' | 'task' | 'deployment' | 'deploymentInformation'>): {
+	existingSituation: DeploymentData[],
 	toDelete: DeploymentData[],
 	toCreate: DeploymentData[],
 	newSituation: DeploymentData[],
 } {
-	const existingDeployments: DeploymentData[] = filter(state, 'deployment', {
+	const existingSituation: DeploymentData[] = filter(state, 'deployment', {
 		deployed: true,
 	}).flatMap(d => filter(state, 'task', {deploymentId: d.id})).map(t => taskToDeploymentData(state, t)).filter(notNull);
 	const newSituation: DeploymentData[] = filter(state, 'deploymentInformation', {
 		deleted: false,
-	}).map(e => ).flatMap(d => filter(state, 'task', {deploymentId: d.id})).map(t => taskToDeploymentData(state, t)).filter(notNull);
+	}).map((e): Deployment | null => {
+		return filter(state, 'deployment', {deploymentInformationId: e.id, status: 'success'}).sort(sortByKey('sequenceId', false))[0] || null;
+	}).flatMap(d => {
+		return !d ? [] : filter(state, 'task', {deploymentId: d.id});
+	}).map(t => taskToDeploymentData(state, t)).filter(notNull);
+	const existingSituationByKey = Object.fromEntries(existingSituation.map((e): [DeploymentData['task']['id'], true] => [e.task.id, true]));
+	const newSituationByKey = Object.fromEntries(newSituation.map((e): [DeploymentData['task']['id'], true] => [e.task.id, true]));
+	return {
+		existingSituation,
+		newSituation,
+		toCreate: newSituation.filter(e => !existingSituationByKey[e.task.id]),
+		toDelete: existingSituation.filter(e => !newSituationByKey[e.task.id]),
+	}
 }
