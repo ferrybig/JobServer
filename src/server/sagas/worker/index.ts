@@ -62,10 +62,10 @@ function* tryUpdateDeployment(deploymentId: Deployment['id']) {
 	}
 }
 function* getOrCreatePendingFileForFile(outputFile: string, fileSize: number): SagaIterator<PendingUploadedFile> {
-	const pendingFile: PendingUploadedFile | null = yield select(s => find(s, 'pendingFiles', ((file: PendingUploadedFile) => file.outputFile === outputFile)));
+	const pendingFile: PendingUploadedFile | null = yield select(s => find(s, 'pendingFile', ((file: PendingUploadedFile) => file.outputFile === outputFile)));
 	if (pendingFile) {
 		if (pendingFile.fileSize !== fileSize) {
-			yield put(crudUpdate('pendingFiles', {
+			yield put(crudUpdate('pendingFile', {
 				id: pendingFile.token,
 				data: {
 					fileSize: fileSize,
@@ -80,7 +80,7 @@ function* getOrCreatePendingFileForFile(outputFile: string, fileSize: number): S
 		outputFile,
 		fileSize,
 	};
-	yield put(crudPersist('pendingFiles', newPendingFile));
+	yield put(crudPersist('pendingFile', newPendingFile));
 	return newPendingFile;
 }
 
@@ -169,7 +169,7 @@ function* handleUploadingTask(socket: Socket, task: Task, packet: TaskFinished, 
 		try {
 			const stats: Stats = yield call(stat, task.outputFile);
 			currentSize = stats.size;
-		} catch(e) {
+		} catch(_) {
 			currentSize = 0;
 		}
 		if (currentSize < pendingFile.fileSize) {
@@ -183,7 +183,7 @@ function* handleUploadingTask(socket: Socket, task: Task, packet: TaskFinished, 
 			});
 			const packetHandler = yield fork(pingHandler, socket);
 			try {
-				yield take(actionMatching(crudDelete, (a) => a.module === 'pendingFiles' && a.payload === pendingFile.token));
+				yield take(actionMatching(crudDelete, (a) => a.module === 'pendingFile' && a.payload === pendingFile.token));
 			} finally {
 				yield cancel(packetHandler)
 			}
@@ -194,7 +194,7 @@ function* handleUploadingTask(socket: Socket, task: Task, packet: TaskFinished, 
 				throw new Error('Task got modified beyond our control, status is "' + updatedTask.status + '" while we expected it to be "uploading"');
 			}
 		} else {
-			yield put(crudDelete('pendingFiles', pendingFile.token));
+			yield put(crudDelete('pendingFile', pendingFile.token));
 		}
 	}
 	yield put(crudUpdate('task', {

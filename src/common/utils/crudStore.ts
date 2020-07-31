@@ -337,4 +337,4 @@ export default function makeCrudModules<D extends Definition, A extends ActionTy
 export function keyByField<F extends ValidKeyof>(field: F): <P extends { [K in F]: ValidKeyof }>() => (entity: P) => P[F] {
 	return () => (entity) => entity[field];
 }
-export const keyById = keyByField('id');
+export const keyByIdField = keyByField('id');

@@ -8,9 +8,10 @@ const reducer = combineReducers({
 	task: crudReducers.task,
 	taskInformation: crudReducers.taskInformation,
 	workers: crudReducers.workers,
-	pendingFiles: crudReducers.pendingFiles,
+	pendingFile: crudReducers.pendingFile,
 	site: crudReducers.site,
 	nginxConfig: crudReducers.nginxConfig,
+	platformTask: crudReducers.platformTask,
 });
 
 export type State = ReturnType<typeof reducer>;

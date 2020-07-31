@@ -130,13 +130,14 @@ function* load() {
 				sequenceId: 1,
 				deployed: false,
 			}],
-			pendingFiles: [],
+			pendingFile: [],
 			site: [{
 				id: '1',
 				name: 'localhost',
 				configBlob: '',
 				aliasses: [],
-				type: 'any-ssl',
+				ssl: 'yes',
+				noSsl: 'yes',
 				default: true,
 				includesBefore: '1',
 				includesAfter: null,
@@ -147,7 +148,8 @@ function* load() {
 				configBlob: '',
 				includesBefore: null,
 				includesAfter: null,
-			}]
+			}],
+			platformTask: [],
 		};
 		yield put(crudInit(state));
 		return;
@@ -164,9 +166,10 @@ function* load() {
 			repo: [],
 			deployment: [],
 			deploymentInformation: [],
-			pendingFiles: [],
+			pendingFile: [],
 			site: [],
 			nginxConfig: [],
+			platformTask: [],
 		}));
 	}
 }

@@ -63,7 +63,8 @@ export interface Site {
 	name: string,
 	configBlob: string,
 	aliasses: string[],
-	type: 'no-ssl' | 'ssl' | 'any-ssl',
+	ssl: 'yes' | 'no',
+	noSsl: 'yes' | 'no' | 'redirect',
 	default: boolean;
 	includesBefore: NginxConfig['id'] | null,
 	includesAfter: NginxConfig['id'] | null,
@@ -75,6 +76,15 @@ export interface NginxConfig {
 	includesBefore: NginxConfig['id'] | null,
 	includesAfter: NginxConfig['id'] | null,
 }
+export interface PlatformTask {
+	id: string
+	type: 'deployment',
+	status: 'pending' | 'running' | 'success' | 'error';
+	log: string;
+	warnings: string;
+	startTime: number;
+	endTime: number;
+}
 // TODO: Deployment agent log file entity
 export interface PersistStateV1 {
 	version: 'v1',
@@ -84,9 +94,10 @@ export interface PersistStateV1 {
 	repo: Repo[],
 	deploymentInformation: DeploymentInformation[],
 	deployment: Deployment[],
-	pendingFiles: PendingUploadedFile[],
+	pendingFile: PendingUploadedFile[],
 	site: Site[],
 	nginxConfig: NginxConfig[],
+	platformTask: PlatformTask[],
 }
 export type PersistState = PersistStateV1;
 export interface PendingUploadedFile {

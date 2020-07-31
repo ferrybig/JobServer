@@ -10,7 +10,7 @@ export default function storeLogger() {
 			return (action) => {
 				const state = next(action);
 				console.log('ACTION: ' + JSON.stringify(state));
-				console.dir(api.getState());
+				//console.dir(api.getState());
 				return state;
 			}
 		}

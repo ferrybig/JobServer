@@ -34,8 +34,9 @@ export default makeWebhookHandler((req) => {
 			break;
 		case 'push':
 			if (body.data.deleted) {
-				res.statusCode = 204;
-				res.send('');
+				res.statusCode = 200;
+				res.header('content-type', 'text/plain');
+				res.send('(Not handing pushed for deleted branches)\n');
 				break;
 			}
 			const ref = body.data.ref;
@@ -92,11 +93,13 @@ export default makeWebhookHandler((req) => {
 			}
 
 			res.statusCode = 200;
-			res.send('Matched deployments: ' + matchedDeploymentInformations.length);
+			res.header('content-type', 'text/plain');
+			res.send('Matched deployments: ' + matchedDeploymentInformations.length + '\n');
 			break;
 		case '?':
 			res.statusCode = 400;
-			res.send('Unknown event: ' + body.originalType);
+			res.header('content-type', 'text/plain');
+			res.send('Unknown event: ' + body.originalType + '\n');
 			break;
 		default:
 			return assertNever(body);

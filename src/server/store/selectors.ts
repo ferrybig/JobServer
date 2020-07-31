@@ -3,7 +3,7 @@ import { PersistStateV1, Task, Deployment } from './types';
 import {selectors as crudSelectors} from './crud'
 import {CrudState} from '../../common/utils/crudStore';
 import {BuildTask} from '../../common/types';
-import {DeploymentData, RawDeploymentData, rawDeploymentDataIsDeploymentData} from '../deployment/deploymentService';
+import {DeploymentData, RawDeploymentData, rawDeploymentDataIsDeploymentData, DeploymentChangeSet} from '../deployment/deploymentService';
 import sortByKey from '../../common/utils/sortByKey';
 
 export const get = crudSelectors.get;
@@ -27,9 +27,10 @@ export function computePersistState(state: State): PersistStateV1 {
 		repo: map(state.repo),
 		deploymentInformation: map(state.deploymentInformation),
 		deployment: map(state.deployment),
-		pendingFiles: map(state.pendingFiles),
+		pendingFile: map(state.pendingFile),
 		site: map(state.site),
 		nginxConfig: map(state.nginxConfig),
+		platformTask: map(state.platformTask),
 	}
 }
 
@@ -74,26 +75,22 @@ function notNull<T>(input: T): input is NonNullable<T> {
 	return input !== undefined && input !== null;
 }
 
-function deploymentToDeploymentData(state: Pick<State, 'task' | 'taskInformation' | 'deployment' | 'deploymentInformation'>, deployment: Deployment) {
+function deploymentToDeploymentData(state: Pick<State, 'task' | 'taskInformation' | 'deployment' | 'deploymentInformation'>, deployment: Deployment | null): DeploymentData[] {
+	if (!deployment) {
+		return [];
+	}
 	return filter(state, 'task', {deploymentId: deployment.id, status: 'success'}).map(t => taskToDeploymentData(state, t)).filter(notNull);
 }
 
-export function computeDeployment(state: Pick<State, 'taskInformation' | 'task' | 'deployment' | 'deploymentInformation'>): {
-	existingSituation: DeploymentData[],
-	toDelete: DeploymentData[],
-	toCreate: DeploymentData[],
-	newSituation: DeploymentData[],
-} {
+export function computeDeployment(state: Pick<State, 'taskInformation' | 'task' | 'deployment' | 'deploymentInformation'>): DeploymentChangeSet {
 	const existingSituation: DeploymentData[] = filter(state, 'deployment', {
 		deployed: true,
-	}).flatMap(d => filter(state, 'task', {deploymentId: d.id})).map(t => taskToDeploymentData(state, t)).filter(notNull);
+	}).flatMap(d => deploymentToDeploymentData(state, d));
 	const newSituation: DeploymentData[] = filter(state, 'deploymentInformation', {
 		deleted: false,
 	}).map((e): Deployment | null => {
 		return filter(state, 'deployment', {deploymentInformationId: e.id, status: 'success'}).sort(sortByKey('sequenceId', false))[0] || null;
-	}).flatMap(d => {
-		return !d ? [] : filter(state, 'task', {deploymentId: d.id});
-	}).map(t => taskToDeploymentData(state, t)).filter(notNull);
+	}).flatMap(d => deploymentToDeploymentData(state, d));
 	const existingSituationByKey = Object.fromEntries(existingSituation.map((e): [DeploymentData['task']['id'], true] => [e.task.id, true]));
 	const newSituationByKey = Object.fromEntries(newSituation.map((e): [DeploymentData['task']['id'], true] => [e.task.id, true]));
 	return {
@@ -102,4 +99,12 @@ export function computeDeployment(state: Pick<State, 'taskInformation' | 'task' 
 		toCreate: newSituation.filter(e => !existingSituationByKey[e.task.id]),
 		toDelete: existingSituation.filter(e => !newSituationByKey[e.task.id]),
 	}
+}
+
+export function getDeploymentNumbers(state: Pick<State, 'deployment' | 'deploymentInformation'>): number[] {
+	return filter(state, 'deploymentInformation', {
+		deleted: false,
+	}).map((e): Deployment | null => {
+		return filter(state, 'deployment', {deploymentInformationId: e.id, status: 'success'}).sort(sortByKey('sequenceId', false))[0] || null;
+	}).filter(notNull).map(e => e.sequenceId)
 }

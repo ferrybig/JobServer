@@ -26,34 +26,36 @@ type MarkFieldAsNonNull<T, F extends keyof T> = {
 	task: MarkFieldAsNonNull<Task, 'outputFile'>;
 	deployment: Deployment;
 	deploymentInformation: DeploymentInformation;
-
- }
+}
+export interface DeploymentServiceOptions {
+	logger?: (log: string) => void;
+}
 
 export interface DeploymentService {
 	/**
 	 * Called at the first step of deploying a service, the old service is still running at the moment
 	 */
-	preStart(data: DeploymentData): Promise<void>;
+	preStart(data: DeploymentData, options?: DeploymentServiceOptions): Promise<void>;
 	/**
 	 * Actually starts the new service, the old service is stopped
 	 */
-	start(data: DeploymentData): Promise<void>;
+	start(data: DeploymentData, options?: DeploymentServiceOptions): Promise<void>;
 	/**
 	 * Stops the service, the new service is prepared, but not started
 	 */
-	stop(data: DeploymentData): Promise<void>;
+	stop(data: DeploymentData, options?: DeploymentServiceOptions): Promise<void>;
 	/**
 	 * Used to clean up files from the deployment
 	 */
-	afterStop(data: DeploymentData): Promise<void>;
+	afterStop(data: DeploymentData, options?: DeploymentServiceOptions): Promise<void>;
 	/**
 	 * Check the status of pending deployment files, called as part of the fsck routines
 	 */
-	checkStatus(data: DeploymentData): Promise<'missing' | 'prepared' | 'running'>;
+	checkStatus(data: DeploymentData, options?: DeploymentServiceOptions): Promise<'missing' | 'prepared' | 'running'>;
 	/**
 	 * Generates a config blob for NGINX
 	 */
-	generateConfigBlob(data: DeploymentData, path: string, site: Site): Promise<string> | string
+	generateConfigBlob(data: DeploymentData, site: Site, options?: DeploymentServiceOptions): Promise<string> | string
 }
 
 export type DeploymentServiceForTask = {
@@ -62,4 +64,10 @@ export type DeploymentServiceForTask = {
 
 export function rawDeploymentDataIsDeploymentData(a: RawDeploymentData): a is DeploymentData {
 	return a.taskInformation.deploymentDir !== null && a.task.outputFile !== null
+}
+export interface DeploymentChangeSet {
+	existingSituation: DeploymentData[],
+	toDelete: DeploymentData[],
+	toCreate: DeploymentData[],
+	newSituation: DeploymentData[],
 }

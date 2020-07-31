@@ -13,6 +13,10 @@ class LocationBuilder {
 		this.append('root', args);
 	}
 
+	public alias(...args: [string]) {
+		this.append('alias', args);
+	}
+
 	public fastcgiPass(...args: string[]) {
 		this.append('fastcgi_pass', args);
 	}

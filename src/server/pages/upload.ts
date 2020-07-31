@@ -8,7 +8,7 @@ import {crudDelete} from "../store/actions";
 export default function uploadPage(req: Request, res: Response, next: NextFunction) {
 	const token = req.params.token;
 	let offset = Number(req.headers['X-offset'] || '0');
-	const file = getOrNull(store.getState(), 'pendingFiles', token);
+	const file = getOrNull(store.getState(), 'pendingFile', token);
 	if(!file) {
 		res.statusCode = 404;
 		res.send('entity not found');
@@ -19,7 +19,6 @@ export default function uploadPage(req: Request, res: Response, next: NextFuncti
 		recursive: true
 	}).then(() => open(file.outputFile, 'w'));
 
-	console.log(token)
 	req.on('data', (e: Buffer) => {
 		promiseChain = promiseChain.then((fd) => fd.write(e, 0, e.length, offset).then(r => {
 			if (r.bytesWritten !== e.length) {
@@ -30,7 +29,6 @@ export default function uploadPage(req: Request, res: Response, next: NextFuncti
 		}))
 	})
 	req.on('end', () => {
-		console.log('end')
 		promiseChain.then((fd) => {
 			fd.close();
 			if (offset > file.fileSize) {
@@ -40,7 +38,7 @@ export default function uploadPage(req: Request, res: Response, next: NextFuncti
 				res.statusCode = 204;
 				res.send();
 				if (offset === file.fileSize) {
-					store.dispatch(crudDelete('pendingFiles', file.token));
+					store.dispatch(crudDelete('pendingFile', file.token));
 				}
 			}
 		})

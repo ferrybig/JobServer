@@ -1,18 +1,19 @@
-import makeCrudModules, {DEFAULT_ACTION_TYPES, keyById} from "../../common/utils/crudStore";
-import {Worker, Task, TaskInformation, Repo, Deployment, DeploymentInformation, PendingUploadedFile, Site, NginxConfig} from './types';
+import makeCrudModules, {DEFAULT_ACTION_TYPES, keyByIdField} from "../../common/utils/crudStore";
+import {Worker, Task, TaskInformation, Repo, Deployment, DeploymentInformation, PendingUploadedFile, Site, NginxConfig, PlatformTask} from './types';
 
 export const {
 	selectors,
 	actions,
 	reducers,
 } = makeCrudModules({
-	workers: keyById<Worker>(),
-	task: keyById<Task>(),
-	taskInformation: keyById<TaskInformation>(),
-	repo: keyById<Repo>(),
-	deployment: keyById<Deployment>(),
-	deploymentInformation: keyById<DeploymentInformation>(),
-	pendingFiles: (file: PendingUploadedFile) => file.token,
-	site: keyById<Site>(),
-	nginxConfig: keyById<NginxConfig>(),
+	workers: keyByIdField<Worker>(),
+	task: keyByIdField<Task>(),
+	taskInformation: keyByIdField<TaskInformation>(),
+	repo: keyByIdField<Repo>(),
+	deployment: keyByIdField<Deployment>(),
+	deploymentInformation: keyByIdField<DeploymentInformation>(),
+	pendingFile: (file: PendingUploadedFile) => file.token,
+	site: keyByIdField<Site>(),
+	nginxConfig: keyByIdField<NginxConfig>(),
+	platformTask: keyByIdField<PlatformTask>(),
 }, DEFAULT_ACTION_TYPES);

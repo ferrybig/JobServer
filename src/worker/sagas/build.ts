@@ -17,10 +17,12 @@ export default function* buildSaga(
 			console.log('Worker picked up task: ' + task.id);
 			const [closeOutput, outputFile]: [() => void, string] = yield call(tmpFile);
 			try {
-				const logger = debounce((logEntry: string) => connection.addTaskLog(logEntry), 500, ([a], [b]): [string] => [b + a]);
+				let shouldSend = true;
+				const logger = debounce((logEntry: string) => connection.addTaskLog(logEntry, shouldSend), 500, ([a], [b]): [string] => [b + a]);
 				try {
 					yield apply(taskRunner, 'run', [task, outputFile, logger]);
 				} finally {
+					shouldSend = false;
 					logger.flush()
 				}
 				yield apply(connection, 'uploadSuccessResult', [outputFile]);

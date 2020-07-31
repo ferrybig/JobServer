@@ -10,7 +10,6 @@ function* spawnSocketHelper(socket: NodeWebSocket, channel: Channel<string>) {
 			yield apply(socket, socket.close, []);
 			return;
 		} else {
-			console.log('Send: ' + packet);
 			yield call(() => socket.send(packet))
 		}
 	}
@@ -29,7 +28,6 @@ export default function* makeWebSocketChannel(url: string | NodeWebSocket): Saga
 				outgoing.close(); // Close outging channel
 			},
 			message (evt) {
-				console.log('Receive: ' + evt.data);
 				emitter(evt.data);
 			},
 			error (e) {
@@ -41,7 +39,6 @@ export default function* makeWebSocketChannel(url: string | NodeWebSocket): Saga
 			},
 		}, socket.close);
 	});
-	console.log(socket.readyState);
 	if (socket.readyState < 1 /* OPEN */) {
 		const initPacket = yield takeMaybe(incoming);
 		if (error !== null) {
@@ -51,7 +48,6 @@ export default function* makeWebSocketChannel(url: string | NodeWebSocket): Saga
 			throw new Error('Socket not ready yet');
 		}
 	}
-	console.log('Returning ');
 	yield spawn(spawnSocketHelper, socket, outgoing);
 	return [incoming, outgoing] as const;
 }

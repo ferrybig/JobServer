@@ -231,10 +231,10 @@ export default class UpstreamConnection {
 		}
 	}
 
-	public addTaskLog(logPart: string) {
+	public addTaskLog(logPart: string, shouldSend: boolean = true) {
 		if (this.state.type === 'executing-task' || this.state.type === 'executing-task-no-log') {
 			this.state.data.log += logPart;
-			if (this.state.type === 'executing-task') {
+			if (this.state.type === 'executing-task' && shouldSend) {
 				this.sendMessage({
 					type: 'taskProgressAppend',
 					payload: {

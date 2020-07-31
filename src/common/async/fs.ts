@@ -9,3 +9,5 @@ export const read = promises.read;
 export const stat = promises.stat;
 export const truncate = promises.truncate;
 export const mkdir = promises.mkdir;
+export const unlink = promises.unlink;
+export const rename = promises.rename;
