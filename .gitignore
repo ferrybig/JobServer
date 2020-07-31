@@ -6,3 +6,4 @@
 /env/worker.env
 /env/server.env
 /env/server-state.json
+/repo.bundle
