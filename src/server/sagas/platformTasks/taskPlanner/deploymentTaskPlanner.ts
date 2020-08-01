@@ -3,7 +3,7 @@ import {v4 as uuid} from 'uuid';
 import {PlatformTask} from "../../../store/types";
 import {find, filter, getDeploymentNumbers} from "../../../store/selectors";
 import {select, put, call} from "redux-saga/effects";
-import {crudPersist, crudUpdate} from "../../../store/actions";
+import {crudPersist, crudUpdate, triggerPlatformTask} from "../../../store/actions";
 import {take} from "../../../../common/utils/effects";
 import assertNever from "../../../../common/utils/assertNever";
 
@@ -22,6 +22,7 @@ function shallowEquals<T>(a: readonly T[], b: readonly T[]): boolean {
 
 const EVENTS_CHILD = [
 	crudUpdate,
+	triggerPlatformTask,
 ];
 type EVENTS_CHILD = ReturnType<typeof EVENTS_CHILD[number]>;
 
@@ -66,14 +67,17 @@ export default function* deploymentTaskPlanner(): SagaIterator<never> {
 				const newDeploymentState = yield select(getDeploymentNumbers);
 				if (!shallowEquals(deploymentState, newDeploymentState)) {
 					deploymentState = newDeploymentState;
+					// Continue with the deployment
 				} else {
 					continue;
 				}
 			} else {
 				continue;
 			}
+		} else if (a.type === 'triggerPlatformTask') {
+			// Continue with the deployment
 		} else {
-			return assertNever(a.type);
+			return assertNever(a);
 		}
 		yield call(planDeployment);
 	}

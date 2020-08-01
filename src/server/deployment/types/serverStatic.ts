@@ -36,13 +36,30 @@ const deployment: DeploymentService = {
 		}
 	},
 	generateConfigBlob(data, site) {
-		const deploymentDir = data.taskInformation.deploymentDir;
+		const deploymentDir = resolve(data.taskInformation.deploymentDir);
 		// Use `root` and other parts in the config
 		return location('', data.taskInformation.sitePath, l => {
-			if(data.taskInformation.sitePath === '/') {
+			if (data.taskInformation.sitePath === '/') {
 				l.root(join(deploymentDir, `${data.deployment.sequenceId}`) + sep);
 			} else {
 				l.alias(join(deploymentDir, `${data.deployment.sequenceId}`) + sep);
+			}
+			l.gzip('on');
+			l.gzipStatic('on');
+			for (const line of data.taskInformation.deploymentInstructions.split('\n')) {
+				switch(line) {
+					case '':
+						// Do nothing
+						break;
+					case 'autoindex':
+						l.autoindex('on');
+						break;
+					case 'spa':
+						l.tryFiles('$url', 'index.html', '=404')
+						break;
+					default:
+						l.comment('Unknown option ' + line)
+				}
 			}
 		});
 	}

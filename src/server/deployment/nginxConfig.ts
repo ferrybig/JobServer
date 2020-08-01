@@ -9,6 +9,10 @@ class LocationBuilder {
 		this.output += `\t${key} ${values.join(' ')};\n`;
 	}
 
+	public raw(line: string) {
+		this.output += `\t${line}\n`;
+	}
+
 	public root(...args: [string]) {
 		this.append('root', args);
 	}
@@ -119,6 +123,40 @@ class LocationBuilder {
 
 	public internal(...args: []) {
 		this.append('internal', args);
+	}
+
+	// Module autoindex
+
+	public autoindex(...args: ['on' | 'off']) {
+		this.append('autoindex', args);
+	}
+
+	public autoindexExactSize(...args: ['on' | 'off']) {
+		this.append('autoindex_exact_size', args);
+	}
+
+	public autoindexFormat(...args: ['html' | 'xml' | 'json' | 'jsonp']) {
+		this.append('autoindex_format', args);
+	}
+
+	public autoindexLocaltime(...args: ['on' | 'off']) {
+		this.append('autoindex_localtime', args);
+	}
+
+	// Module gzip
+
+	public gzip(...args: ['on' | 'off']) {
+		this.append('gzip', args);
+	}
+
+	// Module gzip_static
+
+	public gzipStatic(...args: ['on' | 'off']) {
+		this.append('gzip_static', args);
+	}
+
+	public comment(...args: [string]) {
+		this.append('#', args);
 	}
 
 	public build(): string {

@@ -1,6 +1,6 @@
 import NodeWebSocket from "ws";
 import action from "../../common/utils/ActionCreator";
-import {Worker, Task, Repo, Deployment, DeploymentInformation, TaskInformation, PersistStateV1 } from './types'
+import {Worker, Task, Repo, Deployment, DeploymentInformation, TaskInformation, PersistStateV1, PlatformTask } from './types'
 import {actions as crudActions} from './crud';
 
 export const connectionWorker = action('connectionWorker', (webSocket: NodeWebSocket, ip: string, workerToken: string, baseUrl: string) => ({ webSocket, ip, workerToken, baseUrl }));
@@ -8,6 +8,8 @@ export const connectionClient = action('connectionClient', (webSocket: NodeWebSo
 
 export const workerAwaitsTask = action('workerAwaitsTask', (workerId: Worker['id']) => workerId);
 export const workerDisconnected = action('workerDisconnected', (workerId: Worker['id']) => workerId);
+
+export const triggerPlatformTask = action('triggerPlatformTask', (type: PlatformTask['type']) => type);
 
 export const crudPersist = crudActions.persist;
 export const crudDelete = crudActions.delete;
