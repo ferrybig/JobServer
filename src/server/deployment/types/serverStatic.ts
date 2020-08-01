@@ -1,6 +1,6 @@
 import {DeploymentService} from "../deploymentService";
 import location from "../nginxConfig";
-import {join, resolve} from "path";
+import {join, resolve, sep} from "path";
 import runCommand from "../../../common/async/runCommand";
 import {mkdir, access} from "../../../common/async/fs";
 
@@ -40,9 +40,9 @@ const deployment: DeploymentService = {
 		// Use `root` and other parts in the config
 		return location('', data.taskInformation.sitePath, l => {
 			if(data.taskInformation.sitePath === '/') {
-				l.root(join(deploymentDir, `${data.deployment.sequenceId}`));
+				l.root(join(deploymentDir, `${data.deployment.sequenceId}`) + sep);
 			} else {
-				l.alias(join(deploymentDir, `${data.deployment.sequenceId}`));
+				l.alias(join(deploymentDir, `${data.deployment.sequenceId}`) + sep);
 			}
 		});
 	}
