@@ -38,11 +38,11 @@ function checkLastXMatching<T>(array: T[], x: number, test: (input: T) => boolea
 	return true;
 }
 
-function* planDeployment(): SagaIterator<void> {
+function* planDeployment(force: boolean): SagaIterator<void> {
 	const hasDeployment: null | PlatformTask = yield select(find, 'platformTask', { status: 'pending', type: 'deployment'});
 	if (!hasDeployment) {
 		const lastDeployment: PlatformTask[] = yield select(filter, 'platformTask', { type: 'deployment'});
-		if (checkLastXMatching(lastDeployment, 3, e => e.status === 'error')) {
+		if (checkLastXMatching(lastDeployment, 3, e => e.status === 'error') && !force) {
 			console.warn('Skipping creation of platformtak of type deployment because the last run was an error, manual invocation is required ');
 			return;
 		}
@@ -58,27 +58,32 @@ function* planDeployment(): SagaIterator<void> {
 	}
 }
 
-export default function* deploymentTaskPlanner(): SagaIterator<never> {
-	let deploymentState = yield select(getDeploymentNumbers);
-	while (true) {
-		const a: EVENTS_CHILD = yield take(EVENTS_CHILD);
-		if (a.type === 'update') {
+function* shouldStartDeployment(a: EVENTS_CHILD, localState: { numbers: ReturnType<typeof getDeploymentNumbers>}): SagaIterator<boolean | 'force'> {
+	switch (a.type) {
+		case 'update':
 			if (a.module === 'deployment') {
 				const newDeploymentState = yield select(getDeploymentNumbers);
-				if (!shallowEquals(deploymentState, newDeploymentState)) {
-					deploymentState = newDeploymentState;
-					// Continue with the deployment
-				} else {
-					continue;
+				if (!shallowEquals(localState.numbers, newDeploymentState)) {
+					localState.numbers = newDeploymentState;
+					return true;
 				}
-			} else {
-				continue;
 			}
-		} else if (a.type === 'triggerPlatformTask') {
-			// Continue with the deployment
-		} else {
+			return false;
+		case 'triggerPlatformTask':
+			return 'force';
+		default:
 			return assertNever(a);
+	}
+}
+
+export default function* deploymentTaskPlanner(): SagaIterator<never> {
+	const localState: { numbers: ReturnType<typeof getDeploymentNumbers>} = { numbers: [] };
+	localState.numbers = yield yield select(getDeploymentNumbers);
+	while (true) {
+		const a: EVENTS_CHILD = yield take(EVENTS_CHILD);
+		const should: boolean | 'force' = yield call(shouldStartDeployment, a, localState);
+		if (should) {
+			yield call(planDeployment, should === 'force');
 		}
-		yield call(planDeployment);
 	}
 }
