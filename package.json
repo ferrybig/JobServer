@@ -7,6 +7,8 @@
     "test": "test"
   },
   "scripts": {
+    "client-start": "react-scripts start",
+    "client-build": "react-scripts build",
     "worker-test-1": "tsc src/worker/test.ts --outDir build/ --esModuleInterop --lib dom,dom.iterable,esnext && node build/worker/test.js",
     "worker-run": "tsc src/worker/index.ts --outDir build/ --esModuleInterop --lib dom,dom.iterable,esnext && node build/worker/index.js",
     "server-run": "tsc src/server/index.ts --outDir build/ --downlevelIteration true --esModuleInterop --lib dom,dom.iterable,esnext && node build/server/index.js",
@@ -19,6 +21,8 @@
     "@types/express": "^4.17.7",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/node-fetch": "^2.5.7",
+    "@types/react": "^16.9.35",
+    "@types/react-dom": "^16.9.8",
     "@types/redux-logger": "^3.0.8",
     "@types/redux-saga": "^0.10.5",
     "@types/tmp": "^0.2.0",
@@ -32,6 +36,9 @@
     "jsonwebtoken": "^8.5.1",
     "jwt-decode": "^2.2.0",
     "node-fetch": "^2.6.0",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "^3.4.1",
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "redux-saga": "^1.1.3",
@@ -39,6 +46,21 @@
     "ts-node": "^8.10.2",
     "uuid": "^8.2.0",
     "ws": "^7.3.1"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "devDependencies": {
     "@types/node": "^14.0.20",

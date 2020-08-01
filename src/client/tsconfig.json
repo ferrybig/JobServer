@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+//    "target": "es2015",
+    "lib": [
+	  "dom",
+      "esnext"
+    ],
+
+//	"module": "ES6",
+	"target": "ES2019",
+	"module": "commonjs",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": false,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react",
+	"downlevelIteration": true,
+	"alwaysStrict": true,
+	"noFallthroughCasesInSwitch": true,
+	"sourceMap": true,
+	"rootDir": "src",
+	"typeRoots": [
+		"../../node_modules/@types"
+	]
+  },
+  "include": [
+    ".."
+  ]
+}
