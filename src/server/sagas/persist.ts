@@ -1,7 +1,7 @@
 import {SagaIterator} from "redux-saga";
 import {computePersistState} from "../store/selectors";
 import {select, call, put, delay} from "redux-saga/effects";
-import {PersistStateV1} from "../store/types";
+import {PersistStateV1} from "../../common/types";
 import {CONFIG_PATH, CONFIG_RESET} from "../config";
 import {writeFile, readFile} from "../../common/async/fs";
 import {crudInit} from "../store/actions";
@@ -30,6 +30,7 @@ function* load() {
 					'FROM scratch AS export-stage',
 					'COPY --from=build-stage /app/build / '
 				],
+				buildScriptType: 'docker',
 				deploymentInformationId: '1',
 				sequenceId: 1,
 				deploymentDir: 'output/repo_1/1/deployments/1',
@@ -45,6 +46,7 @@ function* load() {
 					'FROM scratch AS export-stage',
 					'COPY /src /'
 				],
+				buildScriptType: 'docker',
 				deploymentInformationId: '2',
 				sequenceId: 1,
 				deploymentDir: 'output/repo_2/2/deployments/1',

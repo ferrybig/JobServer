@@ -1,6 +1,6 @@
 import {SagaIterator, channel} from "redux-saga";
 import {v4 as uuid} from 'uuid';
-import {PlatformTask} from "../../../store/types";
+import {PlatformTask} from "../../../../common/types";
 import {find, filter, getDeploymentNumbers} from "../../../store/selectors";
 import {select, put, call} from "redux-saga/effects";
 import {crudPersist, crudUpdate, triggerPlatformTask} from "../../../store/actions";

@@ -1,5 +1,5 @@
 import makeCrudModules, {DEFAULT_ACTION_TYPES, keyByIdField} from "../../common/utils/crudStore";
-import {Worker, Task, TaskInformation, Repo, Deployment, DeploymentInformation, PendingUploadedFile, Site, NginxConfig, PlatformTask} from './types';
+import {Worker, Task, TaskInformation, Repo, Deployment, DeploymentInformation, PendingUploadedFile, Site, NginxConfig, PlatformTask} from '../../common/types';
 
 export const {
 	selectors,

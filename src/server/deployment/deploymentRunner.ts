@@ -2,7 +2,7 @@ import {DeploymentChangeSet} from "./deploymentService";
 import {autoDeploymentService} from ".";
 import {State} from "../store/reducer";
 import {get, allKeys} from "../store/selectors";
-import {Site, NginxConfig} from "../store/types";
+import {Site, NginxConfig} from "../../common/types";
 import {SSL_NGINX_PORT, NOSSL_NGINX_PORT, NGINX_CONFIG_PATH, NGINX_CONFIG_CHECK, NGINX_RELOAD, NGINX_RESTART} from "../config";
 import {writeFile, access, unlink, rename} from "../../common/async/fs";
 import assertNever from "../../common/utils/assertNever";

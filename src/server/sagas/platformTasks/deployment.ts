@@ -1,4 +1,4 @@
-import {PlatformTask} from "../../store/types";
+import {PlatformTask} from "../../../common/types";
 import TaskOptions from "./taskOptions";
 import {State} from "../../store/reducer";
 import store from "../../store";

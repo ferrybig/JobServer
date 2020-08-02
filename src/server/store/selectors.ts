@@ -1,5 +1,5 @@
 import { State } from './reducer';
-import { PersistStateV1, Task, Deployment } from './types';
+import { PersistStateV1, Task, Deployment } from '../../common/types';
 import {selectors as crudSelectors} from './crud'
 import {CrudState} from '../../common/utils/crudStore';
 import {BuildTask} from '../../common/types';
@@ -42,6 +42,7 @@ export function taskToBuildTask(state: Pick<State, 'taskInformation' | 'deployme
 	return {
 		id: task.id,
 		buildScript: taskInformation.buildScript,
+		buildScriptType: taskInformation.buildScriptType,
 		repo: {
 			url: repo.url,
 			commit: deployment.commit,

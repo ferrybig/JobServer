@@ -1,4 +1,4 @@
-import {PlatformTask} from "../../store/types";
+import {PlatformTask} from "../../../common/types";
 import {fork, select, put, call, takeMaybe, StrictEffect} from "redux-saga/effects";
 import {find, filter} from "../../store/selectors";
 import {crudUpdate, crudPersist, crudConcat} from "../../store/actions";

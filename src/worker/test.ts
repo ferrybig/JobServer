@@ -15,6 +15,7 @@ taskRunner.run({
 		'FROM scratch AS export-stage',
 		'COPY --from=build-stage /app/build / '
 	],
+	buildScriptType: "docker",
 	repo: {
 		url: 'git@github.com:ferrybig/meet-app.git',
 		commit: '6bb5463193f5ee9434585058c1dcd358517c35a6',

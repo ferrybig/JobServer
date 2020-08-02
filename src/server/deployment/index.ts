@@ -1,4 +1,4 @@
-import {TaskInformation} from "../store/types";
+import {TaskInformation} from "../../common/types";
 import {DeploymentService, DeploymentData, DeploymentServiceForTask} from "./deploymentService";
 import deploymentStaticExtract from "./types/serverStatic";
 import assertNever from "../../common/utils/assertNever";

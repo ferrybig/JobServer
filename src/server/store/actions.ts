@@ -1,6 +1,6 @@
 import NodeWebSocket from "ws";
 import action from "../../common/utils/ActionCreator";
-import {Worker, Task, Repo, Deployment, DeploymentInformation, TaskInformation, PersistStateV1, PlatformTask } from './types'
+import {Worker, Task, Repo, Deployment, DeploymentInformation, TaskInformation, PersistStateV1, PlatformTask } from '../../common/types'
 import {actions as crudActions} from './crud';
 
 export const connectionWorker = action('connectionWorker', (webSocket: NodeWebSocket, ip: string, workerToken: string, baseUrl: string) => ({ webSocket, ip, workerToken, baseUrl }));
