@@ -7,5 +7,5 @@ export default function sortByKey<K extends string | symbol | number>(key: K, as
 		if (a[key] < b[key]) return asending ? -1 : 1;
 		if (a[key] > b[key]) return asending ? 1 : -1;
 		return 0;
-	}
+	};
 }
