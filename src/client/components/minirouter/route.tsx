@@ -141,7 +141,7 @@ function escapeRegExp(input: string) {
 /**
  * Makes a route matcher based on an template string and a few options.
  *
- * For the priority calculation, any normal char in the url gets 1 point, any arg gets 0.1 points, and an exact match gets -0.001 points
+ * For the priority calculation, any normal char in the url gets 1 point, any arg gets 0.1 points, and an exact match gets +0.001 points
  */
 function makeRouteMatcher<K extends string>(
 	templatePath: TemplateStringsArray,
@@ -163,7 +163,7 @@ function makeRouteMatcher<K extends string>(
 	debugValue += '`; ';
 	if (options.exact) {
 		constructed += '$';
-		priority -= 0.001;
+		priority += 0.001;
 	}
 	const asRegex = new RegExp(constructed);
 	debugValue += asRegex;
