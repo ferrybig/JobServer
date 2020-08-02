@@ -59,7 +59,7 @@ export class RouteDefinicationDefiner<P, I> {
 	public mapInverseDirect<R>(mapping: (props: R) => string): RouteDefinicationDefiner<P, R> {
 		return new RouteDefinicationDefiner(this.pathTransform, (other) => mapping(other), this.priority);
 	}
-	public mapAll<PN, IN>(mapping: (props: P, path: string) => PN, toPathMapping: (props: IN) => I): RouteDefinicationDefiner<PN, IN> {
+	public mapAll<PN, IN>(mapping: (props: P, path: string) => PN | null, toPathMapping: (props: IN) => I): RouteDefinicationDefiner<PN, IN> {
 		const toPath = this.toPath;
 		const transform = this.pathTransform;
 		return new RouteDefinicationDefiner((path) => {
@@ -74,21 +74,21 @@ export class RouteDefinicationDefiner<P, I> {
 		return this.mapForward((props, path) => ({ ...props, [key]: path}) as Exclude<P, K> & { [K1 in K]: string});
 	}
 	public addPriority(change: number): this {
-		this.priority += change
+		this.priority += change;
 		return this;
 	}
 	public setPriority(change: number): this {
-		this.priority = change
+		this.priority = change;
 		return this;
 	}
 	public setDebugValue(debugValue: string): this {
-		this.debugValue = debugValue
+		this.debugValue = debugValue;
 		return this;
 	}
 	public addCondition<R extends P>(condition: (props: P) => props is R): RouteDefinicationDefiner<R, I>;
 	public addCondition(condition: (props: P) => boolean): RouteDefinicationDefiner<P, I>;
 	public addCondition(condition: (props: P) => boolean): RouteDefinicationDefiner<P, I> {
-		return this.mapForward((props) => condition(props) ? props : null)
+		return this.mapForward((props) => condition(props) ? props : null);
 	}
 }
 
@@ -103,7 +103,7 @@ type GetInverseMapping<T> = T extends ((props: infer P) => string) ? P : never;
 export function customRoute<P, I extends ((props: any) => string) | null>(converter: (path: string) => P | null, inverseMapping: I, priority: number = 99999): RouteDefinicationDefiner<P, GetInverseMapping<I>> {
 	return new RouteDefinicationDefiner(
 		converter,
-		(inverseMapping || (() => { throw new Error('toPath not provides for this custom route'); })) as (arg: GetInverseMapping<I>) => string,
+		(inverseMapping || (() => { throw new Error('toPath not provided for this custom route'); })) as (arg: GetInverseMapping<I>) => string,
 		priority,
 	);
 }
@@ -113,6 +113,7 @@ interface RouteMatherOptions<K extends string | number | symbol = string | numbe
 	readonly lastOptional?: boolean,
 	readonly tokenDoesMatchSlash?: boolean,
 	readonly priorityAdjustMent?: number,
+	readonly generateDebugValue?: boolean,
 	readonly regexTokenProvider?: (key: K, index: number, isLast: boolean, options: RouteMatherOptions<K>) => string
 }
 
@@ -121,13 +122,14 @@ export const DEFAULT_ROUTE_OPTIONS: Required<RouteMatherOptions> = {
 	lastOptional: false,
 	tokenDoesMatchSlash: false,
 	priorityAdjustMent: 0,
+	generateDebugValue: process.env.NODE_ENV === 'development',
 	regexTokenProvider(key, index, isLast, options): string {
 		if (isLast && options.lastOptional) {
 			return options.tokenDoesMatchSlash ? '.*' : '[^/]*';
 		}
 		return options.tokenDoesMatchSlash ? '.+' : '[^/]+';
 	},
-}
+};
 
 function castedDefaultRouteOptions<K extends string | number | symbol>(): Required<RouteMatherOptions<K>> {
 	return DEFAULT_ROUTE_OPTIONS as unknown as Required<RouteMatherOptions<K>>;
@@ -141,14 +143,14 @@ function escapeRegExp(input: string) {
  *
  * For the priority calculation, any normal char in the url gets 1 point, any arg gets 0.1 points, and an exact match gets -0.001 points
  */
-export function makeRouteMatcher<K extends string>(
+function makeRouteMatcher<K extends string>(
 	templatePath: TemplateStringsArray,
 	options: Required<RouteMatherOptions<K>>,
 	args: K[],
 ): RouteDefinicationDefiner<{ [K1 in K]: string }, { [K1 in K]: string | number | { toString(): string } }> {
 	let constructed = `^${escapeRegExp(templatePath[0])}`;
 	let debugValue = `route\`${templatePath.raw[0]}`;
-	let prioriy = templatePath[0].length + options.priorityAdjustMent;
+	let priority = templatePath[0].length + options.priorityAdjustMent;
 	for (let i = 1; i < templatePath.length; i++) {
 		const argIndex = i - 1;
 		const isLastToken = i === templatePath.length - 1;
@@ -156,12 +158,12 @@ export function makeRouteMatcher<K extends string>(
 		constructed += templatePath[i];
 		debugValue += `\${'${args[argIndex]}'}`;
 		debugValue += templatePath.raw[i];
-		prioriy += 0.1 + templatePath[i].length;
+		priority += 0.1 + templatePath[i].length;
 	}
 	debugValue += '`; ';
 	if (options.exact) {
 		constructed += '$';
-		prioriy -= 0.001;
+		priority -= 0.001;
 	}
 	const asRegex = new RegExp(constructed);
 	debugValue += asRegex;
@@ -181,11 +183,9 @@ export function makeRouteMatcher<K extends string>(
 			}
 			return path;
 		},
-		prioriy,
-	).setDebugValue(debugValue);
+		priority,
+	).setDebugValue(options.generateDebugValue ? debugValue : '');
 }
-
-type FilterType<B, T> = B extends T ? B : never;
 
 interface RouteFinaliser<P, I> {
 	(options?: RouteMatherOptions<keyof P>): RouteDefinicationDefiner<P, I>
