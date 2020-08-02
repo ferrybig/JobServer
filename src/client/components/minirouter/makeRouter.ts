@@ -1,4 +1,4 @@
-import React, { ComponentType, useMemo } from 'react';
+import { ComponentType, useMemo } from 'react';
 import sortByKey from '../../../common/utils/sortByKey';
 import {RouteDefinication} from './route';
 import provideDefaults from '../../../common/utils/provideDefaults';
@@ -32,7 +32,7 @@ export default function makeRouter<R>(routes: RouteDefinication<R, any>[], optio
 			// eslint-disable-next-line react-hooks/rules-of-hooks
 			useMemo(() => newRoutes, []); // Show debug values in componentEditor
 		}
-		const [currentLocation] = finalOptions.locationService.useLocationService();
+		const currentLocation = finalOptions.locationService.useLocationService();
 		const matchedRenderFunction = useMemo((): (props: R) => JSX.Element | null => {
 			for (const route of newRoutes) {
 				const matchResult = route.tryRender(currentLocation);

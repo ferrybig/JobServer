@@ -13,4 +13,3 @@ export const tasksForDeploymentInformation = route`/tasks/${'deploymentInformati
 export const tasks = route`/tasks/`().component(TaskOverview);
 export const home = route`/`({ exact: true }).render(() => <Redirect route={tasks} props={{}}/>);
 export const notFound = route``().render(() => <span>Page not found</span>);
-

@@ -3,17 +3,9 @@ import React, { FC } from 'react';
 import * as routes from './routes';
 import makeRouter from './components/minirouter/makeRouter';
 
-console.log(routes);
 const Router = makeRouter(Object.values(routes));
 
-interface Props {
-//	test: string;
-}
-
-const App: FC<Props> = ({
-//	test
-}): JSX.Element => {
-
+const App: FC = (): JSX.Element => {
 	return (
 		<Router/>
 	);

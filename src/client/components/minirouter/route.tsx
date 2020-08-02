@@ -170,6 +170,7 @@ function makeRouteMatcher<K extends string>(
 	return customRoute(
 		function pathTransform(path): { [K1 in K]: string } | null {
 			const result = asRegex.exec(path);
+			// console.log(path, asRegex, result)
 			if (result === null) {
 				return null;
 			}
