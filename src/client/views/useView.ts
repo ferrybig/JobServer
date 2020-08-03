@@ -31,6 +31,7 @@ export default function useView<A extends string[], D, R>(
 				});
 			}
 		}, ...options);
-	}, [view, setValue]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [view, setValue, JSON.stringify(options)]);
 	return value;
 }
