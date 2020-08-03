@@ -10,7 +10,7 @@ export default function Link<R>({route, props, children, tag, onClick, ...rest}:
 } & HTMLAttributes<HTMLElement>): JSX.Element | null {
 	const [update, format] = contextLocation.useUpdate();
 	const path = route.toPath(props);
-	const realTag = tag || 'a' as const
+	const realTag = tag || 'a' as const;
 	const realOnClick = useCallback((e: React.MouseEvent<HTMLElement, MouseEvent>) => {
 		if (onClick) {
 			onClick(e);
@@ -19,7 +19,7 @@ export default function Link<R>({route, props, children, tag, onClick, ...rest}:
 			e.preventDefault();
 			update(path);
 		}
-	}, [onClick, path, update])
+	}, [onClick, path, update]);
 	return React.createElement(realTag, {
 		href: realTag === 'a' ? format(path) : undefined,
 		onClick: realOnClick,

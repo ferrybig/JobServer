@@ -1,6 +1,6 @@
 import NodeWebSocket from 'ws'
 import {BuildTask} from '../common/types';
-import {ServerToWorkerPacket, WorkerToServerPacket} from '../common/packets';
+import {ServerToWorkerPacket, WorkerToServerPacket} from '../common/packets/workerPackets';
 import fetch from 'node-fetch';
 import {stat, open} from '../common/async/fs';
 import assertNever from '../common/utils/assertNever';

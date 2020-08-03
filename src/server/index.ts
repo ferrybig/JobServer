@@ -1,17 +1,16 @@
 import { createServer } from "http";
-import express, {Request, Response, NextFunction} from "express";
+import express, { Request } from "express";
 import WebSocket from "ws";
 import url from 'url';
+import { Socket } from "net";
 import './polyfill';
-import store from "./store";
-import { connectionWorker, connectionClient } from "./store/actions";
+import store, { startSagas } from "./store";
+import { connectionWorker } from "./store/actions";
+import { PORT } from "./config";
 import uploadPage from "./pages/upload";
 import webhookPage from "./pages/webhook";
 
-
 const app = express();
-
-const port = process.env.PORT || 5000;
 const server = createServer(app);
 
 const webSocketServer = new WebSocket.Server({
@@ -37,10 +36,10 @@ const webSocketServer = new WebSocket.Server({
 	}
 });
 
-server.on('upgrade', function upgrade(request, socket, head) {
-	const pathname = url.parse(request.url).pathname;
+server.on('upgrade', function upgrade(request: Request, socket: Socket, head: Buffer) {
+	const pathname = url.parse(request.url).pathname || '';
 
-	if ((pathname || '').startsWith('/worker/') || pathname === '/follow/') {
+	if (pathname.startsWith('/worker/') || pathname === '/client') {
 		webSocketServer.handleUpgrade(request, socket, head, function done(ws) {
 			webSocketServer.emit('connection', ws, request);
 		});
@@ -60,6 +59,8 @@ webSocketServer.on("connection", (webSocket, req) => {
 		if (workerId.length !== 0) {
 			store.dispatch(connectionWorker(webSocket, req.socket.remoteAddress, workerId, "http://localhost:5000/"));
 		}
+	} else { //TODO add websocket event for a client
+		webSocket.terminate();
 	}
 	
 });
@@ -67,4 +68,10 @@ webSocketServer.on("connection", (webSocket, req) => {
 app.put('/uploads/:token', uploadPage);
 app.post('/webhook/:repo', webhookPage);
 
-server.listen(port, () => console.info(`Server running on port: ${port}`));
+server.listen(PORT, () => console.info(`Server running on port: ${PORT}`));
+
+startSagas().toPromise().catch((e) => {
+	console.error('Unexpected error inthe sagas!');
+	console.error(e);
+	process.exit(1);
+});

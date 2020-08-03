@@ -3,7 +3,7 @@ import {SagaIterator, EventChannel, Channel} from 'redux-saga';
 import crypto from 'crypto';
 import {Stats} from 'fs';
 import {v4 as uuid} from 'uuid'
-import {TaskRequest, TaskFinished, TaskError, WorkerToServerPacket, ServerToWorkerPacket, PingPacket} from '../../../common/packets';
+import {TaskRequest, TaskFinished, TaskError, WorkerToServerPacket, ServerToWorkerPacket, PingPacket} from '../../../common/packets/workerPackets';
 import {Worker, Task, PendingUploadedFile, Deployment} from '../../../common/types';
 import makeWebSocketChannel from '../../../common/sagas/makeWebSocketConnection';
 import timeoutHandler from '../timeoutHandler';
