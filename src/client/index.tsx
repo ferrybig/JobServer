@@ -16,7 +16,7 @@ const upstreamConnection = new UpstreamServer();
 upstreamConnection.registerPacketHandler('auth-challenge', () => {});
 upstreamConnection.registerPacketHandler('auth-response', () => {});
 registerViewsToServer(upstreamConnection);
-upstreamConnection.startConnection('http://loalhost:5000/client')
+upstreamConnection.startConnection('ws://localhost:5000/client')
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

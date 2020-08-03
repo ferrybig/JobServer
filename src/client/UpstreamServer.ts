@@ -89,7 +89,6 @@ export class UpstreamServer {
 		connection.addEventListener('close', (e) => {
 			console.log('Connection closed', e.wasClean, e.code, e.reason);
 			if (this.isConnected) {
-
 				this.isConnected = false;
 				for (const follower of this.serverStateMap.connectionLost) {
 					follower();
@@ -98,6 +97,7 @@ export class UpstreamServer {
 			const schedule = () => {
 				setTimeout(() => {
 					if (window.navigator.onLine === false) {
+						console.log('Refusing to connect because browser reports offline mode')
 						schedule();
 					} else {
 						this.socket = this.setupConnection();

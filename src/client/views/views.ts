@@ -5,8 +5,8 @@ import throwIfNotDefined from '../../common/utils/throwIfNotDefined';
 import {UpstreamServer} from '../UpstreamServer';
 
 type ClientDataForView<V extends views.View<any>> =
-	V['type'] extends 'list' ? V['entityData']['forms'][V['form']][] :
-	V['type'] extends 'single' ? V['entityData']['forms'][V['form']] :
+	V['type'] extends 'list' ? V['entityData']['examples'][V['form']][] :
+	V['type'] extends 'single' ? V['entityData']['examples'][V['form']] :
 	never;
 
 function subscriptionUpdater<V extends views.View<any>>(subscription: SubscriptionHandler<V>, data: SubscriptionListChangeData | SubscriptionSingleChangeData) {
@@ -126,6 +126,8 @@ function makeClientHandlers<V extends Record<any, views.View<any, any, any, any>
 				hasReceivedData: false,
 			};
 			handlerMap[subscriptionKey] = newSubscription;
+			subscriptionMap[newSubscription.requestId] = newSubscription;
+			sendSubscription(newSubscription);
 			return newSubscription;
 		}
 		return subscription;
@@ -213,6 +215,8 @@ function makeClientHandlers<V extends Record<any, views.View<any, any, any, any>
 		},
 	};
 }
+
+export type ViewData<V extends ClientView<any>> = Parameters<Parameters<V>[0]>[0];
 
 const {clientViews, register} = makeClientHandlers(views, {})
 
