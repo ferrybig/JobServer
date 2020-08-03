@@ -13,7 +13,7 @@ const TaskOverview: FC<Props> = ({
 	deploymentInformationId
 }): JSX.Element => {
 
-	const wrappedView = useCallback((subscribe: (data: ViewData<typeof clientViews.taskList> | ViewData<typeof clientViews.taskByDeploymentId>) => void): () => void => {
+	const wrappedView = useCallback((subscribe: (data: ViewData<typeof clientViews.taskList> | ViewData<typeof clientViews.taskByDeploymentId> | null) => void): () => void => {
 		if (deploymentInformationId) {
 			return clientViews.taskByDeploymentId(subscribe, deploymentInformationId);
 		} else {
@@ -22,6 +22,7 @@ const TaskOverview: FC<Props> = ({
 	}, [deploymentInformationId]);
 
 	const {data, status} = useView(wrappedView, []);
+
 	return (
 		<div >
 			{ deploymentInformationId }

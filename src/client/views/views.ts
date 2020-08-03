@@ -71,7 +71,7 @@ function subscriptionUpdater<V extends views.View<any>>(subscription: Subscripti
 }
 
 interface ClientView<V extends views.View<any>> {
-	(subscribe: (handler: (data: ClientDataForView<V> | null) => void) => void, ...options: ReturnType<V['argsHandler']>):() => void
+	(subscribe: (data: ClientDataForView<V> | null) => void, ...options: ReturnType<V['argsHandler']>):() => void
 }
 interface SubscriptionHandler<V extends views.View<any>> {
 	key: string,
@@ -216,7 +216,7 @@ function makeClientHandlers<V extends Record<any, views.View<any, any, any, any>
 	};
 }
 
-export type ViewData<V extends ClientView<any>> = Parameters<Parameters<V>[0]>[0];
+export type ViewData<V extends ClientView<any>> = NonNullable<Parameters<Parameters<V>[0]>[0]>;
 
 const {clientViews, register} = makeClientHandlers(views, {})
 
