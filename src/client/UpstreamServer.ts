@@ -53,7 +53,7 @@ export class UpstreamServer {
 	public sendPacket(packet: ClientToServerPacket) {
 		if (this.isConnected && this.socket) {
 			const data = JSON.stringify(packet);
-			console.debug('S<C: ' + data);
+			console.info('S<C: ' + data);
 			this.socket.send(data);
 		}
 	}
@@ -75,7 +75,7 @@ export class UpstreamServer {
 			}
 		});
 		connection.addEventListener('message', (e) => {
-			console.debug('S>C: ' + e.data);
+			console.info('S>C: ' + e.data);
 			const packet: ServerToClientPacket = JSON.parse(e.data);
 			const handler = this.packetMap[packet.type];
 			if (!handler) {
