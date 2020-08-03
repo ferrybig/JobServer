@@ -31,6 +31,6 @@ export default function useView<A extends string[], D, R>(
 				});
 			}
 		}, ...options);
-	}, [setValue]);
+	}, [view, setValue]);
 	return value;
 }
