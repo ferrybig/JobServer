@@ -9,7 +9,7 @@ type UseResult<D, R> = {
 } | {
 	status: 'not-found',
 	data: R,
-}
+};
 
 export default function useView<A extends string[], D, R>(
 	view: (handler: (data: D | null) => void, ...options: A) => () => void,
@@ -32,6 +32,6 @@ export default function useView<A extends string[], D, R>(
 			}
 		}, ...options);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [view, setValue, JSON.stringify(options)]);
+	}, [view, setValue, ...options]); // TODO use JSON.stringify here if we want to support length changing of the options list
 	return value;
 }
