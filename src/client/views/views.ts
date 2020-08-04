@@ -6,8 +6,8 @@ import { UpstreamServer } from '../UpstreamServer';
 
 type ClientDataForView<V extends views.View<any>> =
 	V['type'] extends 'list' ? V['entityData']['examples'][V['form']][] :
-		V['type'] extends 'single' ? V['entityData']['examples'][V['form']] :
-			never;
+	V['type'] extends 'single' ? V['entityData']['examples'][V['form']] :
+	never;
 
 function subscriptionUpdater<V extends views.View<any>>(subscription: SubscriptionHandler<V>, data: SubscriptionListChangeData | SubscriptionSingleChangeData) {
 	subscription.hasReceivedData = true;

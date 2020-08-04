@@ -14,8 +14,8 @@ function mapFilter(filter: FilterObject): string {
 export function take(filter: FilterArray | BaseTypes): TakeEffect {
 	const reduxFriendlyList =
 		Array.isArray(filter) ? filter.map(mapFilter) :
-			isActionCreator(filter) ? filter.type :
-				filter;
+		isActionCreator(filter) ? filter.type :
+		filter;
 	return sagaTake(reduxFriendlyList as unknown as string);
 }
 

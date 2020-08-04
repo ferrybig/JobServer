@@ -8,8 +8,8 @@ type FilterExtends<O, E> = O extends E ? O : never;
 
 type ExtractAction<A extends AllowedActions> =
 	A extends ActionCreator<any, infer P> ? P :
-		A extends ActionMapper<any, infer P> ? P :
-			never;
+	A extends ActionMapper<any, infer P> ? P :
+	never;
 
 export default function buildReducer<
 	S,

@@ -13,7 +13,7 @@ type FilterExtends<O, E> = O extends E ? O : never;
 
 type ExtractAction<A extends ActionCreator<any, any>> =
 	A extends ActionCreator<any, infer P> ? P :
-		never;
+	never;
 
 export default function mappedAction<
 	S,

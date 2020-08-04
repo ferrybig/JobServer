@@ -14,8 +14,8 @@ function isActionList(patterns: ActionPattern): patterns is { type: string }[] {
 
 type ActionType<T extends ActionPattern> =
 	T extends (arg: any) => arg is infer R ? R :
-		T extends { type: string, (...args: any[]): infer R }[] ? R :
-			AnyAction;
+	T extends { type: string, (...args: any[]): infer R }[] ? R :
+	AnyAction;
 
 export default function loopedActionChannel<
 	T extends ActionPattern,

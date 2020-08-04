@@ -17,7 +17,7 @@ type TargetToMapType<T> =
 	//	T extends HTMLVideoElement ? HTMLVideoElementEventMap :
 	//	T extends HTMLElement ? HTMLElementEventMap :
 	//	T extends Window ? WindowEventMap :
-		Record<string, any>
+	Record<string, any>
 
 type MapTypesToMap<O extends Record<string,any>, T> = { [K in keyof O]?: (this: T, event: O[K]) => void };
 

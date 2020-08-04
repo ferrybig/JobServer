@@ -12,7 +12,8 @@
 				},
 				"FunctionExpression": {
 					"parameters": "first"
-				}
+				},
+				"flatTernaryExpressions": true
 			}
 		],
 		"comma-dangle": [
