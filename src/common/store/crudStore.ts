@@ -1,6 +1,6 @@
 import { Reducer } from 'redux';
+import Values from '../utils/Values';
 
-type Values<T> = T[keyof T];
 type ValidKeyof = string | number | symbol
 
 type Definition = Record<string, (entity: any) => ValidKeyof>;
@@ -70,7 +70,8 @@ interface CrudStore<D extends Definition, A extends ActionTypes> {
 	},
 	reducers: {
 		[M in keyof D]: Reducer<CrudState<Parameters<D[M]>[0], ReturnType<D[M]>>, RemapType<BaseActions<M, Parameters<D[M]>[0], ReturnType<D[M]>>, A>>
-	}
+	},
+	keys: (keyof D)[];
 }
 
 function checkMappedActionType<M extends ValidKeyof, P, I extends ValidKeyof, T extends ActionType, A extends ActionTypes>(actionTypes: A, action: RemapType<BaseActions<M, P, I>, A>, type: T, module: M): action is FilterOnType<BaseActions<M, P, I>, { type: T }> {
@@ -337,6 +338,7 @@ export default function makeCrudModules<D extends Definition, A extends ActionTy
 		selectors: DEFAULT_SELECTORS,
 		actions: actions as { [K in keyof typeof actions]: AddTypeFromReturnType<RemoveNullType<(typeof actions)[K]>>},
 		reducers: Object.fromEntries(Object.entries(definitions).map(([module, getKey]): [keyof D, Reducer<any, any>] => [module, makeReducer(module, getKey, actionTypes)])) as Record<keyof D, Reducer<any, any>>,
+		keys: Object.keys(definitions),
 	};
 }
 

@@ -6,19 +6,7 @@ import { select, put, call } from 'redux-saga/effects';
 import { crudPersist, crudUpdate, triggerPlatformTask } from '../../../store/actions';
 import { take } from '../../../../common/utils/effects';
 import assertNever from '../../../../common/utils/assertNever';
-
-function shallowEquals<T>(a: readonly T[], b: readonly T[]): boolean {
-	if (a.length !== b.length) {
-		return false;
-	}
-	for (let i = 0; i < a.length; i++) {
-		if (a[i] !== b[i]) {
-			return false;
-		}
-	}
-	return true;
-}
-
+import shallowEquals from '../../../../common/utils/shallowEquals';
 
 const EVENTS_CHILD = [
 	crudUpdate,

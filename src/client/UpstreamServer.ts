@@ -1,6 +1,5 @@
 import { ServerToClientPacket, ClientToServerPacket } from '../common/packets/clientPackets';
 import assertNever from '../common/utils/assertNever';
-import Filter from '../common/utils/Filter';
 
 type ServerState = 'connected' | 'connectionLost';
 
@@ -27,7 +26,7 @@ export class UpstreamServer {
 		}, PING_TIMEOUT);
 	}
 
-	public registerPacketHandler<T extends ServerToClientPacket['type']>(type: T, onPacket: (packet: Filter<ServerToClientPacket, { type: T }>) => void): () => void {
+	public registerPacketHandler<T extends ServerToClientPacket['type']>(type: T, onPacket: (packet: Extract<ServerToClientPacket, { type: T }>) => void): () => void {
 		const packetMap: Record<ServerToClientPacket['type'], undefined | ((packet: ServerToClientPacket) => void)> = this.packetMap;
 		const existingHandler = packetMap[type];
 		if (existingHandler) {

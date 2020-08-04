@@ -1,4 +1,5 @@
-type Values<O> = O[keyof O];
+import Values from './Values';
+
 type SelectIfUndefined<T, K> = T extends undefined ? K : never;
 type OnlyUndefinedValues<O> = Values<{ [K in keyof O]: SelectIfUndefined<O[K], K>}>;
 type RemoveUndefined<T> = T extends undefined ? never : T;
