@@ -1,4 +1,4 @@
-import action from '../../common/utils/ActionCreator';
+import action from '../../common/store/ActionCreator';
 import { BuildTask } from '../../common/types';
 
 export const taskRequest = action('taskRequest', () => null);

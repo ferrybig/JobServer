@@ -12,7 +12,7 @@ import { take } from '../../../common/utils/effects';
 import assertNever from '../../../common/utils/assertNever';
 import { BuildTask } from '../../../common/types';
 import { stat, truncate } from '../../../common/async/fs';
-import actionMatching from '../../../common/utils/actionMatching';
+import actionMatching from '../../../common/store/actionMatching';
 import pickFirstNonNullCount from '../../../common/utils/pickFirstNonNullCount';
 
 type FilterAway<B, T> = B extends T ? never : B;

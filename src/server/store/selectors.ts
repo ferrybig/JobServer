@@ -1,7 +1,7 @@
 import { State } from './reducer';
 import { PersistStateV1, Task, Deployment } from '../../common/types';
 import { selectors as crudSelectors } from './crud';
-import { CrudState } from '../../common/utils/crudStore';
+import { CrudState } from '../../common/store/crudStore';
 import { BuildTask } from '../../common/types';
 import { DeploymentData, RawDeploymentData, rawDeploymentDataIsDeploymentData, DeploymentChangeSet } from '../deployment/deploymentService';
 import sortByKey from '../../common/utils/sortByKey';

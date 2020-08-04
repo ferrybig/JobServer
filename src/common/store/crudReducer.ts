@@ -1,4 +1,4 @@
-import Values from './Values';
+import Values from '../utils/Values';
 
 type UnionToIntersection<T> =
   (T extends any ? (x: T) => any : never) extends
