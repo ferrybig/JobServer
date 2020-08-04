@@ -26,6 +26,15 @@ function makeView<
 	};
 }
 
+export type DataForView<V extends View<any>> =
+	V['type'] extends 'list' ? V['entityData']['examples'][V['form']][] :
+	V['type'] extends 'single' ? V['entityData']['examples'][V['form']] :
+	never;
+export type AllDataForView<V extends View<any>> =
+	V['type'] extends 'list' ? V['entityData']['examples']['all'][] :
+	V['type'] extends 'single' ? V['entityData']['examples']['all'] :
+	never;
+
 export const taskGet = makeView(task, 'full', 'single', args<[string]>());
 export const taskList = makeView(task, 'short', 'list', args<[]>());
 export const taskByRepo = makeView(task, 'short', 'list', args<[string]>());

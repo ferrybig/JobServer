@@ -4,11 +4,6 @@ import assertNever from '../../common/utils/assertNever';
 import throwIfNotDefined from '../../common/utils/throwIfNotDefined';
 import { UpstreamServer } from '../UpstreamServer';
 
-type ClientDataForView<V extends views.View<any>> =
-	V['type'] extends 'list' ? V['entityData']['examples'][V['form']][] :
-	V['type'] extends 'single' ? V['entityData']['examples'][V['form']] :
-	never;
-
 function subscriptionUpdater<V extends views.View<any>>(subscription: SubscriptionHandler<V>, data: SubscriptionListChangeData | SubscriptionSingleChangeData) {
 	subscription.hasReceivedData = true;
 	switch (subscription.view.type) {
@@ -16,22 +11,22 @@ function subscriptionUpdater<V extends views.View<any>>(subscription: Subscripti
 		const listData = data as SubscriptionListChangeData;
 		switch (listData.type) {
 		case 'replace':
-			subscription.value = listData.data as ClientDataForView<V>;
+			subscription.value = listData.data as views.DataForView<V>;
 			break;
 		case 'delete':
 			const array1 = [...throwIfNotDefined(subscription.value) as V['entityData']['forms'][V['form']][]];
 			array1.splice(listData.index, 1);
-			subscription.value = array1 as ClientDataForView<V>;
+			subscription.value = array1 as views.DataForView<V>;
 			break;
 		case 'update':
 			const array2 = [...throwIfNotDefined(subscription.value) as V['entityData']['forms'][V['form']][]];
 			array2[listData.index] = listData.data;
-			subscription.value = array2 as ClientDataForView<V>;
+			subscription.value = array2 as views.DataForView<V>;
 			break;
 		case 'insert':
 			const array3 = [...throwIfNotDefined(subscription.value) as V['entityData']['forms'][V['form']][]];
 			array3.splice(listData.index, 0, listData.data);
-			subscription.value = array3 as ClientDataForView<V>;
+			subscription.value = array3 as views.DataForView<V>;
 			break;
 		default:
 			return assertNever(listData);
@@ -47,12 +42,12 @@ function subscriptionUpdater<V extends views.View<any>>(subscription: Subscripti
 			subscription.value = {
 				...throwIfNotDefined(subscription.value),
 				...singleData.data,
-			} as ClientDataForView<V> ;
+			} as views.DataForView<V> ;
 			break;
 		case 'concat':
 			const copy = {
 				...throwIfNotDefined(subscription.value),
-			} as unknown as ClientDataForView<V>;
+			} as unknown as views.DataForView<V>;
 			for (const [key, value] of Object.entries(singleData.data)) {
 				copy[key] = value;
 			}
@@ -71,14 +66,14 @@ function subscriptionUpdater<V extends views.View<any>>(subscription: Subscripti
 }
 
 interface ClientView<V extends views.View<any>> {
-	(subscribe: (data: ClientDataForView<V> | null) => void, ...options: ReturnType<V['argsHandler']>):() => void
+	(subscribe: (data: views.DataForView<V> | null) => void, ...options: ReturnType<V['argsHandler']>):() => void
 }
 interface SubscriptionHandler<V extends views.View<any>> {
 	key: string,
 	requestId: number;
-	followers: ((data: ClientDataForView<V> | null) => void)[];
+	followers: ((data: views.DataForView<V> | null) => void)[];
 	args: string[];
-	value: ClientDataForView<V> | null;
+	value: views.DataForView<V> | null;
 	view: V;
 	wantsSubscription: boolean;
 	viewName: string,
@@ -150,7 +145,7 @@ function makeClientHandlers<V extends Record<any, views.View<any, any, any, any>
 	}
 	const clientViews: Partial<{ [K in keyof V]: ClientView<V[K]> }> = {};
 	for (const [key, value] of Object.entries(views)) {
-		clientViews[key as keyof V] = ((handler: (data: ClientDataForView<V[keyof V]> | null) => void, ...args: string[]) => {
+		clientViews[key as keyof V] = ((handler: (data: views.DataForView<V[keyof V]> | null) => void, ...args: string[]) => {
 			const wantsSubscription = true;
 			const subscription = getOrCreateSubscriptionHandler(key, value, args, wantsSubscription);
 
@@ -165,7 +160,7 @@ function makeClientHandlers<V extends Record<any, views.View<any, any, any, any>
 				return unsubscribeHandler(subscription, handler);
 			} else {
 				let unsubscribe: () => void;
-				const newHandler = (data: ClientDataForView<V[keyof V]> | null) => {
+				const newHandler = (data: views.DataForView<V[keyof V]> | null) => {
 					handler(data);
 					unsubscribe();
 				};
