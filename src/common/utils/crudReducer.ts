@@ -71,7 +71,7 @@ export default function crudReducer<T, I extends string | number, M extends Acti
 				byId: [...state.byId],
 			};
 			const index = newState.byId.indexOf(key);
-			if(index < 0) {
+			if (index < 0) {
 				throw new Error('Inconsistent state! key was found in entity map, but not in byId map');
 			}
 			newState.byId.splice(index, 1);

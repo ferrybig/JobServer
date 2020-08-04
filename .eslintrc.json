@@ -3,7 +3,7 @@
 	"plugins": ["jsx-a11y"],
 	"rules": {
 		"@typescript-eslint/indent": [
-			"error",
+			"warn",
 			"tab",
 			{
 				"ObjectExpression": "first",
@@ -16,7 +16,7 @@
 			}
 		],
 		"comma-dangle": [
-			"error",
+			"warn",
 			"only-multiline"
 		],
 		"@typescript-eslint/no-explicit-any": ["off"],
@@ -25,9 +25,10 @@
 		"no-undef": ["off"],
 		"react/prop-types": ["off"],
 		"@typescript-eslint/no-empty-function": ["off"],
-		"object-curly-spacing": ["error", "always"],
+		"object-curly-spacing": ["warn", "always"],
 		"semi": ["error", "always"],
-		"eol-last": ["error", "always"],
-		"quotes": ["error", "single"]
+		"eol-last": ["warn", "always"],
+		"quotes": ["warn", "single"],
+		"keyword-spacing": ["warn", { "before": true, "after": true, "overrides": { "function": { "after": false }, "catch": { "after": false }}}]
 	}
 }

@@ -16,7 +16,7 @@ export default function debounce<T extends (...args: any) => any>(
 		}
 	};
 	const debounced = (...args: Parameters<T>): void => {
-		if(nextCall !== null) {
+		if (nextCall !== null) {
 			clearTimeout(nextCall.timer);
 			nextCall.args = combine(args, nextCall.args);
 			nextCall.timer = setTimeout(flush, wait);

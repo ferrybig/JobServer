@@ -20,7 +20,7 @@ type FilterAway<B, T> = B extends T ? never : B;
 type WorkerToServerPacketNoPing = FilterAway<WorkerToServerPacket, PingPacket>;
 
 function* receivePacket(socket: Socket): SagaIterator<WorkerToServerPacketNoPing> {
-	while(true) {
+	while (true) {
 		const packet: WorkerToServerPacket = JSON.parse(yield take(socket.incoming));
 		if (packet.type !== 'ping') {
 			return packet;
@@ -99,7 +99,7 @@ function* handlePing(socket: Socket, packet: PingPacket): SagaIterator<void> {
 }
 
 function* handleWaitingForTask(socket: Socket, packet: TaskRequest): SagaIterator<CallEffect> {
-	while(true) {
+	while (true) {
 		const worker: Worker = yield select(get, 'workers', socket.worker.id);
 		socket.worker = worker;
 		if (worker.currentTask !== null) {

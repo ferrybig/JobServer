@@ -15,7 +15,7 @@ export default class Lock {
 		return new Promise<() => void>((resolve) => {
 			const doLock = () => {
 				resolve(() => {
-					if(!this.locked) {
+					if (!this.locked) {
 						throw new Error('Lock not locked');
 					}
 					const taker = this.pendingLockers.shift();
@@ -27,7 +27,7 @@ export default class Lock {
 					}
 				});
 			};
-			if(!this.locked) {
+			if (!this.locked) {
 				this.locked = true;
 				this.onLock();
 				return doLock();

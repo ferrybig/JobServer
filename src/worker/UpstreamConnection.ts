@@ -79,7 +79,7 @@ export default class UpstreamConnection {
 		this.state = state;
 	}
 	private sendPacketForState() {
-		switch(this.state.type) {
+		switch (this.state.type) {
 		case 'uploading':
 			this.sendMessage({
 				type: 'taskFinished',

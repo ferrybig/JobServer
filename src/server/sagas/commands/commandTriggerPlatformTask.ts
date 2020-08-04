@@ -10,7 +10,7 @@ const isValidType = stringInListChecker<PlatformTask['type']>({
 });
 
 export default function* commandTriggerPlatformTask(sender: CommandSender, [command, arg1]: string[]): SagaIterator<void> {
-	if(!arg1) {
+	if (!arg1) {
 		sender.sendMessage(`Usage: ${command} ${isValidType.types.join('|')}`);
 		return;
 	}

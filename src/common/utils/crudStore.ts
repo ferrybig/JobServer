@@ -126,18 +126,22 @@ const DEFAULT_SELECTORS = {
 	},
 	find: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, pattern: Partial<T> | ((input: T) => boolean)): T | null => {
 		const filter = makeFilter(pattern);
-		for(const id of state[module].byId) {
-			if (filter(state[module].entities[id]!)) {
-				return state[module].entities[id]!;
+		const byId = state[module].byId;
+		const entities = state[module].entities;
+		for (const id of byId) {
+			if (filter(entities[id]!)) {
+				return entities[id]!;
 			}
 		}
 		return null;
 	},
 	findLatest: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, pattern: Partial<T> | ((input: T) => boolean)): T | null => {
 		const filter = makeFilter(pattern);
-		for (let i = state[module].byId.length - 1; i >= 0; i--) {
-			if (filter(state[module].entities[state[module].byId[i]]!)) {
-				return state[module].entities[state[module].byId[i]]!;
+		const byId = state[module].byId;
+		const entities = state[module].entities;
+		for (let i = byId.length - 1; i >= 0; i--) {
+			if (filter(entities[byId[i]]!)) {
+				return entities[byId[i]]!;
 			}
 		}
 		return null;
@@ -145,9 +149,11 @@ const DEFAULT_SELECTORS = {
 	filter: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, pattern: Partial<T> | ((input: T) => boolean)): T[] => {
 		const filter = makeFilter(pattern);
 		const res: T[] = [];
-		for(const id of state[module].byId) {
-			if (filter(state[module].entities[id]!)) {
-				res.push(state[module].entities[id]!);
+		const byId = state[module].byId;
+		const entities = state[module].entities;
+		for (const id of byId) {
+			if (filter(entities[id]!)) {
+				res.push(entities[id]!);
 			}
 		}
 		return res;
@@ -165,7 +171,7 @@ function makeReducer<
 	actionTypes: A
 ): Reducer<CrudState<P, I>, RemapType<BaseActions<M, P, I>, A>> {
 	return function reducer(state: CrudState<P, I> = DEFAULT_STATE, action): CrudState<P, I> {
-		if(checkMappedActionType(actionTypes, action, 'persist', module)) {
+		if (checkMappedActionType(actionTypes, action, 'persist', module)) {
 			const key = getKey(action.payload);
 			const existingValue = state.entities[key];
 			if (existingValue === action.payload) {
@@ -199,7 +205,7 @@ function makeReducer<
 			delete newState.entities[key];
 			return newState;
 		} else if (checkMappedActionType(actionTypes, action, 'init', module)) {
-			if(!action.payload[module]) {
+			if (!action.payload[module]) {
 				return state;
 			}
 			const newState = {

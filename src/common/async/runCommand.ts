@@ -22,16 +22,16 @@ function startProcess(command: string, args: string[], options: Options, resolve
 		});
 		if (stdIn !== null) {
 			close(stdIn, (e) => {
-				if(e) {
+				if (e) {
 					console.warn(e);
 				}
 			});
 		}
 		resolve(null, proc);
 	}
-	if(options.stdin) {
+	if (options.stdin) {
 		open(options.stdin, 'r', (err, fd) => {
-			if(err) {
+			if (err) {
 				resolve(err, null as unknown as ChildProcess);
 			} else {
 				start(fd);

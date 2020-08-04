@@ -18,7 +18,7 @@ function* loopedChannelInternal(
 	) ? yield channelOrFactory : channelOrFactory;
 	let task: Task | null = null;
 	try {
-		while(true) {
+		while (true) {
 			const packet = yield take(channel);
 			if (options.nonBlocking) {
 				if (options.killLast && task) {

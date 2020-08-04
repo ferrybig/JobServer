@@ -45,7 +45,7 @@ function makeConsoleCommandSender(): CommandSender {
 export default function* stdinReader(): SagaIterator {
 	const sender: CommandSender = yield call(makeConsoleCommandSender);
 	const channel: EventChannel<string[]> = yield call(createChannel);
-	while(true) {
+	while (true) {
 		const parsed: string[] = yield take(channel);
 		yield call(executeCommand, sender, parsed);
 	}

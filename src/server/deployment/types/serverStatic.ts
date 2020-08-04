@@ -47,7 +47,7 @@ const deployment: DeploymentService = {
 			l.gzip('on');
 			l.gzipStatic('on');
 			for (const line of data.taskInformation.deploymentInstructions.split('\n')) {
-				switch(line) {
+				switch (line) {
 				case '':
 					// Do nothing
 					break;

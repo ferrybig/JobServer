@@ -184,7 +184,7 @@ function* save() {
 export default function* handlePersist(): SagaIterator {
 	yield call(load);
 	yield call(save);
-	while(true) {
+	while (true) {
 		yield take(() => true);
 		yield delay(1000);
 		yield call(save);

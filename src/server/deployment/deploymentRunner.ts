@@ -33,7 +33,7 @@ async function tryAllOrDeconstructLoop<T, R>(array: T[], callback: {
 		}
 		return callback.inner();
 	} catch(e) {
-		for(index = index - 1; index >= 0; index--) {
+		for (index = index - 1; index >= 0; index--) {
 			try {
 				await callback.onDestroy(array[index], index, array);
 			} catch(e) {

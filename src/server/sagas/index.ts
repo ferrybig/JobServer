@@ -19,7 +19,7 @@ function* spawnHelper(toKill: Task | undefined, action: ReturnType<typeof connec
 
 function* startWorkerListener(): SagaIterator {
 	const map: Map<string, Task> = new Map();
-	while(true) {
+	while (true) {
 		const action: ReturnType<typeof connectionWorker> = yield take(connectionWorker);
 		const existingTask = map.get(action.payload.workerToken);
 		const newTask = yield spawn(spawnHelper, existingTask, action);

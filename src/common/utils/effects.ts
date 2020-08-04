@@ -26,7 +26,7 @@ export function takeFiltered<
 	actions: A[], key: K, value: V
 ): TakeEffect {
 	const map: Record<string, true> = {};
-	for(const action of actions) {
+	for (const action of actions) {
 		map[action.type] = true;
 	}
 	function isMatchedAction(action: AnyAction): action is ReturnType<A> {

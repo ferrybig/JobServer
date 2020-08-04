@@ -25,7 +25,7 @@ export default function* taskDistributer(timestampService: () => number = () => 
 	let hasNewTasks = true;
 	while (true) {
 		const action: EVENTS_CHILD = yield take(EVENTS_CHILD);
-		switch(action.type) {
+		switch (action.type) {
 		case 'update':
 			if (action.module === 'task') {
 				if ((action.payload.data as Partial<Task>).status === 'approved') {

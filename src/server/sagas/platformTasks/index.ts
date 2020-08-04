@@ -96,7 +96,7 @@ function* executeTask(task: PlatformTask, timestampService: () => number = () =>
 				default:
 					return assertNever(packet);
 				}
-			} while(!hasEnded);
+			} while (!hasEnded);
 		} finally {
 			channel.close();
 		}
@@ -136,7 +136,7 @@ function* taskWatcher(timestampService: () => number = () => Date.now()): SagaIt
 		}));
 	}
 	yield fork(taskPlanner);
-	while(true) {
+	while (true) {
 		const task: PlatformTask | null = yield select(find, 'platformTask', { status: 'pending' });
 		if (task) {
 			yield put(crudUpdate('platformTask', {

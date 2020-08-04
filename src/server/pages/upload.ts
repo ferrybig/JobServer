@@ -9,7 +9,7 @@ export default function uploadPage(req: Request, res: Response, next: NextFuncti
 	const token = req.params.token;
 	let offset = Number(req.headers['X-offset'] || '0');
 	const file = getOrNull(store.getState(), 'pendingFile', token);
-	if(!file) {
+	if (!file) {
 		res.statusCode = 404;
 		res.send('entity not found');
 		return;

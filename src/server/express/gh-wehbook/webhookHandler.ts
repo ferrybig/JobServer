@@ -6,7 +6,7 @@ import { Webhook, UnknownWebhook } from './webhookTypes';
 
 function makeWebhookData(type: string, body: any): Webhook {
 	const castedType = type as Exclude<Webhook['type'], UnknownWebhook['type']> | undefined;
-	switch(castedType) {
+	switch (castedType) {
 	case 'ping':
 	case 'push':
 		return {
