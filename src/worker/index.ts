@@ -1,5 +1,6 @@
 import { runSaga, stdChannel, RunSagaOptions } from 'redux-saga'
 import mainSaga from './sagas';
+import stopNodeProcessOnError from '../common/utils/stopNodeProcessOnError';
 
 const channel = stdChannel<never>()
 
@@ -19,4 +20,4 @@ const myIO: RunSagaOptions<never, never> = {
 runSaga(
 	myIO,
 	mainSaga,
-);
+).toPromise().catch(stopNodeProcessOnError);

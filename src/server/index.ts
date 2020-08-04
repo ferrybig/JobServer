@@ -9,6 +9,7 @@ import { connectionWorker } from "./store/actions";
 import { PORT } from "./config";
 import uploadPage from "./pages/upload";
 import webhookPage from "./pages/webhook";
+import stopNodeProcessOnError from "../common/utils/stopNodeProcessOnError";
 
 const app = express();
 const server = createServer(app);
@@ -70,8 +71,4 @@ app.post('/webhook/:repo', webhookPage);
 
 server.listen(PORT, () => console.info(`Server running on port: ${PORT}`));
 
-startSagas().toPromise().catch((e) => {
-	console.error('Unexpected error inthe sagas!');
-	console.error(e);
-	process.exit(1);
-});
+startSagas().toPromise().catch(stopNodeProcessOnError);
