@@ -1,7 +1,7 @@
-import {ServerToClientPacket, ClientToServerPacket} from "../common/packets/clientPackets";
+import { ServerToClientPacket, ClientToServerPacket } from "../common/packets/clientPackets";
 import assertNever from "../common/utils/assertNever";
+import Filter from "../common/utils/Filter";
 
-type Filter<B, T> = B extends T ? B : never;
 type ServerState = 'connected' | 'connectionLost';
 
 function mapWithValue<K extends string | number | symbol, V>(keys: K[], value: V): Record<K, V> {
@@ -66,46 +66,53 @@ export class UpstreamServer {
 		this.socketUrl = socketUrl;
 		this.socket = this.setupConnection();
 	}
-	private setupConnection(): WebSocket {
-		const connection = new WebSocket(this.socketUrl);
-		connection.addEventListener('open', (e) => {
-			this.isConnected = true;
-			for (const follower of this.serverStateMap.connected) {
-				follower();
+
+	private scheduleReconnect() {
+		setTimeout(() => {
+			if (window.navigator.onLine === false) {
+				console.log('Refusing to connect because browser reports offline mode')
+				this.scheduleReconnect();
+			} else {
+				this.socket = this.setupConnection();
 			}
-		});
-		connection.addEventListener('message', (e) => {
-			console.info('S>C: ' + e.data);
-			const packet: ServerToClientPacket = JSON.parse(e.data);
-			const handler = this.packetMap[packet.type];
-			if (!handler) {
-				return assertNever(handler, 'packet type ' + packet.type + ' not handled');
-			}
-			handler(packet);
-		});
-		connection.addEventListener('error', (e) => {
-			console.error(e);
-		});
-		connection.addEventListener('close', (e) => {
-			console.log('Connection closed', e.wasClean, e.code, e.reason);
-			if (this.isConnected) {
-				this.isConnected = false;
-				for (const follower of this.serverStateMap.connectionLost) {
+		}, RECONNECT_TIMEOUT);
+	}
+	private setupConnection(): WebSocket | null {
+		try {
+			const connection = new WebSocket(this.socketUrl);
+			connection.addEventListener('open', (e) => {
+				this.isConnected = true;
+				for (const follower of this.serverStateMap.connected) {
 					follower();
 				}
-			}
-			const schedule = () => {
-				setTimeout(() => {
-					if (window.navigator.onLine === false) {
-						console.log('Refusing to connect because browser reports offline mode')
-						schedule();
-					} else {
-						this.socket = this.setupConnection();
+			});
+			connection.addEventListener('message', (e) => {
+				console.info('S>C: ' + e.data);
+				const packet: ServerToClientPacket = JSON.parse(e.data);
+				const handler = this.packetMap[packet.type];
+				if (!handler) {
+					return assertNever(handler, 'packet type ' + packet.type + ' not handled');
+				}
+				handler(packet);
+			});
+			connection.addEventListener('error', (e) => {
+				console.error(e);
+			});
+			connection.addEventListener('close', (e) => {
+				console.log('Connection closed', e.wasClean, e.code, e.reason);
+				if (this.isConnected) {
+					this.isConnected = false;
+					for (const follower of this.serverStateMap.connectionLost) {
+						follower();
 					}
-				}, RECONNECT_TIMEOUT);
-			};
-			schedule();
-		});
-		return connection;
+				}
+				this.scheduleReconnect();
+			});
+			return connection;
+		} catch(e) {
+			console.error(e)
+			this.scheduleReconnect();
+			return this.socket;
+		}
 	}
 }
