@@ -1,6 +1,5 @@
 import { CallEffect, call, fork, put, select, cancel } from 'redux-saga/effects';
 import { SagaIterator, EventChannel, Channel } from 'redux-saga';
-import crypto from 'crypto';
 import { Stats } from 'fs';
 import { v4 as uuid } from 'uuid';
 import { TaskRequest, TaskFinished, TaskError, WorkerToServerPacket, ServerToWorkerPacket, PingPacket } from '../../../common/packets/workerPackets';
@@ -90,7 +89,7 @@ interface Socket {
 	worker: Worker,
 	baseUrl: string,
 }
-function* disconnectInvalidSequence(socket: Socket, packet: WorkerToServerPacket): SagaIterator<never> {
+function disconnectInvalidSequence(socket: Socket, packet: WorkerToServerPacket): never {
 	throw new Error('Connection for worker ' + socket.worker.id + ' send invalid packet: ' + JSON.stringify(packet));
 }
 function* handlePing(socket: Socket, packet: PingPacket): SagaIterator<void> {

@@ -1,5 +1,5 @@
 import NodeWebSocket from 'ws';
-import { SagaIterator, eventChannel, END, Channel } from 'redux-saga';
+import { SagaIterator, eventChannel, END } from 'redux-saga';
 import onEvent from '../../common/utils/onEvent';
 import { take } from '../../common/utils/effects';
 import assertNever from '../../common/utils/assertNever';

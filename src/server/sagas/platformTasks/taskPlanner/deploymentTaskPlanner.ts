@@ -1,4 +1,4 @@
-import { SagaIterator, channel } from "redux-saga";
+import { SagaIterator } from "redux-saga";
 import { v4 as uuid } from 'uuid';
 import { PlatformTask } from "../../../../common/types";
 import { find, filter, getDeploymentNumbers } from "../../../store/selectors";

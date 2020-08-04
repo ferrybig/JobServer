@@ -4,9 +4,10 @@ import { State } from "../store/reducer";
 import { get, allKeys } from "../store/selectors";
 import { Site, NginxConfig } from "../../common/types";
 import { SSL_NGINX_PORT, NOSSL_NGINX_PORT, NGINX_CONFIG_PATH, NGINX_CONFIG_CHECK, NGINX_RELOAD, NGINX_RESTART } from "../config";
-import { writeFile, access, unlink, rename } from "../../common/async/fs";
+import { writeFile, unlink, rename } from "../../common/async/fs";
 import assertNever from "../../common/utils/assertNever";
 import runCommand from "../../common/async/runCommand";
+import indent from "../../common/utils/indent";
 
 const NGINX_CONFIG_PATH_NEW = NGINX_CONFIG_PATH + '.new';
 const NGINX_CONFIG_PATH_BAK = NGINX_CONFIG_PATH + '.bak';
@@ -53,15 +54,6 @@ function writeConfigFor(state: Pick<State, 'nginxConfig'>, topic: Site | NginxCo
 
 }
 
-function indent(main: string, indent: number | string) {
-	const finalIndent = typeof indent === 'number' ? '\t'.repeat(indent) : indent;
-	if (main.length === 0) {
-		return '';
-	}
-	const split = main.split('\n');
-	return split.map((e, i) => i === split.length - 1 ? e : finalIndent + e).join('\n');
-}
-
 interface Options {
 	abortSignal?: SimpleAbortSignal,
 	logger?: (log: string) => void;
@@ -72,8 +64,6 @@ type OptionsAllRequired = {
 }
 
 export default class DeploymentRunner {
-	public constructor() {}
-
 	public run(changes: DeploymentChangeSet, state: Pick<State, 'site' | 'nginxConfig'>, options: Options = {}): Promise<void> {
 		const abortSignal = options.abortSignal || { aborted: false };
 		const logger = options.logger || (() => {});

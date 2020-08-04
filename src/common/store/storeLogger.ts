@@ -1,10 +1,6 @@
-import { Middleware, MiddlewareAPI, Dispatch, AnyAction } from "redux";
-import { createLogger } from 'redux-logger';
+import { Middleware } from "redux";
 
 export default function storeLogger() {
-//	return createLogger({
-//		
-//	});
 	const middleWare: Middleware = (api) => {
 		return (next)  => {
 			return (action) => {

@@ -1,5 +1,5 @@
 import { Worker, Task } from '../../../common/types';
-import { crudUpdate, crudPersist, workerAwaitsTask, workerDisconnected } from '../../store/actions';
+import { crudUpdate, workerAwaitsTask, workerDisconnected } from '../../store/actions';
 import { take } from '../../../common/utils/effects';
 import { select, put } from 'redux-saga/effects';
 import { findNextPendingTask } from '../../store/selectors';

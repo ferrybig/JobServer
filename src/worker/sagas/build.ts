@@ -1,5 +1,5 @@
 import { SagaIterator } from "redux-saga";
-import { fork, call, apply } from "redux-saga/effects";
+import { call, apply } from "redux-saga/effects";
 import UpstreamConnection from "../UpstreamConnection";
 import { BuildTask } from "../../common/types";
 import TaskRunner from "../taskRunner";

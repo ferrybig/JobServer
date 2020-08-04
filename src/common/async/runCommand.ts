@@ -1,5 +1,5 @@
 import { spawn, ChildProcess } from 'child_process';
-import { createReadStream, open, close } from 'fs';
+import { open, close } from 'fs';
 
 interface Options {
 	logger?: (str: string) => void,

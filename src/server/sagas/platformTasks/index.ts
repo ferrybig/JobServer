@@ -1,8 +1,8 @@
 import { PlatformTask } from "../../../common/types";
-import { fork, select, put, call, takeMaybe, StrictEffect } from "redux-saga/effects";
+import { fork, select, put, call, StrictEffect } from "redux-saga/effects";
 import { find, filter } from "../../store/selectors";
 import { crudUpdate, crudPersist, crudConcat } from "../../store/actions";
-import { SagaIterator, eventChannel, END, buffers } from "redux-saga";
+import { SagaIterator, eventChannel, buffers } from "redux-saga";
 import { take } from "../../../common/utils/effects";
 import actionMatching from "../../../common/utils/actionMatching";
 import TaskOptions from "./taskOptions";
@@ -93,7 +93,6 @@ function* executeTask(task: PlatformTask, timestampService: () => number = () =>
 				case 'final-error':
 					hasEnded = true;
 					throw packet.data;
-					break;
 				default:
 					return assertNever(packet);
 				}

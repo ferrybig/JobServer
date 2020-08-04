@@ -1,4 +1,4 @@
-import { BuildTask, RepoDescription } from "../common/types";
+import { BuildTask } from "../common/types";
 import { tmpFileBlock } from "../common/async/tmp";
 import { writeFile, readdir, readFile } from "../common/async/fs";
 import runCommand from "../common/async/runCommand";
