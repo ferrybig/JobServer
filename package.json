@@ -12,7 +12,8 @@
     "worker-test-1": "tsc src/worker/test.ts --outDir build/ --esModuleInterop --lib dom,dom.iterable,esnext && node build/worker/test.js",
     "worker-run": "tsc src/worker/index.ts --outDir build/ --esModuleInterop --lib dom,dom.iterable,esnext && node build/worker/index.js",
     "server-run": "tsc src/server/index.ts --outDir build/ --downlevelIteration true --esModuleInterop --lib dom,dom.iterable,esnext && node build/server/index.js",
-    "webhook-test": "curl -v -X POST --upload-file test/gh-wh-payload-1.json -H 'X-GitHub-Event: push' -H 'X-GitHub-Delivery: xxxx' -H 'X-Hub-Signature: sha1=d44d20fd29c4174d927e93ba5013a827963f0928' -H 'content-type: application/json' http://localhost:5000/webhook/2"
+    "webhook-test": "curl -v -X POST --upload-file test/gh-wh-payload-1.json -H 'X-GitHub-Event: push' -H 'X-GitHub-Delivery: xxxx' -H 'X-Hub-Signature: sha1=d44d20fd29c4174d927e93ba5013a827963f0928' -H 'content-type: application/json' http://localhost:5000/webhook/2",
+    "lint": "eslint --ext js,jsx,ts,tsx src"
   },
   "author": "",
   "license": "ISC",
