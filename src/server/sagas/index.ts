@@ -1,12 +1,12 @@
-import { SagaIterator, Task } from "redux-saga";
-import { connectionWorker } from "../store/actions";
-import handleWorkerConnection from "./worker";
-import { take } from "../../common/utils/effects";
-import { spawn, fork, join, call } from "redux-saga/effects";
-import handlePersist from "./persist";
-import taskDistributer from "./worker/taskDistributer";
-import handlePlatformTasks from "./platformTasks";
-import stdinReader from "./stdin";
+import { SagaIterator, Task } from 'redux-saga';
+import { connectionWorker } from '../store/actions';
+import handleWorkerConnection from './worker';
+import { take } from '../../common/utils/effects';
+import { spawn, fork, join, call } from 'redux-saga/effects';
+import handlePersist from './persist';
+import taskDistributer from './worker/taskDistributer';
+import handlePlatformTasks from './platformTasks';
+import stdinReader from './stdin';
 
 function* spawnHelper(toKill: Task | undefined, action: ReturnType<typeof connectionWorker>) {
 	if (toKill) {

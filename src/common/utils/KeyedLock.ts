@@ -1,4 +1,4 @@
-import Lock from "./Lock";
+import Lock from './Lock';
 
 export default class KeyedLock {
 	private locks = new Map<string, Lock>()

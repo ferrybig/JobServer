@@ -1,4 +1,4 @@
-import { AnyAction } from "redux";
+import { AnyAction } from 'redux';
 
 interface SimpleActionCreator<T, A> {
 	type: T,

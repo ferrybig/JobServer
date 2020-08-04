@@ -1,8 +1,8 @@
-import { SagaIterator } from "redux-saga";
-import { fork, spawn, call } from "redux-saga/effects";
-import buildSaga from "./build";
-import TaskRunner from "../taskRunner";
-import RepoAccessor from "../RepoAccessor";
+import { SagaIterator } from 'redux-saga';
+import { fork, spawn, call } from 'redux-saga/effects';
+import buildSaga from './build';
+import TaskRunner from '../taskRunner';
+import RepoAccessor from '../RepoAccessor';
 
 function* spawnWorker(workerUrl: string, taskRunner: TaskRunner): SagaIterator {
 	yield call(buildSaga, workerUrl, taskRunner);

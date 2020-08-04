@@ -1,15 +1,15 @@
-import { PlatformTask } from "../../../common/types";
-import { fork, select, put, call, StrictEffect } from "redux-saga/effects";
-import { find, filter } from "../../store/selectors";
-import { crudUpdate, crudPersist, crudConcat } from "../../store/actions";
-import { SagaIterator, eventChannel, buffers } from "redux-saga";
-import { take } from "../../../common/utils/effects";
-import actionMatching from "../../../common/utils/actionMatching";
-import TaskOptions from "./taskOptions";
-import handleDeploymentTask from "./deployment";
-import assertNever from "../../../common/utils/assertNever";
-import taskPlanner from "./taskPlanner";
-import debounce from "../../../common/utils/debounce";
+import { PlatformTask } from '../../../common/types';
+import { fork, select, put, call, StrictEffect } from 'redux-saga/effects';
+import { find, filter } from '../../store/selectors';
+import { crudUpdate, crudPersist, crudConcat } from '../../store/actions';
+import { SagaIterator, eventChannel, buffers } from 'redux-saga';
+import { take } from '../../../common/utils/effects';
+import actionMatching from '../../../common/utils/actionMatching';
+import TaskOptions from './taskOptions';
+import handleDeploymentTask from './deployment';
+import assertNever from '../../../common/utils/assertNever';
+import taskPlanner from './taskPlanner';
+import debounce from '../../../common/utils/debounce';
 
 type MessageType = {
 	type: 'log',

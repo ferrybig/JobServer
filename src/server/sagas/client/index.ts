@@ -1,8 +1,8 @@
-import { connectionClient } from "../../store/actions";
-import makeWebSocketChannel from "../../../common/sagas/makeWebSocketConnection";
-import { call, fork } from "redux-saga/effects";
-import { Channel, EventChannel } from "redux-saga";
-import timeoutHandler from "../timeoutHandler";
+import { connectionClient } from '../../store/actions';
+import makeWebSocketChannel from '../../../common/sagas/makeWebSocketConnection';
+import { call, fork } from 'redux-saga/effects';
+import { Channel, EventChannel } from 'redux-saga';
+import timeoutHandler from '../timeoutHandler';
 
 export default function* handleWorkerConnection(data: ReturnType<typeof connectionClient>['payload']) {
 	const [incoming, outgoing]: [EventChannel<string>, Channel<string>] = yield call(makeWebSocketChannel, data.webSocket);

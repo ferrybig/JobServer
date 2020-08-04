@@ -1,7 +1,7 @@
-import { SagaIterator, Buffer, buffers } from "redux-saga";
-import { actionChannel, CallEffect, ForkEffect } from "redux-saga/effects";
-import { AnyAction } from "redux";
-import loopedChannel, { InferRest } from "./loopedChannel";
+import { SagaIterator, Buffer, buffers } from 'redux-saga';
+import { actionChannel, CallEffect, ForkEffect } from 'redux-saga/effects';
+import { AnyAction } from 'redux';
+import loopedChannel, { InferRest } from './loopedChannel';
 
 type ActionPattern = ((action: AnyAction) => boolean)
 | ((action: AnyAction) => action is any)

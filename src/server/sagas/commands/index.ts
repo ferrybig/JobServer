@@ -1,10 +1,10 @@
-import { call } from "redux-saga/effects";
-import { SagaIterator } from "redux-saga";
-import CommandSender from "./CommandSender";
+import { call } from 'redux-saga/effects';
+import { SagaIterator } from 'redux-saga';
+import CommandSender from './CommandSender';
 import commandNotFound from './commandNotFound';
 import commandHelp from './commandHelp';
-import commandTriggerPlatformTask from "./commandTriggerPlatformTask";
-import CommandExecutor from "./CommandExecutor";
+import commandTriggerPlatformTask from './commandTriggerPlatformTask';
+import CommandExecutor from './CommandExecutor';
 
 const notFound: CommandExecutor = commandNotFound;
 const commands: Record<string, CommandExecutor> = {

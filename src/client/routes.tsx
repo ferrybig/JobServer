@@ -1,5 +1,5 @@
 import React from 'react';
-import route from "./components/minirouter/route";
+import route from './components/minirouter/route';
 import TaskOverview from './components/TaskOverview';
 import Redirect from './components/minirouter/Redirect';
 

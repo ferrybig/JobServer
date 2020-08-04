@@ -1,5 +1,5 @@
-import NodeWebSocket from "ws";
-import action from "../../common/utils/ActionCreator";
+import NodeWebSocket from 'ws';
+import action from '../../common/utils/ActionCreator';
 import { Worker, PlatformTask } from '../../common/types';
 import { actions as crudActions } from './crud';
 

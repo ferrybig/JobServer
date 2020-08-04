@@ -1,4 +1,4 @@
-import { TaskInformation, Task, Site, Deployment, DeploymentInformation } from "../../common/types";
+import { TaskInformation, Task, Site, Deployment, DeploymentInformation } from '../../common/types';
 
 type RemoveNull<T> = T extends null ? never : T;
 type MarkFieldAsNonNull<T, F extends keyof T> = {

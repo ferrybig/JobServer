@@ -1,5 +1,5 @@
-import action from "../../common/utils/ActionCreator";
-import { BuildTask } from "../../common/types";
+import action from '../../common/utils/ActionCreator';
+import { BuildTask } from '../../common/types';
 
 export const taskRequest = action('taskRequest', () => null);
 export const taskReceived = action('taskReceived', (task: BuildTask) => ({ task }));

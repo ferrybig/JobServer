@@ -1,6 +1,6 @@
-import { ServerToClientPacket, ClientToServerPacket } from "../common/packets/clientPackets";
-import assertNever from "../common/utils/assertNever";
-import Filter from "../common/utils/Filter";
+import { ServerToClientPacket, ClientToServerPacket } from '../common/packets/clientPackets';
+import assertNever from '../common/utils/assertNever';
+import Filter from '../common/utils/Filter';
 
 type ServerState = 'connected' | 'connectionLost';
 
@@ -12,7 +12,7 @@ const RECONNECT_TIMEOUT = 10000;
 const PING_TIMEOUT = 60000;
 
 export class UpstreamServer {
-	private packetMap: Record<ServerToClientPacket['type'], (packet: ServerToClientPacket) => void> = mapWithValue(["pong", "auth-challenge", "entity-data", "entity-end", "auth-response"], undefined as unknown as (packet: ServerToClientPacket) => void);
+	private packetMap: Record<ServerToClientPacket['type'], (packet: ServerToClientPacket) => void> = mapWithValue(['pong', 'auth-challenge', 'entity-data', 'entity-end', 'auth-response'], undefined as unknown as (packet: ServerToClientPacket) => void);
 	private serverStateMap: Record<ServerState, (() => void)[]> = { connected: [], connectionLost: [] };
 	private isConnected = false;
 	private socketUrl = '';

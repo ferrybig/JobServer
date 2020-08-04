@@ -1,9 +1,9 @@
 import { v4 as uuid } from 'uuid';
-import { getOrNull, filter } from "../store/selectors";
-import store from "../store";
-import makeWebhookHandler from "../express/gh-wehbook/webhookHandler";
-import assertNever from "../../common/utils/assertNever";
-import { Deployment, DeploymentInformation, Task } from "../../common/types";
+import { getOrNull, filter } from '../store/selectors';
+import store from '../store';
+import makeWebhookHandler from '../express/gh-wehbook/webhookHandler';
+import assertNever from '../../common/utils/assertNever';
+import { Deployment, DeploymentInformation, Task } from '../../common/types';
 import { join } from 'path';
 import { crudPersist, crudUpdate } from '../store/actions';
 

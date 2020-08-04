@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
-import { Webhook, UnknownWebhook } from "./webhookTypes";
+import { Webhook, UnknownWebhook } from './webhookTypes';
 
 
 

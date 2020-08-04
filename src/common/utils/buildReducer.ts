@@ -1,6 +1,6 @@
-import { ActionCreator } from "./ActionCreator";
-import { ActionMapper } from "./ActionMapper";
-import { AnyAction } from "redux";
+import { ActionCreator } from './ActionCreator';
+import { ActionMapper } from './ActionMapper';
+import { AnyAction } from 'redux';
 
 type AllowedActions = ActionCreator<any, any> | ActionMapper<any, any>;
 

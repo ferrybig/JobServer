@@ -223,4 +223,3 @@ const { clientViews, register } = makeClientHandlers(views, {});
 export const registerViewsToServer = register;
 
 export default clientViews;
-

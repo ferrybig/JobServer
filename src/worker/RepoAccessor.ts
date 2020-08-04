@@ -1,8 +1,8 @@
-import KeyedLock from "../common/utils/KeyedLock";
+import KeyedLock from '../common/utils/KeyedLock';
 import { join } from 'path';
-import { access } from "../common/async/fs";
-import runCommand from "../common/async/runCommand";
-import { RepoDescription } from "../common/types";
+import { access } from '../common/async/fs';
+import runCommand from '../common/async/runCommand';
+import { RepoDescription } from '../common/types';
 
 interface Options {
 	logger?: (message: string) => void;
@@ -20,7 +20,7 @@ export default class RepoAccessor {
 		callback: (directory: string) => Promise<T>,
 		{ logger }: Options = {}
 	): Promise<T> {
-		const hash = url.replace(/[^a-zA-Z0-9]+/g, "-");
+		const hash = url.replace(/[^a-zA-Z0-9]+/g, '-');
 		const unlock = await this.lock.lock(hash);
 		const cwd = join(this.cachedReposLocation, hash);
 		if (logger) {

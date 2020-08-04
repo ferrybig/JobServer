@@ -27,6 +27,7 @@
 		"@typescript-eslint/no-empty-function": ["off"],
 		"object-curly-spacing": ["error", "always"],
 		"semi": ["error", "always"],
-		"eol-last": ["error", "always"]
+		"eol-last": ["error", "always"],
+		"quotes": ["error", "single"]
 	}
 }

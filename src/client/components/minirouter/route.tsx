@@ -1,5 +1,5 @@
-import React, { ComponentType } from "react";
-import provideDefaults from "../../../common/utils/provideDefaults";
+import React, { ComponentType } from 'react';
+import provideDefaults from '../../../common/utils/provideDefaults';
 
 export class RouteDefinicationDefiner<P, I> {
 	private pathTransform: (path: string) => P | null;

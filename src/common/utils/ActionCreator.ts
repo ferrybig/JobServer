@@ -1,4 +1,4 @@
-import { AnyAction } from "redux";
+import { AnyAction } from 'redux';
 
 export interface ActionCreator<D extends any[], A extends { type: string, payload: any }> {
 	toString(): string;

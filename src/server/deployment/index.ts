@@ -1,9 +1,9 @@
-import { TaskInformation } from "../../common/types";
-import { DeploymentService, DeploymentData, DeploymentServiceForTask } from "./deploymentService";
-import deploymentStaticExtract from "./types/serverStatic";
+import { TaskInformation } from '../../common/types';
+import { DeploymentService, DeploymentData, DeploymentServiceForTask } from './deploymentService';
+import deploymentStaticExtract from './types/serverStatic';
 
 const map: Readonly<Record<TaskInformation['deploymentType'], DeploymentService>> = {
-	"static-extract": deploymentStaticExtract
+	'static-extract': deploymentStaticExtract
 };
 
 export function forTaskType(taskInformationType: TaskInformation['deploymentType']): DeploymentService {

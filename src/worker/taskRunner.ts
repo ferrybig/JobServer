@@ -1,8 +1,8 @@
-import { BuildTask } from "../common/types";
-import { tmpFileBlock } from "../common/async/tmp";
-import { writeFile, readdir, readFile } from "../common/async/fs";
-import runCommand from "../common/async/runCommand";
-import RepoAccessor from "./RepoAccessor";
+import { BuildTask } from '../common/types';
+import { tmpFileBlock } from '../common/async/tmp';
+import { writeFile, readdir, readFile } from '../common/async/fs';
+import runCommand from '../common/async/runCommand';
+import RepoAccessor from './RepoAccessor';
 
 
 function buildScriptToDockerFile(buildScript: string[]) {
@@ -28,7 +28,7 @@ export default class TaskRunner {
 				await tmpFileBlock(async(tmp1) => {
 					await tmpFileBlock(async(tmp2) => {
 						await writeFile(tmp1, buildScriptToDockerFile(task.buildScript));
-						await writeFile(tmp2, ignoreFile + "\nDockerfile\n");
+						await writeFile(tmp2, ignoreFile + '\nDockerfile\n');
 						await runCommand('tar', [
 							'-czf',
 							tmp,

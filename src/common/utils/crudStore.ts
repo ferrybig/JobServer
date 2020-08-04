@@ -1,4 +1,4 @@
-import { Reducer } from "redux";
+import { Reducer } from 'redux';
 
 type Values<T> = T[keyof T];
 type ValidKeyof = string | number | symbol

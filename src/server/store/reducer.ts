@@ -1,4 +1,4 @@
-import { combineReducers } from "redux";
+import { combineReducers } from 'redux';
 import { reducers as crudReducers } from './crud';
 
 const reducer = combineReducers({

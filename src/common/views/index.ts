@@ -1,4 +1,4 @@
-import { NetworkEntity, task } from "./types";
+import { NetworkEntity, task } from './types';
 
 type Form = keyof NetworkEntity<any, any, any>['examples'];
 

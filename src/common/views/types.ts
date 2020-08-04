@@ -1,5 +1,5 @@
-import { Repo, Deployment, DeploymentInformation, Task, TaskInformation } from "../types";
-import pick from "../utils/pick";
+import { Repo, Deployment, DeploymentInformation, Task, TaskInformation } from '../types';
+import pick from '../utils/pick';
 
 export interface NetworkEntity<B extends object, F extends keyof B, S extends F> {
 	examples: {
@@ -26,8 +26,8 @@ function defineNetworkEntity<B extends object>(): <F extends keyof B, S extends 
 }
 
 export const repository = defineNetworkEntity<Repo>()(
-	["id", "url"],
-	["id", "url"],
+	['id', 'url'],
+	['id', 'url'],
 	{
 		id: '',
 		url: 'git://',
@@ -36,8 +36,8 @@ export const repository = defineNetworkEntity<Repo>()(
 	}
 );
 export const deployment = defineNetworkEntity<Deployment>()(
-	["id", "commit", "branch", "status", "deploymentInformationId", "timestamp", "sequenceId", "deployed"],
-	["id", "commit", "branch", "status", "deploymentInformationId", "timestamp", "sequenceId", "deployed"],
+	['id', 'commit', 'branch', 'status', 'deploymentInformationId', 'timestamp', 'sequenceId', 'deployed'],
+	['id', 'commit', 'branch', 'status', 'deploymentInformationId', 'timestamp', 'sequenceId', 'deployed'],
 	{
 		id: '',
 		commit: '',
@@ -51,8 +51,8 @@ export const deployment = defineNetworkEntity<Deployment>()(
 	}
 );
 export const deploymentInformation = defineNetworkEntity<DeploymentInformation>()(
-	["id", "name", "pattern", "repoId"],
-	["id", "name", "pattern", "repoId"],
+	['id', 'name', 'pattern', 'repoId'],
+	['id', 'name', 'pattern', 'repoId'],
 	{
 		id: '',
 		name: 'Loading deployment information...',
@@ -63,8 +63,8 @@ export const deploymentInformation = defineNetworkEntity<DeploymentInformation>(
 	}
 );
 export const task = defineNetworkEntity<Task>()(
-	["id", "workerId", "status", "log", "taskInformationId", "deploymentId", "startTime", "buildTime", "endTime"],
-	["id", "status", "taskInformationId", "deploymentId", "startTime", "buildTime"],
+	['id', 'workerId', 'status', 'log', 'taskInformationId', 'deploymentId', 'startTime', 'buildTime', 'endTime'],
+	['id', 'status', 'taskInformationId', 'deploymentId', 'startTime', 'buildTime'],
 	{
 		id: '',
 		outputFile: null,
@@ -79,8 +79,8 @@ export const task = defineNetworkEntity<Task>()(
 	}
 );
 export const taskInformation = defineNetworkEntity<TaskInformation>()(
-	["id", "name", "buildScript", "buildScriptType", "deploymentInformationId", "sequenceId", "deploymentType", "sitePath", "siteId"],
-	["id", "name", "sequenceId", "sitePath", "siteId"],
+	['id', 'name', 'buildScript', 'buildScriptType', 'deploymentInformationId', 'sequenceId', 'deploymentType', 'sitePath', 'siteId'],
+	['id', 'name', 'sequenceId', 'sitePath', 'siteId'],
 	{
 		id: '',
 		name: 'Example task information',

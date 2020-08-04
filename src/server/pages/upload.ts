@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction } from 'express';
 import store from '../store/';
-import { getOrNull } from "../store/selectors";
+import { getOrNull } from '../store/selectors';
 import { dirname } from 'path';
-import { mkdir, open } from "../../common/async/fs";
-import { crudDelete } from "../store/actions";
+import { mkdir, open } from '../../common/async/fs';
+import { crudDelete } from '../store/actions';
 
 export default function uploadPage(req: Request, res: Response, next: NextFunction) {
 	const token = req.params.token;

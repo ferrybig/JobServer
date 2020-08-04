@@ -1,9 +1,9 @@
-import CommandSender from "./CommandSender";
-import { SagaIterator } from "redux-saga";
-import { PlatformTask } from "../../../common/types";
-import stringInListChecker from "../../../common/utils/stringInListChecker";
-import { put } from "redux-saga/effects";
-import { triggerPlatformTask } from "../../store/actions";
+import CommandSender from './CommandSender';
+import { SagaIterator } from 'redux-saga';
+import { PlatformTask } from '../../../common/types';
+import stringInListChecker from '../../../common/utils/stringInListChecker';
+import { put } from 'redux-saga/effects';
+import { triggerPlatformTask } from '../../store/actions';
 
 const isValidType = stringInListChecker<PlatformTask['type']>({
 	deployment: true,

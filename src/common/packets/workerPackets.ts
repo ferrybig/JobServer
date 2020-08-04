@@ -1,4 +1,4 @@
-import { BuildTask } from "../types";
+import { BuildTask } from '../types';
 
 export interface TaskRequest {
 	type: 'taskRequest',

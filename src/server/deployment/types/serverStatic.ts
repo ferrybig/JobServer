@@ -1,8 +1,8 @@
-import { DeploymentService } from "../deploymentService";
-import location from "../nginxConfig";
-import { join, resolve, sep } from "path";
-import runCommand from "../../../common/async/runCommand";
-import { mkdir, access } from "../../../common/async/fs";
+import { DeploymentService } from '../deploymentService';
+import location from '../nginxConfig';
+import { join, resolve, sep } from 'path';
+import runCommand from '../../../common/async/runCommand';
+import { mkdir, access } from '../../../common/async/fs';
 
 const deployment: DeploymentService = {
 	async preStart(data) {

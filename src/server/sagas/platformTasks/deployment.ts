@@ -1,11 +1,11 @@
-import { PlatformTask } from "../../../common/types";
-import TaskOptions from "./taskOptions";
-import { State } from "../../store/reducer";
-import store from "../../store";
-import DeploymentRunner from "../../deployment/deploymentRunner";
-import { computeDeployment } from "../../store/selectors";
-import { StrictEffect, all, put } from "redux-saga/effects";
-import { crudUpdate } from "../../store/actions";
+import { PlatformTask } from '../../../common/types';
+import TaskOptions from './taskOptions';
+import { State } from '../../store/reducer';
+import store from '../../store';
+import DeploymentRunner from '../../deployment/deploymentRunner';
+import { computeDeployment } from '../../store/selectors';
+import { StrictEffect, all, put } from 'redux-saga/effects';
+import { crudUpdate } from '../../store/actions';
 
 const runner = new DeploymentRunner();
 

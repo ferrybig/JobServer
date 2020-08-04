@@ -1,15 +1,15 @@
-import { createServer } from "http";
-import express, { Request } from "express";
-import WebSocket from "ws";
+import { createServer } from 'http';
+import express, { Request } from 'express';
+import WebSocket from 'ws';
 import url from 'url';
-import { Socket } from "net";
+import { Socket } from 'net';
 import './polyfill';
-import store, { startSagas } from "./store";
-import { connectionWorker } from "./store/actions";
-import { PORT } from "./config";
-import uploadPage from "./pages/upload";
-import webhookPage from "./pages/webhook";
-import stopNodeProcessOnError from "../common/utils/stopNodeProcessOnError";
+import store, { startSagas } from './store';
+import { connectionWorker } from './store/actions';
+import { PORT } from './config';
+import uploadPage from './pages/upload';
+import webhookPage from './pages/webhook';
+import stopNodeProcessOnError from '../common/utils/stopNodeProcessOnError';
 
 const app = express();
 const server = createServer(app);
@@ -48,7 +48,7 @@ server.on('upgrade', function upgrade(request: Request, socket: Socket, head: Bu
 		socket.destroy();
 	}
 });
-webSocketServer.on("connection", (webSocket, req) => {
+webSocketServer.on('connection', (webSocket, req) => {
 	if (!req.url) {
 		throw new Error('Request missing url');
 	}
@@ -58,7 +58,7 @@ webSocketServer.on("connection", (webSocket, req) => {
 	if (req.url.startsWith('/worker/')) {
 		const workerId = req.url.substring('/worker/'.length);
 		if (workerId.length !== 0) {
-			store.dispatch(connectionWorker(webSocket, req.socket.remoteAddress, workerId, "http://localhost:5000/"));
+			store.dispatch(connectionWorker(webSocket, req.socket.remoteAddress, workerId, 'http://localhost:5000/'));
 		}
 	} else { //TODO add websocket event for a client
 		webSocket.terminate();

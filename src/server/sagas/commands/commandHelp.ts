@@ -1,5 +1,5 @@
-import CommandSender from "./CommandSender";
-import CommandExecutor from "./CommandExecutor";
+import CommandSender from './CommandSender';
+import CommandExecutor from './CommandExecutor';
 
 export default function commandHelp(sender: CommandSender, _: string[], registeredCommands: Record<string, CommandExecutor>): void {
 	sender.sendMessage('Help information:');

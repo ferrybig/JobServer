@@ -1,10 +1,10 @@
-import { SagaIterator } from "redux-saga";
-import { call, apply } from "redux-saga/effects";
-import UpstreamConnection from "../UpstreamConnection";
-import { BuildTask } from "../../common/types";
-import TaskRunner from "../taskRunner";
-import { tmpFile } from "../../common/async/tmp";
-import debounce from "../../common/utils/debounce";
+import { SagaIterator } from 'redux-saga';
+import { call, apply } from 'redux-saga/effects';
+import UpstreamConnection from '../UpstreamConnection';
+import { BuildTask } from '../../common/types';
+import TaskRunner from '../taskRunner';
+import { tmpFile } from '../../common/async/tmp';
+import debounce from '../../common/utils/debounce';
 
 export default function* buildSaga(
 	workerUrl: string,

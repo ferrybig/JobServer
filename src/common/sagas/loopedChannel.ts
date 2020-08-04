@@ -1,6 +1,6 @@
-import { Channel, Task, EventChannel } from "redux-saga";
-import { take } from "../utils/effects";
-import { fork, call, cancel, CallEffect, ActionChannelEffect, ForkEffect } from "redux-saga/effects";
+import { Channel, Task, EventChannel } from 'redux-saga';
+import { take } from '../utils/effects';
+import { fork, call, cancel, CallEffect, ActionChannelEffect, ForkEffect } from 'redux-saga/effects';
 
 export type AnyChannel = Channel<any> | EventChannel<any>;
 

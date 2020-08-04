@@ -1,11 +1,11 @@
-import { SagaIterator } from "redux-saga";
+import { SagaIterator } from 'redux-saga';
 import { v4 as uuid } from 'uuid';
-import { PlatformTask } from "../../../../common/types";
-import { find, filter, getDeploymentNumbers } from "../../../store/selectors";
-import { select, put, call } from "redux-saga/effects";
-import { crudPersist, crudUpdate, triggerPlatformTask } from "../../../store/actions";
-import { take } from "../../../../common/utils/effects";
-import assertNever from "../../../../common/utils/assertNever";
+import { PlatformTask } from '../../../../common/types';
+import { find, filter, getDeploymentNumbers } from '../../../store/selectors';
+import { select, put, call } from 'redux-saga/effects';
+import { crudPersist, crudUpdate, triggerPlatformTask } from '../../../store/actions';
+import { take } from '../../../../common/utils/effects';
+import assertNever from '../../../../common/utils/assertNever';
 
 function shallowEquals<T>(a: readonly T[], b: readonly T[]): boolean {
 	if (a.length !== b.length) {

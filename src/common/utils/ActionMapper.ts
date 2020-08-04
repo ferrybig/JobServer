@@ -1,5 +1,5 @@
-import { ActionCreator } from "./ActionCreator";
-import { AnyAction } from "redux";
+import { ActionCreator } from './ActionCreator';
+import { AnyAction } from 'redux';
 
 export interface ActionMapper<
 	S,
