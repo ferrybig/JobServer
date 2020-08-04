@@ -10,6 +10,7 @@ export const get = crudSelectors.get;
 export const getOrNull = crudSelectors.getOrNull;
 export const exists = crudSelectors.exists;
 export const allKeys = crudSelectors.allKeys;
+export const allValues = crudSelectors.allValues;
 export const size = crudSelectors.size;
 export const find = crudSelectors.find;
 export const findLatest = crudSelectors.findLatest;

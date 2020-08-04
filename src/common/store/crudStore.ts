@@ -7,7 +7,7 @@ type Definition = Record<string, (entity: any) => ValidKeyof>;
 type BaseActions<M extends ValidKeyof, P, I extends ValidKeyof> = {
 	type: 'persist',
 	module: M,
-	payload: P
+	payload: P,
 } | {
 	type: 'delete',
 	module: M,
@@ -31,12 +31,11 @@ type BaseActions<M extends ValidKeyof, P, I extends ValidKeyof> = {
 	type: 'init',
 	payload: {
 		[K in M]: P[] | undefined
-	}
+	},
 };
 type ActionType = BaseActions<any, any, any>['type'];
 type ActionTypes = Record<ActionType, string | null>;
 
-type FilterOnType<B, T> = B extends T ? B : never;
 type RemapType<A extends { type: any }, T extends Record<A['type'], string | null>> = A extends never ? never : Pick<A, Exclude<keyof A, 'type'>> & { type: T[A['type']] };
 type AddTypeFromReturnType<F extends (...args: any) => {type: any}> = F extends (...args: any) => {type: infer T} ? F & { type: T } : never;
 type RemoveNullType<F> = F extends (...args: any) => { type: null } ? never : F;
@@ -54,6 +53,7 @@ interface CrudStore<D extends Definition, A extends ActionTypes> {
 		exists<M extends keyof D>(state: { [S in M]: CrudState<any, ReturnType<D[M]>> }, module: M, key: ReturnType<D[M]> | null): boolean;
 		size<M extends keyof D>(state: { [S in M]: CrudState<any, any> }, module: M): number;
 		allKeys<M extends keyof D>(state: { [S in M]: CrudState<any, ReturnType<D[M]>> }, module: M): ReturnType<D[M]>[];
+		allValues<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], ReturnType<D[M]>> }, module: M): Parameters<D[M]>[0][];
 		find<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], any> }, module: M, pattern: Partial<Parameters<D[M]>[0]> | ((input: Parameters<D[M]>[0]) => boolean)): Parameters<D[M]>[0] | null;
 		findLatest<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], any> }, module: M, pattern: Partial<Parameters<D[M]>[0]> | ((input: Parameters<D[M]>[0]) => boolean)): Parameters<D[M]>[0] | null;
 		filter<M extends keyof D>(state: { [S in M]: CrudState<Parameters<D[M]>[0], any> }, module: M, pattern: Partial<Parameters<D[M]>[0]> | ((input: Parameters<D[M]>[0]) => boolean)): Parameters<D[M]>[0][];
@@ -61,12 +61,12 @@ interface CrudStore<D extends Definition, A extends ActionTypes> {
 	actions: {
 		[K in Exclude<BaseActions<keyof D, any, any>['type'], 'init'>]: AddTypeFromReturnType<RemoveNullType<<M extends keyof D>(
 			module: M,
-			payload: FilterOnType<BaseActions<M, Parameters<D[M]>[0], ReturnType<D[M]>>, { type: K }>['payload']
-		) => RemapType<FilterOnType<BaseActions<M, Parameters<D[M]>[0], ReturnType<D[M]>>, { type: K }>, A>>>
+			payload: Extract<BaseActions<M, Parameters<D[M]>[0], ReturnType<D[M]>>, { type: K }>['payload']
+		) => RemapType<Extract<BaseActions<M, M extends unknown ? unknown : Parameters<D[M]>[0], ReturnType<D[M]>>, { type: K }>, A>>>
 	} & {
 		[K in 'init']: AddTypeFromReturnType<RemoveNullType<(initMap: {
 			[M in keyof D]: Parameters<D[M]>[0][] | undefined
-		}) => RemapType<FilterOnType<BaseActions<keyof D, Parameters<D[keyof D]>, ReturnType<D[keyof D]>>, { type: 'init' }>, A>>>
+		}) => RemapType<Extract<BaseActions<keyof D, Parameters<D[keyof D]>, ReturnType<D[keyof D]>>, { type: 'init' }>, A>>>
 	},
 	reducers: {
 		[M in keyof D]: Reducer<CrudState<Parameters<D[M]>[0], ReturnType<D[M]>>, RemapType<BaseActions<M, Parameters<D[M]>[0], ReturnType<D[M]>>, A>>
@@ -74,7 +74,7 @@ interface CrudStore<D extends Definition, A extends ActionTypes> {
 	keys: (keyof D)[];
 }
 
-function checkMappedActionType<M extends ValidKeyof, P, I extends ValidKeyof, T extends ActionType, A extends ActionTypes>(actionTypes: A, action: RemapType<BaseActions<M, P, I>, A>, type: T, module: M): action is FilterOnType<BaseActions<M, P, I>, { type: T }> {
+function checkMappedActionType<M extends ValidKeyof, P, I extends ValidKeyof, T extends ActionType, A extends ActionTypes>(actionTypes: A, action: RemapType<BaseActions<M, P, I>, A>, type: T, module: M): action is Extract<BaseActions<M, P, I>, { type: T }> {
 	if (action.type === actionTypes[type]) {
 		if ('module' in action) {
 			return (action as {module?: ValidKeyof}).module === module;
@@ -124,6 +124,10 @@ const DEFAULT_SELECTORS = {
 	},
 	allKeys: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M): I[] => {
 		return state[module].byId;
+	},
+	allValues: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M): T[] => {
+		const entities = state[module].entities;
+		return state[module].byId.map(key => entities[key]!);
 	},
 	find: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, pattern: Partial<T> | ((input: T) => boolean)): T | null => {
 		const filter = makeFilter(pattern);
@@ -301,12 +305,12 @@ export default function makeCrudModules<D extends Definition, A extends ActionTy
 	const actions: {
 		[K in Exclude<BaseActions<keyof D, any, any>['type'], 'init'>]: <M extends keyof D>(
 			module: M,
-			payload: FilterOnType<BaseActions<M, ReturnType<D[M]>, Parameters<D[M]>[0]>, { type: K }>['payload']
-		) => RemapType<FilterOnType<BaseActions<M, ReturnType<D[M]>, Parameters<D[M]>[0]>, { type: K }>, A> & { type: string | null }
+			payload: Extract<BaseActions<M, ReturnType<D[M]>, Parameters<D[M]>[0]>, { type: K }>['payload']
+		) => RemapType<Extract<BaseActions<M, ReturnType<D[M]>, Parameters<D[M]>[0]>, { type: K }>, A> & { type: string | null }
 	} & {
 		[K in 'init']: (initMap: {
 			[M in keyof D]: Parameters<D[M]>[0][] | undefined
-		}) => RemapType<FilterOnType<BaseActions<keyof D, Parameters<D[keyof D]>, ReturnType<D[keyof D]>>, { type: 'init' }>, A> & { type: string | null }
+		}) => RemapType<Extract<BaseActions<keyof D, Parameters<D[keyof D]>, ReturnType<D[keyof D]>>, { type: 'init' }>, A> & { type: string | null }
 	} = {
 		persist: makeAction((module, payload) => ({
 			module,
@@ -336,7 +340,7 @@ export default function makeCrudModules<D extends Definition, A extends ActionTy
 
 	return {
 		selectors: DEFAULT_SELECTORS,
-		actions: actions as { [K in keyof typeof actions]: AddTypeFromReturnType<RemoveNullType<(typeof actions)[K]>>},
+		actions: actions as any,
 		reducers: Object.fromEntries(Object.entries(definitions).map(([module, getKey]): [keyof D, Reducer<any, any>] => [module, makeReducer(module, getKey, actionTypes)])) as Record<keyof D, Reducer<any, any>>,
 		keys: Object.keys(definitions),
 	};

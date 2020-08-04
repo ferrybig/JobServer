@@ -5,6 +5,7 @@ export const {
 	selectors,
 	actions,
 	reducers,
+	keys: moduleKeys,
 } = makeCrudModules({
 	workers: keyByIdField<Worker>(),
 	task: keyByIdField<Task>(),
@@ -17,3 +18,5 @@ export const {
 	nginxConfig: keyByIdField<NginxConfig>(),
 	platformTask: keyByIdField<PlatformTask>(),
 }, DEFAULT_ACTION_TYPES);
+
+export type ModuleKeys = (typeof moduleKeys)[number];

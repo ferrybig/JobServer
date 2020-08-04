@@ -3,6 +3,7 @@ import Link from './minirouter/Link';
 import { tasksForDeploymentInformation } from '../routes';
 import useView from '../views/useView';
 import clientViews, { ViewData } from '../views/views';
+import Debug from './Debug';
 //import classes from './TaskOverview.module.css';
 
 interface Props {
@@ -33,6 +34,7 @@ const TaskOverview: FC<Props> = ({
 				Test link.
 				<code>ssss</code>
 			</Link>
+			<Debug data={data} status={status}/>
 		</div>
 	);
 };

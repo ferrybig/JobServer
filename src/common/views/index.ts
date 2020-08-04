@@ -37,5 +37,5 @@ export type AllDataForView<V extends View<any>> =
 
 export const taskGet = makeView(task, 'full', 'single', args<[string]>());
 export const taskList = makeView(task, 'short', 'list', args<[]>());
-export const taskByRepo = makeView(task, 'short', 'list', args<[string]>());
+//export const taskByRepo = makeView(task, 'short', 'list', args<[string]>());
 export const taskByDeploymentId = makeView(task, 'short', 'list', args<[string]>());

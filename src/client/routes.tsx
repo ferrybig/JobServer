@@ -2,10 +2,7 @@ import React from 'react';
 import route from './components/minirouter/route';
 import TaskOverview from './components/TaskOverview';
 import Redirect from './components/minirouter/Redirect';
-
-function Debug(props: Record<string, any>) {
-	return <pre>{JSON.stringify(props, null, 4)}</pre>;
-}
+import Debug from './components/Debug';
 
 export const deploymentInformationSingle = route`/deploymentInformation/${'id'}/`().component((props) => <span>deploymentInformation<Debug {...props}/></span>);
 export const deploymentInformation = route`/deploymentInformation/`().component((props) => <span>deploymentInformation<Debug {...props}/></span>);
