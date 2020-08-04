@@ -1,5 +1,5 @@
-import {ActionCreator} from "./ActionCreator";
-import {AnyAction} from "redux";
+import { ActionCreator } from "./ActionCreator";
+import { AnyAction } from "redux";
 
 export interface ActionMapper<
 	S,
@@ -13,7 +13,7 @@ type FilterExtends<O, E> = O extends E ? O : never;
 
 type ExtractAction<A extends ActionCreator<any, any>> =
 	A extends ActionCreator<any, infer P> ? P :
-	never;
+		never;
 
 export default function mappedAction<
 	S,

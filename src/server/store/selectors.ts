@@ -1,9 +1,9 @@
 import { State } from './reducer';
 import { PersistStateV1, Task, Deployment } from '../../common/types';
-import {selectors as crudSelectors} from './crud'
-import {CrudState} from '../../common/utils/crudStore';
-import {BuildTask} from '../../common/types';
-import {DeploymentData, RawDeploymentData, rawDeploymentDataIsDeploymentData, DeploymentChangeSet} from '../deployment/deploymentService';
+import { selectors as crudSelectors } from './crud';
+import { CrudState } from '../../common/utils/crudStore';
+import { BuildTask } from '../../common/types';
+import { DeploymentData, RawDeploymentData, rawDeploymentDataIsDeploymentData, DeploymentChangeSet } from '../deployment/deploymentService';
 import sortByKey from '../../common/utils/sortByKey';
 
 export const get = crudSelectors.get;
@@ -31,7 +31,7 @@ export function computePersistState(state: State): PersistStateV1 {
 		site: map(state.site),
 		nginxConfig: map(state.nginxConfig),
 		platformTask: map(state.platformTask),
-	}
+	};
 }
 
 export function taskToBuildTask(state: Pick<State, 'taskInformation' | 'deployment' | 'repo' | 'deploymentInformation'>, task: Task): BuildTask  {
@@ -48,7 +48,7 @@ export function taskToBuildTask(state: Pick<State, 'taskInformation' | 'deployme
 			commit: deployment.commit,
 			branch: deployment.branch,
 		}
-	}
+	};
 }
 
 export function findNextPendingTask(state: Pick<State, 'task'>): Task | null {
@@ -80,7 +80,7 @@ function deploymentToDeploymentData(state: Pick<State, 'task' | 'taskInformation
 	if (!deployment) {
 		return [];
 	}
-	return filter(state, 'task', {deploymentId: deployment.id, status: 'success'}).map(t => taskToDeploymentData(state, t)).filter(notNull);
+	return filter(state, 'task', { deploymentId: deployment.id, status: 'success' }).map(t => taskToDeploymentData(state, t)).filter(notNull);
 }
 
 export function computeDeployment(state: Pick<State, 'taskInformation' | 'task' | 'deployment' | 'deploymentInformation'>): DeploymentChangeSet {
@@ -90,7 +90,7 @@ export function computeDeployment(state: Pick<State, 'taskInformation' | 'task' 
 	const newSituation: DeploymentData[] = filter(state, 'deploymentInformation', {
 		deleted: false,
 	}).map((e): Deployment | null => {
-		return filter(state, 'deployment', {deploymentInformationId: e.id, status: 'success'}).sort(sortByKey('sequenceId', false))[0] || null;
+		return filter(state, 'deployment', { deploymentInformationId: e.id, status: 'success' }).sort(sortByKey('sequenceId', false))[0] || null;
 	}).flatMap(d => deploymentToDeploymentData(state, d));
 	const existingSituationByKey = Object.fromEntries(existingSituation.map((e): [DeploymentData['task']['id'], true] => [e.task.id, true]));
 	const newSituationByKey = Object.fromEntries(newSituation.map((e): [DeploymentData['task']['id'], true] => [e.task.id, true]));
@@ -99,13 +99,13 @@ export function computeDeployment(state: Pick<State, 'taskInformation' | 'task' 
 		newSituation,
 		toCreate: newSituation.filter(e => !existingSituationByKey[e.task.id]),
 		toDelete: existingSituation.filter(e => !newSituationByKey[e.task.id]),
-	}
+	};
 }
 
 export function getDeploymentNumbers(state: Pick<State, 'deployment' | 'deploymentInformation'>): number[] {
 	return filter(state, 'deploymentInformation', {
 		deleted: false,
 	}).map((e): Deployment | null => {
-		return filter(state, 'deployment', {deploymentInformationId: e.id, status: 'success'}).sort(sortByKey('sequenceId', false))[0] || null;
-	}).filter(notNull).map(e => e.sequenceId)
+		return filter(state, 'deployment', { deploymentInformationId: e.id, status: 'success' }).sort(sortByKey('sequenceId', false))[0] || null;
+	}).filter(notNull).map(e => e.sequenceId);
 }

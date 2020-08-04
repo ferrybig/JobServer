@@ -1,9 +1,9 @@
-import {SagaIterator} from "redux-saga";
-import {fork, call, apply} from "redux-saga/effects";
+import { SagaIterator } from "redux-saga";
+import { fork, call, apply } from "redux-saga/effects";
 import UpstreamConnection from "../UpstreamConnection";
-import {BuildTask} from "../../common/types";
+import { BuildTask } from "../../common/types";
 import TaskRunner from "../taskRunner";
-import {tmpFile} from "../../common/async/tmp";
+import { tmpFile } from "../../common/async/tmp";
 import debounce from "../../common/utils/debounce";
 
 export default function* buildSaga(
@@ -23,7 +23,7 @@ export default function* buildSaga(
 					yield apply(taskRunner, 'run', [task, outputFile, logger]);
 				} finally {
 					shouldSend = false;
-					logger.flush()
+					logger.flush();
 				}
 				yield apply(connection, 'uploadSuccessResult', [outputFile]);
 			} catch(e) {
@@ -35,6 +35,6 @@ export default function* buildSaga(
 			console.log('Worker fnished task: ' + task.id);
 		}
 	} finally {
-		yield apply(connection, 'close', [])
+		yield apply(connection, 'close', []);
 	}
 }

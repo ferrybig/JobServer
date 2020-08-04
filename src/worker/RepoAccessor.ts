@@ -1,8 +1,8 @@
 import KeyedLock from "../common/utils/KeyedLock";
-import {join} from 'path';
-import {access} from "../common/async/fs";
+import { join } from 'path';
+import { access } from "../common/async/fs";
 import runCommand from "../common/async/runCommand";
-import {RepoDescription} from "../common/types";
+import { RepoDescription } from "../common/types";
 
 interface Options {
 	logger?: (message: string) => void;

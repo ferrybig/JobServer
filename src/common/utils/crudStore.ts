@@ -1,4 +1,4 @@
-import {Reducer} from "redux";
+import { Reducer } from "redux";
 
 type Values<T> = T[keyof T];
 type ValidKeyof = string | number | symbol
@@ -97,7 +97,7 @@ function makeFilter<T>(pattern: Partial<T> | ((input: T) => boolean)): (input: T
 const DEFAULT_STATE: CrudState<any, any> = {
 	entities: {},
 	byId: [],
-}
+};
 
 const DEFAULT_SELECTORS = {
 	get: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, key: I | null): T => {
@@ -122,7 +122,7 @@ const DEFAULT_SELECTORS = {
 		return state[module].byId.length;
 	},
 	allKeys: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M): I[] => {
-		return state[module].byId
+		return state[module].byId;
 	},
 	find: <M extends ValidKeyof, T, I extends ValidKeyof>(state: { [S in M]: CrudState<T, I> }, module: M, pattern: Partial<T> | ((input: T) => boolean)): T | null => {
 		const filter = makeFilter(pattern);
@@ -174,7 +174,7 @@ function makeReducer<
 			const newState = {
 				...state,
 				entities: { ...state.entities },
-			}
+			};
 			if (existingValue === undefined) {
 				newState.byId = [...state.byId, key]; // This is an insertion, not an update
 			}
@@ -206,7 +206,7 @@ function makeReducer<
 				...state,
 				entities: Object.fromEntries((action.payload[module] as P[]).map((e): [I, P] => [getKey(e), e])) as Record<I, P>,
 				byId: (action.payload[module] as P[]).map(getKey),
-			}
+			};
 			if (Object.keys(newState.entities).length !== newState.byId.length) {
 				throw new Error('Dublicate ID detected');
 			}
@@ -222,14 +222,14 @@ function makeReducer<
 			const newState = {
 				...state,
 				entities: { ...state.entities },
-			}
+			};
 			newState.entities[key] = {
 				...existingValue,
 				...(action.payload.data as Partial<P>),
-			} as P
+			} as P;
 			const newKey = getKey(newState.entities[key]!);
 			if (newKey !== key) {
-				const entity = newState.entities[key]
+				const entity = newState.entities[key];
 				delete newState.entities[key];
 				newState.entities[newKey] = entity;
 				// The key got modified!! Handle just in case
@@ -252,14 +252,14 @@ function makeReducer<
 			const newState = {
 				...state,
 				entities: { ...state.entities },
-			}
+			};
 			newState.entities[key] = {
 				...existingValue,
 				[action.payload.field]: (existingValue as P)[action.payload.field] + action.payload.data,
 			} as P;
 			const newKey = getKey(newState.entities[key]!);
 			if (newKey !== key) {
-				const entity = newState.entities[key]
+				const entity = newState.entities[key];
 				delete newState.entities[key];
 				newState.entities[newKey] = entity;
 				// The key got modified!! Handle just in case
@@ -274,7 +274,7 @@ function makeReducer<
 		} else {
 			return state;
 		}
-	}
+	};
 }
 
 function makeAction<F, T>(actionCreator: F, type: T): F & { type: T } {
@@ -288,7 +288,7 @@ export const DEFAULT_ACTION_TYPES = {
 	update: 'update',
 	concat: 'concat',
 	init: 'init',
-} as const
+} as const;
 
 export default function makeCrudModules<D extends Definition, A extends ActionTypes>(definitions: D, actionTypes: A): CrudStore<D, A> {
 	const actions: {

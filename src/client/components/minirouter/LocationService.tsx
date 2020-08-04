@@ -1,4 +1,4 @@
-import React, {createContext, useState, useEffect, useContext, FC } from 'react';
+import React, { createContext, useState, useEffect, useContext, FC } from 'react';
 
 export interface HookedLocationService {
 	useLocationService(): string;
@@ -80,7 +80,7 @@ export const contextLocation: HookedLocationService = {
 		const service = useContext(LOCATION_CONTEXT);
 		return [service.update, service.format];
 	}
-}
+};
 
 export const LocationProvider: FC<{ service: LocationService }> = ({ service, children }) => {
 	return (
@@ -88,4 +88,4 @@ export const LocationProvider: FC<{ service: LocationService }> = ({ service, ch
 			{children}
 		</LOCATION_CONTEXT.Provider>
 	);
-}
+};

@@ -1,9 +1,9 @@
-import {PlatformTask} from "../../../common/types";
-import {fork, select, put, call, takeMaybe, StrictEffect} from "redux-saga/effects";
-import {find, filter} from "../../store/selectors";
-import {crudUpdate, crudPersist, crudConcat} from "../../store/actions";
-import {SagaIterator, eventChannel, END, buffers} from "redux-saga";
-import {take} from "../../../common/utils/effects";
+import { PlatformTask } from "../../../common/types";
+import { fork, select, put, call, takeMaybe, StrictEffect } from "redux-saga/effects";
+import { find, filter } from "../../store/selectors";
+import { crudUpdate, crudPersist, crudConcat } from "../../store/actions";
+import { SagaIterator, eventChannel, END, buffers } from "redux-saga";
+import { take } from "../../../common/utils/effects";
 import actionMatching from "../../../common/utils/actionMatching";
 import TaskOptions from "./taskOptions";
 import handleDeploymentTask from "./deployment";
@@ -42,17 +42,17 @@ function* executeTask(task: PlatformTask, timestampService: () => number = () =>
 	try {
 		const channel = eventChannel<MessageType>((emit) => {
 			const options = debouncedTaskOptions({
-				logger: (data) => emit({type: 'log', data}),
-				warnings: (data) => emit({type: 'warning', data}),
+				logger: (data) => emit({ type: 'log', data }),
+				warnings: (data) => emit({ type: 'warning', data }),
 				abortSignal: { aborted: false },
 			});
 			let promise: Promise<StrictEffect>;
 			switch (task.type) {
-				case 'deployment':
-					promise = handleDeploymentTask(task, options);
-					break;
-				default:
-					promise = assertNever(task.type);
+			case 'deployment':
+				promise = handleDeploymentTask(task, options);
+				break;
+			default:
+				promise = assertNever(task.type);
 			}
 			promise.finally(() => options.flush()).then((d) => emit({
 				type: 'final',
@@ -70,32 +70,32 @@ function* executeTask(task: PlatformTask, timestampService: () => number = () =>
 			do {
 				const packet: MessageType = yield take(channel);
 				switch (packet.type) {
-					case 'log':
-						yield put(crudConcat('platformTask', {
-							id: task.id,
-							field: 'log',
-							data: packet.data,
-						}));
-						break;
-					case 'warning':
-						yield put(crudConcat('platformTask', {
-							id: task.id,
-							field: 'warnings',
-							data: '\n' + packet.data + '\n' + packet.data?.stack + '\n',
-						}));
-						break;
-					case 'final':
-						hasEnded = true;
-						if (packet.data) {
-							yield packet.data
-						}
-						break;
-					case 'final-error':
-						hasEnded = true;
-						throw packet.data
-						break;
-					default:
-						return assertNever(packet);
+				case 'log':
+					yield put(crudConcat('platformTask', {
+						id: task.id,
+						field: 'log',
+						data: packet.data,
+					}));
+					break;
+				case 'warning':
+					yield put(crudConcat('platformTask', {
+						id: task.id,
+						field: 'warnings',
+						data: '\n' + packet.data + '\n' + packet.data?.stack + '\n',
+					}));
+					break;
+				case 'final':
+					hasEnded = true;
+					if (packet.data) {
+						yield packet.data;
+					}
+					break;
+				case 'final-error':
+					hasEnded = true;
+					throw packet.data;
+					break;
+				default:
+					return assertNever(packet);
 				}
 			} while(!hasEnded);
 		} finally {
@@ -109,7 +109,7 @@ function* executeTask(task: PlatformTask, timestampService: () => number = () =>
 			},
 		}));
 	} catch(e) {
-		console.warn('Task deployment error', e)
+		console.warn('Task deployment error', e);
 		yield put(crudConcat('platformTask', {
 			id: task.id,
 			field: 'log',
@@ -125,7 +125,7 @@ function* executeTask(task: PlatformTask, timestampService: () => number = () =>
 	}
 }
 function* taskWatcher(timestampService: () => number = () => Date.now()): SagaIterator {
-	const failedTasks: PlatformTask[] = yield select(filter, 'platformTask', {status: 'running' });
+	const failedTasks: PlatformTask[] = yield select(filter, 'platformTask', { status: 'running' });
 	for (const failed of failedTasks) {
 		yield put(crudUpdate('platformTask', {
 			id: failed.id,
@@ -134,9 +134,9 @@ function* taskWatcher(timestampService: () => number = () => Date.now()): SagaIt
 				status: 'error',
 				endTime: timestampService(),
 			}
-		}))
+		}));
 	}
-	yield fork(taskPlanner)
+	yield fork(taskPlanner);
 	while(true) {
 		const task: PlatformTask | null = yield select(find, 'platformTask', { status: 'pending' });
 		if (task) {
@@ -146,11 +146,11 @@ function* taskWatcher(timestampService: () => number = () => Date.now()): SagaIt
 					status: 'running',
 					startTime: timestampService(),
 				}
-			}))
+			}));
 			yield call(executeTask, task);
 			continue;
 		}
-		yield take(actionMatching<ReturnType<typeof crudPersist>>(crudPersist, a => a.module === 'platformTask'))
+		yield take(actionMatching<ReturnType<typeof crudPersist>>(crudPersist, a => a.module === 'platformTask'));
 	}
 }
 

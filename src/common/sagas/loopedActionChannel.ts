@@ -1,12 +1,12 @@
 import { SagaIterator, Buffer, buffers } from "redux-saga";
-import { actionChannel, CallEffect, ForkEffect} from "redux-saga/effects";
-import {AnyAction} from "redux";
-import loopedChannel, {InferRest} from "./loopedChannel";
+import { actionChannel, CallEffect, ForkEffect } from "redux-saga/effects";
+import { AnyAction } from "redux";
+import loopedChannel, { InferRest } from "./loopedChannel";
 
 type ActionPattern = ((action: AnyAction) => boolean)
-  | ((action: AnyAction) => action is any)
-  | { type: string }[]
-  | { type: string, (...args: any[]): AnyAction }[];
+| ((action: AnyAction) => action is any)
+| { type: string }[]
+| { type: string, (...args: any[]): AnyAction }[];
 
 function isActionList(patterns: ActionPattern): patterns is { type: string }[] {
 	return Array.isArray(patterns);
@@ -14,8 +14,8 @@ function isActionList(patterns: ActionPattern): patterns is { type: string }[] {
 
 type ActionType<T extends ActionPattern> =
 	T extends (arg: any) => arg is infer R ? R :
-	T extends { type: string, (...args: any[]): infer R }[] ? R :
-	AnyAction;
+		T extends { type: string, (...args: any[]): infer R }[] ? R :
+			AnyAction;
 
 export default function loopedActionChannel<
 	T extends ActionPattern,
@@ -23,7 +23,7 @@ export default function loopedActionChannel<
 >(
 	pattern: T,
 	handler: H,
-	{buffer, ...options}: {
+	{ buffer, ...options }: {
 		killLast?: boolean,
 		nonBlocking?: boolean,
 		buffer?: Buffer<ActionType<T>>,

@@ -30,10 +30,10 @@ type MapActionMapDefinition<
 	I extends string | number,
 	D extends ReducerType<any> | DeepReducerType | undefined
 > = D extends (...arg: any[]) => { type: infer R, payload: infer P } ? {
-		[K in (R extends string ? R : never)]: <S extends CrudState<T, I>>(state: S, action: { payload: P }) => S & CrudState<T, I>
-	} : D extends readonly [(...arg: any[]) => { type: infer R }, infer K1] ? {
-		[K in (R extends string ? R : never)]: <S extends CrudState<T, I>>(state: S, action: { payload: { [K2 in (K1 extends string ? K1 : never)]: T[] | undefined } }) => S & CrudState<T, I>
-	} : never;
+	[K in (R extends string ? R : never)]: <S extends CrudState<T, I>>(state: S, action: { payload: P }) => S & CrudState<T, I>
+} : D extends readonly [(...arg: any[]) => { type: infer R }, infer K1] ? {
+	[K in (R extends string ? R : never)]: <S extends CrudState<T, I>>(state: S, action: { payload: { [K2 in (K1 extends string ? K1 : never)]: T[] | undefined } }) => S & CrudState<T, I>
+} : never;
 
 type MapActionMap<M extends ActionMap<any, any>, T, I extends string | number> = UnionToIntersection<FilterUndefined<Values<{
 	[K in keyof ActionMap<any, any>]: MapActionMapDefinition<T, I, M[K]>
@@ -51,13 +51,13 @@ export default function crudReducer<T, I extends string | number, M extends Acti
 			const newState = {
 				...state,
 				entities: { ...state.entities },
-			}
+			};
 			if (existingValue !== undefined) {
 				newState.byId = [...state.byId, key];
 			}
 			newState.entities[key] = payload;
 			return newState;
-		}
+		};
 	}
 	if (actions.destroy) {
 		map[actions.destroy.type] = <S extends CrudState<T, I>>(state: S, { payload: key }: { payload: I }): S => {

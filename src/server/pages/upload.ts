@@ -1,9 +1,9 @@
-import {Request, Response, NextFunction} from "express";
-import store from '../store/'
-import {getOrNull} from "../store/selectors";
-import {dirname} from 'path'
-import {mkdir, open} from "../../common/async/fs";
-import {crudDelete} from "../store/actions";
+import { Request, Response, NextFunction } from "express";
+import store from '../store/';
+import { getOrNull } from "../store/selectors";
+import { dirname } from 'path';
+import { mkdir, open } from "../../common/async/fs";
+import { crudDelete } from "../store/actions";
 
 export default function uploadPage(req: Request, res: Response, next: NextFunction) {
 	const token = req.params.token;
@@ -26,8 +26,8 @@ export default function uploadPage(req: Request, res: Response, next: NextFuncti
 			}
 			offset += r.bytesWritten;
 			return fd;
-		}))
-	})
+		}));
+	});
 	req.on('end', () => {
 		promiseChain.then((fd) => {
 			fd.close();
@@ -41,6 +41,6 @@ export default function uploadPage(req: Request, res: Response, next: NextFuncti
 					store.dispatch(crudDelete('pendingFile', file.token));
 				}
 			}
-		})
-	})
+		});
+	});
 }

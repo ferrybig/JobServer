@@ -160,7 +160,7 @@ class LocationBuilder {
 	}
 
 	public build(): string {
-		return this.output + '}\n'
+		return this.output + '}\n';
 	}
 }
 

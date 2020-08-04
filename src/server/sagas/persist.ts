@@ -1,11 +1,11 @@
-import {SagaIterator} from "redux-saga";
-import {computePersistState} from "../store/selectors";
-import {select, call, put, delay} from "redux-saga/effects";
-import {PersistStateV1} from "../../common/types";
-import {CONFIG_PATH, CONFIG_RESET} from "../config";
-import {writeFile, readFile} from "../../common/async/fs";
-import {crudInit} from "../store/actions";
-import {take} from "../../common/utils/effects";
+import { SagaIterator } from "redux-saga";
+import { computePersistState } from "../store/selectors";
+import { select, call, put, delay } from "redux-saga/effects";
+import { PersistStateV1 } from "../../common/types";
+import { CONFIG_PATH, CONFIG_RESET } from "../config";
+import { writeFile, readFile } from "../../common/async/fs";
+import { crudInit } from "../store/actions";
+import { take } from "../../common/utils/effects";
 
 
 function* load() {
@@ -158,7 +158,7 @@ function* load() {
 	}
 	try {
 		const contents: string = yield call(readFile, CONFIG_PATH, 'utf-8');
-		yield put(crudInit(JSON.parse(contents)))
+		yield put(crudInit(JSON.parse(contents)));
 	} catch(e) {
 		console.warn(e);
 		yield put(crudInit({

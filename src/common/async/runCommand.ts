@@ -1,5 +1,5 @@
-import {spawn, ChildProcess} from 'child_process';
-import {createReadStream, open, close} from 'fs';
+import { spawn, ChildProcess } from 'child_process';
+import { createReadStream, open, close } from 'fs';
 
 interface Options {
 	logger?: (str: string) => void,
@@ -25,7 +25,7 @@ function startProcess(command: string, args: string[], options: Options, resolve
 				if(e) {
 					console.warn(e);
 				}
-			})
+			});
 		}
 		resolve(null, proc);
 	}
@@ -73,6 +73,6 @@ export default function runCommand(command: string, args: string[], options: Opt
 			ps.on('error', (code) => {
 				return reject(code);
 			});
-		})
-	})
+		});
+	});
 }

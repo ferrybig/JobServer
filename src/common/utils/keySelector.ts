@@ -16,8 +16,8 @@ export function keySelector<S>(): <K extends keyof S>(key: K) => ThenableSelecto
 		): (state: Record<K, Arg1<F>>, ...rest: A) => ReturnType<F> => {
 			return (state: Record<K, Arg1<F>>, ...rest: A): ReturnType<F> => {
 				return next(state[key], ...rest);
-			}
-		}
+			};
+		};
 		return keySelectorCaller;
-	}
+	};
 }

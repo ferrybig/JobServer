@@ -26,7 +26,7 @@ export default class Lock {
 						this.onUnlock();
 					}
 				});
-			}
+			};
 			if(!this.locked) {
 				this.locked = true;
 				this.onLock();
@@ -35,6 +35,6 @@ export default class Lock {
 				this.pendingLockers.push(doLock);
 			}
 
-		})
+		});
 	}
 }

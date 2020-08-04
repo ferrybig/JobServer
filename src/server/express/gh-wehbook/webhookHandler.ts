@@ -1,25 +1,25 @@
-import {Request, Response, NextFunction} from "express";
+import { Request, Response, NextFunction } from "express";
 import crypto from 'crypto';
-import {Webhook, UnknownWebhook} from "./webhookTypes";
+import { Webhook, UnknownWebhook } from "./webhookTypes";
 
 
 
 function makeWebhookData(type: string, body: any): Webhook {
-	const castedType = type as Exclude<Webhook['type'], UnknownWebhook['type']> | undefined
+	const castedType = type as Exclude<Webhook['type'], UnknownWebhook['type']> | undefined;
 	switch(castedType) {
-		case 'ping':
-		case 'push':
-			return {
-				type: castedType,
-				data: body,
-			};
-		default:
-			const type: undefined = castedType;
-			return {
-				type: '?',
-				data: body,
-				originalType: type as unknown as string,
-			};
+	case 'ping':
+	case 'push':
+		return {
+			type: castedType,
+			data: body,
+		};
+	default:
+		const type: undefined = castedType;
+		return {
+			type: '?',
+			data: body,
+			originalType: type as unknown as string,
+		};
 	}
 }
 
@@ -83,7 +83,7 @@ export default function makeWebhookHandler<T>(
 		const extra: T = Array.isArray(secret) ? secret[1] : undefined as unknown as T;
 
 		let body = '';
-		req.setEncoding('utf-8')
+		req.setEncoding('utf-8');
 		req.on('data', (e: string) => {
 			body += e;
 		});
@@ -108,5 +108,5 @@ export default function makeWebhookHandler<T>(
 				signature: actualSignature,
 			}, req, res, next);
 		});
-	}
+	};
 }

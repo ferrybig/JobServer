@@ -1,5 +1,5 @@
 import dotenv from 'dotenv-safe';
-import {resolve} from 'path';
+import { resolve } from 'path';
 import throwIfNotDefined from '../common/utils/throwIfNotDefined';
 
 dotenv.config({

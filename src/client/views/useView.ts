@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react"
+import { useState, useEffect } from "react";
 
 type UseResult<D, R> = {
 	status: 'loading',

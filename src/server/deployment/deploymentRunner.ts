@@ -1,10 +1,10 @@
-import {DeploymentChangeSet} from "./deploymentService";
-import {autoDeploymentService} from ".";
-import {State} from "../store/reducer";
-import {get, allKeys} from "../store/selectors";
-import {Site, NginxConfig} from "../../common/types";
-import {SSL_NGINX_PORT, NOSSL_NGINX_PORT, NGINX_CONFIG_PATH, NGINX_CONFIG_CHECK, NGINX_RELOAD, NGINX_RESTART} from "../config";
-import {writeFile, access, unlink, rename} from "../../common/async/fs";
+import { DeploymentChangeSet } from "./deploymentService";
+import { autoDeploymentService } from ".";
+import { State } from "../store/reducer";
+import { get, allKeys } from "../store/selectors";
+import { Site, NginxConfig } from "../../common/types";
+import { SSL_NGINX_PORT, NOSSL_NGINX_PORT, NGINX_CONFIG_PATH, NGINX_CONFIG_CHECK, NGINX_RELOAD, NGINX_RESTART } from "../config";
+import { writeFile, access, unlink, rename } from "../../common/async/fs";
 import assertNever from "../../common/utils/assertNever";
 import runCommand from "../../common/async/runCommand";
 
@@ -44,12 +44,12 @@ async function tryAllOrDeconstructLoop<T, R>(array: T[], callback: {
 }
 
 function writeConfigFor(state: Pick<State, 'nginxConfig'>, topic: Site | NginxConfig): string {
-	let config = `# Start ${topic.name}\n`
+	let config = `# Start ${topic.name}\n`;
 	config += topic.includesBefore ? writeConfigFor(state, get(state, 'nginxConfig', topic.includesBefore)) : '';
 	config += topic.configBlob ? `${topic.configBlob}\n` : '';
 	config += topic.includesAfter ? writeConfigFor(state, get(state, 'nginxConfig', topic.includesAfter)) : '';
-	config += `# End ${topic.name}\n`
-	return config
+	config += `# End ${topic.name}\n`;
+	return config;
 
 }
 
@@ -115,7 +115,7 @@ export default class DeploymentRunner {
 				options.logger(`[${i}] afterStop`);
 				return autoDeploymentService.afterStop(t, { logger: options.logger });
 			},
-		}, options.warnings)
+		}, options.warnings);
 	}
 
 	private async generateNewConfigAndCheck(changes: DeploymentChangeSet, state: Pick<State, 'site' | 'nginxConfig'>, options: OptionsAllRequired): Promise<void> {
@@ -170,18 +170,18 @@ export default class DeploymentRunner {
 			throw new Error('Aborted');
 		}
 		let testConfig = '';
-		testConfig += 'error_log /tmp/123456.log debug;\n'
-		testConfig += 'daemon off;\n'
-		testConfig += 'pid /tmp/123456.pid;\n'
-		testConfig += 'events {\n'
-		testConfig += '}\n'
+		testConfig += 'error_log /tmp/123456.log debug;\n';
+		testConfig += 'daemon off;\n';
+		testConfig += 'pid /tmp/123456.pid;\n';
+		testConfig += 'events {\n';
+		testConfig += '}\n';
 		testConfig += 'http {\n';
-		testConfig += '\terror_log /tmp/123456.log debug;\n'
-		testConfig += '\taccess_log /tmp/123456.log;\n'
+		testConfig += '\terror_log /tmp/123456.log debug;\n';
+		testConfig += '\taccess_log /tmp/123456.log;\n';
 		testConfig += '\tinclude ' + NGINX_CONFIG_PATH_NEW + ';\n';
 		testConfig += '}\n';
 		await writeFile(NGINX_CONFIG_PATH_TEST, testConfig, 'utf-8');
-		await runCommand('sh', ['-c', NGINX_CONFIG_CHECK, 'configCheck.sh', NGINX_CONFIG_PATH_TEST], {logger: options.logger });
+		await runCommand('sh', ['-c', NGINX_CONFIG_CHECK, 'configCheck.sh', NGINX_CONFIG_PATH_TEST], { logger: options.logger });
 		return this.stopOldTasks(changes, state, options);
 	}
 
@@ -233,11 +233,11 @@ export default class DeploymentRunner {
 		await rename(NGINX_CONFIG_PATH_NEW, NGINX_CONFIG_PATH);
 
 		try {
-			await runCommand('sh', ['-c', NGINX_RELOAD, 'nginxReload.sh'], {logger: options.logger });
+			await runCommand('sh', ['-c', NGINX_RELOAD, 'nginxReload.sh'], { logger: options.logger });
 		} catch(e) {
 			options.warnings(e);
 			try {
-				await runCommand('sh', ['-c', NGINX_RESTART, 'nginxStart.sh'], {logger: options.logger });
+				await runCommand('sh', ['-c', NGINX_RESTART, 'nginxStart.sh'], { logger: options.logger });
 			} catch(e) {
 				options.warnings(e);
 			}

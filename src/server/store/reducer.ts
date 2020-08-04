@@ -1,5 +1,5 @@
-import {combineReducers} from "redux";
-import {reducers as crudReducers} from './crud'
+import { combineReducers } from "redux";
+import { reducers as crudReducers } from './crud';
 
 const reducer = combineReducers({
 	deployment: crudReducers.deployment,

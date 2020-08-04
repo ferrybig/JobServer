@@ -1,8 +1,8 @@
 import { useLayoutEffect } from 'react';
-import {contextLocation} from './LocationService';
-import {RouteDefinication} from './route';
+import { contextLocation } from './LocationService';
+import { RouteDefinication } from './route';
 
-export default function Redirect<R>({route, props}: {
+export default function Redirect<R>({ route, props }: {
 	route: RouteDefinication<any, R>,
 	props: R,
 }): JSX.Element | null {

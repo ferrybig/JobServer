@@ -1,4 +1,4 @@
-import tmp, {FileOptions} from 'tmp';
+import tmp, { FileOptions } from 'tmp';
 
 export function tmpFile(opt?: FileOptions): Promise<[() => void, string]> {
 	return new Promise((resolve, reject) => {
@@ -8,9 +8,9 @@ export function tmpFile(opt?: FileOptions): Promise<[() => void, string]> {
 			}
 			// fd will be undefined, allowing application to use fs.createReadStream(path)
 			// without holding an unused descriptor open.
-			resolve([cleanupCallback, path])
+			resolve([cleanupCallback, path]);
 		});
-	})
+	});
 }
 
 export async function tmpFileBlock<T>(func: (file: string) => Promise<T> | T, opt?: FileOptions): Promise<T> {
@@ -30,7 +30,7 @@ export function tmpDir(): Promise<[() => void, string]> {
 			}
 			// fd will be undefined, allowing application to use fs.createReadStream(path)
 			// without holding an unused descriptor open.
-			resolve([cleanupCallback, path])
+			resolve([cleanupCallback, path]);
 		});
-	})
+	});
 }

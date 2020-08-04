@@ -1,6 +1,6 @@
-import {BuildTask, RepoDescription} from "../common/types";
-import {tmpFileBlock} from "../common/async/tmp";
-import {writeFile, readdir, readFile} from "../common/async/fs";
+import { BuildTask, RepoDescription } from "../common/types";
+import { tmpFileBlock } from "../common/async/tmp";
+import { writeFile, readdir, readFile } from "../common/async/fs";
 import runCommand from "../common/async/runCommand";
 import RepoAccessor from "./RepoAccessor";
 

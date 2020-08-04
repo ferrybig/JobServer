@@ -1,5 +1,5 @@
-import {SagaIterator, channel, Channel} from "redux-saga";
-import {fork, spawn, call} from "redux-saga/effects";
+import { SagaIterator, channel, Channel } from "redux-saga";
+import { fork, spawn, call } from "redux-saga/effects";
 import buildSaga from "./build";
 import TaskRunner from "../taskRunner";
 import RepoAccessor from "../RepoAccessor";

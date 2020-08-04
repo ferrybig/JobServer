@@ -1,46 +1,46 @@
-import NodeWebSocket from 'ws'
-import {BuildTask} from '../common/types';
-import {ServerToWorkerPacket, WorkerToServerPacket} from '../common/packets/workerPackets';
+import NodeWebSocket from 'ws';
+import { BuildTask } from '../common/types';
+import { ServerToWorkerPacket, WorkerToServerPacket } from '../common/packets/workerPackets';
 import fetch from 'node-fetch';
-import {stat, open} from '../common/async/fs';
+import { stat, open } from '../common/async/fs';
 import assertNever from '../common/utils/assertNever';
 
-	interface LocalState<T extends string, D = null> {
+interface LocalState<T extends string, D = null> {
 	type: T,
 	data: D,
 }
 
 type InternalState = LocalState<'idle', null>
-	| LocalState<'request-task', {
-		done: (task: BuildTask) => void
-	}>
-	| LocalState<'executing-task', {
-		log: string,
-		taskId: BuildTask['id'],
-	}>
-	| LocalState<'executing-task-no-log', {
-		log: string,
-		taskId: BuildTask['id'],
-	}>
-	| LocalState<'uploading', {
-		log: string,
-		resultFile: string,
-		fileSize: number,
-		taskId: BuildTask['id'],
-		done: () => void,
-	}>
-	| LocalState<'error', {
-		log: string,
-		taskId: BuildTask['id'],
-		done: () => void,
-	}>;
+| LocalState<'request-task', {
+	done: (task: BuildTask) => void
+}>
+| LocalState<'executing-task', {
+	log: string,
+	taskId: BuildTask['id'],
+}>
+| LocalState<'executing-task-no-log', {
+	log: string,
+	taskId: BuildTask['id'],
+}>
+| LocalState<'uploading', {
+	log: string,
+	resultFile: string,
+	fileSize: number,
+	taskId: BuildTask['id'],
+	done: () => void,
+}>
+| LocalState<'error', {
+	log: string,
+	taskId: BuildTask['id'],
+	done: () => void,
+}>;
 
 const RECONNECT_TIMEOUT = 10000;
 const PING_TIMER = 30000;
 const CHUNK_SIZE = 1 * 1024 * 1024;
 
 export default class UpstreamConnection {
-	private state: InternalState = {type: 'idle', data: null};
+	private state: InternalState = { type: 'idle', data: null };
 	private isConnected: boolean = false;
 	// During uploading, automatic reconnection is disabled
 	private isUploading: boolean = false;
@@ -68,7 +68,7 @@ export default class UpstreamConnection {
 		try {
 			if (this.isConnected) {
 				console.debug('S<C: ' + JSON.stringify(packet));
-				this.socket.send(JSON.stringify(packet))
+				this.socket.send(JSON.stringify(packet));
 			}
 		} catch(e) {
 			console.error(e);
@@ -80,30 +80,30 @@ export default class UpstreamConnection {
 	}
 	private sendPacketForState() {
 		switch(this.state.type) {
-			case 'uploading':
-				this.sendMessage({
-					type: 'taskFinished',
-					payload: {
-						taskId: this.state.data.taskId,
-						log: this.state.data.log,
-						fileSize: this.state.data.fileSize,
-					},
-				});
-				break;
-			case 'error':
-				this.sendMessage({
-					type: 'taskError',
-					payload: {
-						taskId: this.state.data.taskId,
-						log: this.state.data.log,
-					},
-				});
-				break;
-			case 'request-task':
-				this.sendMessage({
-					type: 'taskRequest',
-				});
-				break;
+		case 'uploading':
+			this.sendMessage({
+				type: 'taskFinished',
+				payload: {
+					taskId: this.state.data.taskId,
+					log: this.state.data.log,
+					fileSize: this.state.data.fileSize,
+				},
+			});
+			break;
+		case 'error':
+			this.sendMessage({
+				type: 'taskError',
+				payload: {
+					taskId: this.state.data.taskId,
+					log: this.state.data.log,
+				},
+			});
+			break;
+		case 'request-task':
+			this.sendMessage({
+				type: 'taskRequest',
+			});
+			break;
 
 		}
 	}
@@ -117,55 +117,55 @@ export default class UpstreamConnection {
 		connection.addEventListener('open', (e) => {
 			this.isConnected = true;
 			this.sendPacketForState();
-		})
+		});
 		connection.addEventListener('message', (e) => {
 			console.debug('S>C: ' + e.data);
 			const packet: ServerToWorkerPacket = JSON.parse(e.data);
 			switch (packet.type) {
-				case 'taskReceived':
-					if (this.state.type === 'request-task') {
-						const oldState = this.state;
-						this.state = {
-							type: 'executing-task',
-							data: {
-								log: '',
-								taskId: packet.payload.task.id,
-							},
-						};
-						oldState.data.done(packet.payload.task);
-					} else {
-						throw new Error('Invalid state for received packet');
-					}
-					break;
-				case 'taskStartUpload':
-					if (this.state.type === 'uploading') {
-						this.startUpload(packet.payload.offset, packet.payload.url).catch((e) => {
-							console.error('Error during uploading: ', e);
+			case 'taskReceived':
+				if (this.state.type === 'request-task') {
+					const oldState = this.state;
+					this.state = {
+						type: 'executing-task',
+						data: {
+							log: '',
+							taskId: packet.payload.task.id,
+						},
+					};
+					oldState.data.done(packet.payload.task);
+				} else {
+					throw new Error('Invalid state for received packet');
+				}
+				break;
+			case 'taskStartUpload':
+				if (this.state.type === 'uploading') {
+					this.startUpload(packet.payload.offset, packet.payload.url).catch((e) => {
+						console.error('Error during uploading: ', e);
 
-						})
-					} else {
-						throw new Error('Invalid state for received packet');
-					}
-					break;
-				case 'pong':
-					break;
-				case 'taskResultUploaded':
-					if (this.state.type === 'uploading' || this.state.type === 'error') {
-						const oldState = this.state;
-						this.state = {
-							type: 'idle',
-							data: null,
-						}
-						oldState.data.done();
-					} else {
-						throw new Error('Invalid state for received packet');
-					}
-					break;
-				default:
-					return assertNever(packet);
+					});
+				} else {
+					throw new Error('Invalid state for received packet');
+				}
+				break;
+			case 'pong':
+				break;
+			case 'taskResultUploaded':
+				if (this.state.type === 'uploading' || this.state.type === 'error') {
+					const oldState = this.state;
+					this.state = {
+						type: 'idle',
+						data: null,
+					};
+					oldState.data.done();
+				} else {
+					throw new Error('Invalid state for received packet');
+				}
+				break;
+			default:
+				return assertNever(packet);
 
 			}
-		})
+		});
 		connection.addEventListener('error', (e) => {
 			console.error(e.type + ': ' + e.message);
 		});
@@ -218,7 +218,7 @@ export default class UpstreamConnection {
 							'X-offset': String(currentOffset),
 							'X-length': String(lastRead),
 						}
-					})
+					});
 					if (!result.ok) {
 						throw new Error('http status not ok: ' + result.status);
 					}
@@ -241,7 +241,7 @@ export default class UpstreamConnection {
 						taskId: this.state.data.taskId,
 						logPart,
 					}
-				})
+				});
 			}
 		} else {
 			throw new Error('State is not executing-task: ' + JSON.stringify(this.state));
@@ -291,7 +291,7 @@ export default class UpstreamConnection {
 						log: this.state.data.log,
 						taskId: this.state.data.taskId,
 					},
-				})
+				});
 			} else {
 				reject(new Error('State is not idle: ' + JSON.stringify(this.state)));
 			}

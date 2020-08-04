@@ -9,4 +9,4 @@ export default function commandHelp(sender: CommandSender, _: string[], register
 		sender.sendMessage(` ${key}:${' '.repeat(longest - key.length)} ${value.description || '.'}`);
 	}
 }
-commandHelp.description = 'Shows this help menu'
+commandHelp.description = 'Shows this help menu';

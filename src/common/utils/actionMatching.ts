@@ -1,4 +1,4 @@
-import {AnyAction} from "redux";
+import { AnyAction } from "redux";
 
 interface SimpleActionCreator<T, A> {
 	type: T,
@@ -11,5 +11,5 @@ export default function actionMatching<A>(creator: SimpleActionCreator<any, A>, 
 			return false;
 		}
 		return matcher(action as unknown as A);
-	}
+	};
 }

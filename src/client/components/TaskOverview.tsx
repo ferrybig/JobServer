@@ -1,8 +1,8 @@
 import React, { FC, useCallback } from 'react';
 import Link from './minirouter/Link';
-import {tasksForDeploymentInformation} from '../routes';
+import { tasksForDeploymentInformation } from '../routes';
 import useView from '../views/useView';
-import clientViews, {ViewData} from '../views/views';
+import clientViews, { ViewData } from '../views/views';
 //import classes from './TaskOverview.module.css';
 
 interface Props {
@@ -21,7 +21,7 @@ const TaskOverview: FC<Props> = ({
 		}
 	}, [deploymentInformationId]);
 
-	const {data, status} = useView(wrappedView, []);
+	const { data, status } = useView(wrappedView, []);
 
 	return (
 		<div >
@@ -35,6 +35,6 @@ const TaskOverview: FC<Props> = ({
 			</Link>
 		</div>
 	);
-}
+};
 
 export default TaskOverview;

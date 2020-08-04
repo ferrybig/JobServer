@@ -1,6 +1,6 @@
 import { Channel, Task, EventChannel } from "redux-saga";
-import {take} from "../utils/effects";
-import {fork, call, cancel, CallEffect, ActionChannelEffect, ForkEffect} from "redux-saga/effects";
+import { take } from "../utils/effects";
+import { fork, call, cancel, CallEffect, ActionChannelEffect, ForkEffect } from "redux-saga/effects";
 
 export type AnyChannel = Channel<any> | EventChannel<any>;
 
@@ -15,7 +15,7 @@ function* loopedChannelInternal(
 ) {
 	const channel: AnyChannel = (
 		channelOrFactory instanceof Function || ('type' in channelOrFactory && channelOrFactory.type === 'ACTION_CHANNEL')
-		) ? yield channelOrFactory : channelOrFactory;
+	) ? yield channelOrFactory : channelOrFactory;
 	let task: Task | null = null;
 	try {
 		while(true) {

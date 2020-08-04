@@ -24,7 +24,7 @@ export class UpstreamServer {
 			this.sendPacket({
 				type: 'ping',
 			});
-		}, PING_TIMEOUT)
+		}, PING_TIMEOUT);
 	}
 
 	public registerPacketHandler<T extends ServerToClientPacket['type']>(type: T, onPacket: (packet: Filter<ServerToClientPacket, { type: T }>) => void): () => void {
@@ -70,7 +70,7 @@ export class UpstreamServer {
 	private scheduleReconnect() {
 		setTimeout(() => {
 			if (window.navigator.onLine === false) {
-				console.log('Refusing to connect because browser reports offline mode')
+				console.log('Refusing to connect because browser reports offline mode');
 				this.scheduleReconnect();
 			} else {
 				this.socket = this.setupConnection();
@@ -110,7 +110,7 @@ export class UpstreamServer {
 			});
 			return connection;
 		} catch(e) {
-			console.error(e)
+			console.error(e);
 			this.scheduleReconnect();
 			return this.socket;
 		}

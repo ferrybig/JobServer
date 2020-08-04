@@ -1,5 +1,5 @@
-import {SagaIterator, EventChannel, eventChannel, END} from "redux-saga";
-import {call, take} from "redux-saga/effects";
+import { SagaIterator, EventChannel, eventChannel, END } from "redux-saga";
+import { call, take } from "redux-saga/effects";
 import executeCommand from "../commands";
 import CommandSender from "../commands/CommandSender";
 
@@ -39,7 +39,7 @@ function makeConsoleCommandSender(): CommandSender {
 		sendMessage(message) {
 			console.log(`> ${message}`);
 		}
-	}
+	};
 }
 
 export default function* stdinReader(): SagaIterator {
@@ -47,6 +47,6 @@ export default function* stdinReader(): SagaIterator {
 	const channel: EventChannel<string[]> = yield call(createChannel);
 	while(true) {
 		const parsed: string[] = yield take(channel);
-		yield call(executeCommand, sender, parsed)
+		yield call(executeCommand, sender, parsed);
 	}
 }

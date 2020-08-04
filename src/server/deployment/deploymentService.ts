@@ -1,4 +1,4 @@
-import {TaskInformation, Task, Site, Deployment, DeploymentInformation} from "../../common/types";
+import { TaskInformation, Task, Site, Deployment, DeploymentInformation } from "../../common/types";
 
 type RemoveNull<T> = T extends null ? never : T;
 type MarkFieldAsNonNull<T, F extends keyof T> = {
@@ -14,14 +14,14 @@ type MarkFieldAsNonNull<T, F extends keyof T> = {
  * newService.start()
  * oldService.afterStop()
  */
- export interface RawDeploymentData {
+export interface RawDeploymentData {
 	 taskInformation: TaskInformation;
 	 task: Task;
 	 deployment: Deployment;
 	 deploymentInformation: DeploymentInformation;
 
- }
- export interface DeploymentData {
+}
+export interface DeploymentData {
 	taskInformation: MarkFieldAsNonNull<TaskInformation, 'deploymentDir'>;
 	task: MarkFieldAsNonNull<Task, 'outputFile'>;
 	deployment: Deployment;
@@ -63,7 +63,7 @@ export type DeploymentServiceForTask = {
 } & { data: DeploymentData }
 
 export function rawDeploymentDataIsDeploymentData(a: RawDeploymentData): a is DeploymentData {
-	return a.taskInformation.deploymentDir !== null && a.task.outputFile !== null
+	return a.taskInformation.deploymentDir !== null && a.task.outputFile !== null;
 }
 export interface DeploymentChangeSet {
 	existingSituation: DeploymentData[],

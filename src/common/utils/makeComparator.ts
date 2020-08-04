@@ -11,5 +11,5 @@ export default function makeComparator<T>(asending: boolean, ...functions: (((ob
 			if (valA > valB) return asending ? 1 : -1;
 		}
 		return 0;
-	}
+	};
 }

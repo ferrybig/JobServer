@@ -1,4 +1,4 @@
-import React, {ComponentType} from "react";
+import React, { ComponentType } from "react";
 import provideDefaults from "../../../common/utils/provideDefaults";
 
 export class RouteDefinicationDefiner<P, I> {
@@ -46,7 +46,7 @@ export class RouteDefinicationDefiner<P, I> {
 			if (transformed == null) {
 				return null;
 			}
-			return mapping(transformed, path)
+			return mapping(transformed, path);
 		}, this.toPath, this.priority);
 	}
 	public mapForwardDirect<R>(mapping: (path: string) => R | null, priority: number = this.priority): RouteDefinicationDefiner<R, I> {
@@ -67,11 +67,11 @@ export class RouteDefinicationDefiner<P, I> {
 			if (transformed == null) {
 				return null;
 			}
-			return mapping(transformed, path)
+			return mapping(transformed, path);
 		}, (props) => toPath(toPathMapping(props)), this.priority);
 	}
 	public exposingPath<K extends string>(key: K): RouteDefinicationDefiner<Exclude<P, K> & { [K1 in K]: string}, I> {
-		return this.mapForward((props, path) => ({ ...props, [key]: path}) as Exclude<P, K> & { [K1 in K]: string});
+		return this.mapForward((props, path) => ({ ...props, [key]: path }) as Exclude<P, K> & { [K1 in K]: string});
 	}
 	public addPriority(change: number): this {
 		this.priority += change;
@@ -193,10 +193,10 @@ interface RouteFinaliser<P, I> {
 }
 
 export default function route<K extends string>(templatePath: TemplateStringsArray, ...args: K[]): RouteFinaliser<
-	{ [K1 in K]: string },
-	{ [K1 in K]: string | number | { toString(): string }}
+{ [K1 in K]: string },
+{ [K1 in K]: string | number | { toString(): string }}
 > {
 	return (options: RouteMatherOptions<K> = {}) => {
-		return makeRouteMatcher(templatePath, provideDefaults<Required<RouteMatherOptions<K>>>(options, castedDefaultRouteOptions<K>()), args)
-	}
+		return makeRouteMatcher(templatePath, provideDefaults<Required<RouteMatherOptions<K>>>(options, castedDefaultRouteOptions<K>()), args);
+	};
 }

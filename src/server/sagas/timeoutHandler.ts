@@ -1,7 +1,7 @@
 import NodeWebSocket from 'ws';
-import {SagaIterator, eventChannel, END, Channel} from 'redux-saga';
+import { SagaIterator, eventChannel, END, Channel } from 'redux-saga';
 import onEvent from '../../common/utils/onEvent';
-import {take} from '../../common/utils/effects';
+import { take } from '../../common/utils/effects';
 import assertNever from '../../common/utils/assertNever';
 export default function* (webSocket: NodeWebSocket): SagaIterator<never> {
 	const channel = eventChannel<'timeout'>(emitter => {
@@ -27,10 +27,10 @@ export default function* (webSocket: NodeWebSocket): SagaIterator<never> {
 	while (true) {
 		const packet: 'timeout' = yield take(channel);
 		switch (packet) {
-			case 'timeout':
-				throw new Error('Connection timed out');
-			default:
-				return assertNever(packet);
+		case 'timeout':
+			throw new Error('Connection timed out');
+		default:
+			return assertNever(packet);
 		}
 	}
 }

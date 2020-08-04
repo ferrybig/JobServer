@@ -1,8 +1,8 @@
 import { ComponentType, useMemo } from 'react';
 import sortByKey from '../../../common/utils/sortByKey';
-import {RouteDefinication} from './route';
+import { RouteDefinication } from './route';
 import provideDefaults from '../../../common/utils/provideDefaults';
-import {contextLocation, HookedLocationService} from './LocationService';
+import { contextLocation, HookedLocationService } from './LocationService';
 
 function sortRoutes<R extends RouteDefinication<any, any>>(routes: R[]): R[] {
 	const copy = [...routes];
@@ -20,7 +20,7 @@ export const DEFAULT_ROUTER_OPTIONS: Readonly<Required<RouterOptions>> = {
 	locationService: contextLocation,
 	autoSort: true,
 	debug: process.env.NODE_ENV === 'development',
-}
+};
 
 const NULL_RENDER_FUNC = () => null;
 
@@ -41,7 +41,7 @@ export default function makeRouter<R>(routes: RouteDefinication<R, any>[], optio
 				}
 			}
 			return NULL_RENDER_FUNC;
-		}, [currentLocation])
+		}, [currentLocation]);
 		return matchedRenderFunction(props);
 	};
 }

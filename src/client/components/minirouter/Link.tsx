@@ -1,8 +1,8 @@
 import React, { ReactNode, ReactHTML, HTMLAttributes, useCallback } from 'react';
-import {contextLocation} from './LocationService';
-import {RouteDefinication} from './route';
+import { contextLocation } from './LocationService';
+import { RouteDefinication } from './route';
 
-export default function Link<R>({route, props, children, tag, onClick, ...rest}: {
+export default function Link<R>({ route, props, children, tag, onClick, ...rest }: {
 	route: RouteDefinication<any, R>,
 	props: R,
 	children: ReactNode,

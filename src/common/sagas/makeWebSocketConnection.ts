@@ -1,6 +1,6 @@
 import NodeWebSocket from 'ws';
-import {Channel, END, SagaIterator, EventChannel, channel, eventChannel} from 'redux-saga';
-import {takeMaybe, apply, call, spawn} from 'redux-saga/effects';
+import { Channel, END, SagaIterator, EventChannel, channel, eventChannel } from 'redux-saga';
+import { takeMaybe, apply, call, spawn } from 'redux-saga/effects';
 import onEvent from '../utils/onEvent';
 
 function* spawnSocketHelper(socket: NodeWebSocket, channel: Channel<string>) {
@@ -10,7 +10,7 @@ function* spawnSocketHelper(socket: NodeWebSocket, channel: Channel<string>) {
 			yield apply(socket, socket.close, []);
 			return;
 		} else {
-			yield call(() => socket.send(packet))
+			yield call(() => socket.send(packet));
 		}
 	}
 }

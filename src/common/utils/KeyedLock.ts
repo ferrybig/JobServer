@@ -9,7 +9,7 @@ export default class KeyedLock {
 		}
 		const newLock = new Lock(() => {
 			this.locks.delete(key);
-		})
+		});
 		this.locks.set(key, newLock);
 		return newLock;
 

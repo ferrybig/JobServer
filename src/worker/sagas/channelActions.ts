@@ -1,12 +1,12 @@
 import action from "../../common/utils/ActionCreator";
-import {BuildTask} from "../../common/types";
+import { BuildTask } from "../../common/types";
 
 export const taskRequest = action('taskRequest', () => null);
-export const taskReceived = action('taskReceived', (task: BuildTask) => ({task}));
-export const taskProgressAppend = action('taskProgressAppend', (log: string) => ({log}));
-export const taskFinished = action('taskFinished', (resultFile: string, log: string) =>  ({resultFile, log}));
-export const taskErrored = action('taskErrored', (log: string) =>  ({log}));
-export const taskResultUploaded = action('taskResultUploaded', (resultFile: string | null) =>  ({resultFile}));
+export const taskReceived = action('taskReceived', (task: BuildTask) => ({ task }));
+export const taskProgressAppend = action('taskProgressAppend', (log: string) => ({ log }));
+export const taskFinished = action('taskFinished', (resultFile: string, log: string) =>  ({ resultFile, log }));
+export const taskErrored = action('taskErrored', (log: string) =>  ({ log }));
+export const taskResultUploaded = action('taskResultUploaded', (resultFile: string | null) =>  ({ resultFile }));
 export const socketConnected = action('socketConnected', () => null);
 export const socketDisconnected = action('socketDisconnected', () => null);
 

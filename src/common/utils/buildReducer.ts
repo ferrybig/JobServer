@@ -1,6 +1,6 @@
-import {ActionCreator} from "./ActionCreator";
-import {ActionMapper} from "./ActionMapper";
-import {AnyAction} from "redux";
+import { ActionCreator } from "./ActionCreator";
+import { ActionMapper } from "./ActionMapper";
+import { AnyAction } from "redux";
 
 type AllowedActions = ActionCreator<any, any> | ActionMapper<any, any>;
 
@@ -8,8 +8,8 @@ type FilterExtends<O, E> = O extends E ? O : never;
 
 type ExtractAction<A extends AllowedActions> =
 	A extends ActionCreator<any, infer P> ? P :
-	A extends ActionMapper<any, infer P> ? P :
-	never;
+		A extends ActionMapper<any, infer P> ? P :
+			never;
 
 export default function buildReducer<
 	S,

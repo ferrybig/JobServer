@@ -1,11 +1,11 @@
-import {TaskInformation} from "../../common/types";
-import {DeploymentService, DeploymentData, DeploymentServiceForTask} from "./deploymentService";
+import { TaskInformation } from "../../common/types";
+import { DeploymentService, DeploymentData, DeploymentServiceForTask } from "./deploymentService";
 import deploymentStaticExtract from "./types/serverStatic";
 import assertNever from "../../common/utils/assertNever";
 
 const map: Readonly<Record<TaskInformation['deploymentType'], DeploymentService>> = {
 	"static-extract": deploymentStaticExtract
-}
+};
 
 export function forTaskType(taskInformationType: TaskInformation['deploymentType']): DeploymentService {
 	const res = map[taskInformationType];
@@ -36,4 +36,4 @@ export const autoDeploymentService: DeploymentService = {
 	afterStop: (data, ...args) => forTaskType(data.taskInformation.deploymentType).afterStop(data, ...args),
 	checkStatus: (data, ...args) => forTaskType(data.taskInformation.deploymentType).checkStatus(data, ...args),
 	generateConfigBlob: (data, ...args) => forTaskType(data.taskInformation.deploymentType).generateConfigBlob(data, ...args),
-}
+};

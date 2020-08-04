@@ -1,8 +1,8 @@
-import {SagaIterator, Task} from "redux-saga";
-import {connectionWorker} from "../store/actions";
+import { SagaIterator, Task } from "redux-saga";
+import { connectionWorker } from "../store/actions";
 import handleWorkerConnection from "./worker";
-import {take} from "../../common/utils/effects";
-import {spawn, fork, join, call} from "redux-saga/effects";
+import { take } from "../../common/utils/effects";
+import { spawn, fork, join, call } from "redux-saga/effects";
 import handlePersist from "./persist";
 import taskDistributer from "./worker/taskDistributer";
 import handlePlatformTasks from "./platformTasks";
@@ -26,7 +26,7 @@ function* startWorkerListener(): SagaIterator {
 		action.payload.webSocket.addEventListener('close', () => {
 			const task = map.get(action.payload.workerToken);
 			if (task === newTask) {
-				map.delete(action.payload.workerToken)
+				map.delete(action.payload.workerToken);
 			}
 		});
 	}

@@ -16,16 +16,16 @@ function makeVoidMutationBase<S, R>(_: S, rootState: R): MutationBase<S, R> {
 	}
 	voidMutationSelecter.set = (): R => {
 		return rootState;
-	}
+	};
 	voidMutationSelecter.update = (): R => {
 		return rootState;
-	}
+	};
 	voidMutationSelecter.delete = (): R => {
 		return rootState;
-	}
+	};
 	voidMutationSelecter.batch = (): R => {
 		return rootState;
-	}
+	};
 	return voidMutationSelecter;
 }
 
@@ -49,20 +49,20 @@ function makeMutationBase<S, R>(state: S, toRootState: (state: S) => R, rootStat
 		});
 	};
 	mutationSelecter.update = <K extends keyof S>(key: K, callback: (input: RemoveUndefined<S[K]>) => S[K] | undefined): R => {
-		const value = state[key]
+		const value = state[key];
 		if (value === undefined) {
 			return rootState;
 		}
 		const newValue = callback(value as RemoveUndefined<S[K]>);
 		if (newValue === undefined) {
-			return mutationSelecter.delete(key)
+			return mutationSelecter.delete(key);
 		} else {
 			return mutationSelecter.set(key, newValue);
 		}
 	};
 	mutationSelecter.delete = <K extends keyof S>(key: K): R => {
 		if (key in state) {
-			const newState = {...state};
+			const newState = { ...state };
 			delete newState[key];
 			return toRootState(newState);
 		} else {

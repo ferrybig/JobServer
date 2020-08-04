@@ -1,4 +1,4 @@
-import {buffers, Buffer, channel} from "redux-saga";
+import { buffers, Buffer, channel } from "redux-saga";
 
 class LoggingBuffer<T> implements Buffer<T> {
 	private prefix: string;

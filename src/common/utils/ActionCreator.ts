@@ -1,4 +1,4 @@
-import {AnyAction} from "redux";
+import { AnyAction } from "redux";
 
 export interface ActionCreator<D extends any[], A extends { type: string, payload: any }> {
 	toString(): string;
@@ -27,6 +27,6 @@ export default function action<D extends any[], P, T extends string>(
 	actionCreator.asFilter = (filter?: (action: { type: T, payload: P }) => boolean): (action: AnyAction) => boolean => (action) => {
 		if (action.type !== type) return false;
 		return filter ? filter(action as { type: T, payload: P }) : true;
-	}
+	};
 	return actionCreator;
 }

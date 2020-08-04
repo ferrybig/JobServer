@@ -1,13 +1,13 @@
 import { eventChannel, Subscribe, Buffer } from "redux-saga";
-import { CallEffect, ForkEffect} from "redux-saga/effects";
-import loopedChannel, {InferRest, InferType} from "./loopedChannel";
+import { CallEffect, ForkEffect } from "redux-saga/effects";
+import loopedChannel, { InferRest, InferType } from "./loopedChannel";
 
 export default function loopedEventChannel<
 	H extends (packet?: any, ...args: any[]) => void = (packet: any) => void
 >(
 	subscribe: Subscribe<InferType<H>>,
 	handler: H,
-	{buffer, ...options}: {
+	{ buffer, ...options }: {
 		killLast?: boolean,
 		nonBlocking?: boolean,
 		buffer?: Buffer<InferType<H>>,

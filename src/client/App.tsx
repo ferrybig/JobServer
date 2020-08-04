@@ -9,6 +9,6 @@ const App: FC = (): JSX.Element => {
 	return (
 		<Router/>
 	);
-}
+};
 
 export default App;
