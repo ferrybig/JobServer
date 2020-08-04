@@ -5,7 +5,7 @@ import url from 'url';
 import { Socket } from 'net';
 import './polyfill';
 import store, { startSagas } from './store';
-import { connectionWorker } from './store/actions';
+import { connectionWorker, connectionClient } from './store/actions';
 import { PORT } from './config';
 import uploadPage from './pages/upload';
 import webhookPage from './pages/webhook';
@@ -60,6 +60,8 @@ webSocketServer.on('connection', (webSocket, req) => {
 		if (workerId.length !== 0) {
 			store.dispatch(connectionWorker(webSocket, req.socket.remoteAddress, workerId, 'http://localhost:5000/'));
 		}
+	} else if (req.url === '/client') {
+		store.dispatch(connectionClient(webSocket, req.socket.remoteAddress));
 	} else { //TODO add websocket event for a client
 		webSocket.terminate();
 	}
