@@ -1,0 +1,13 @@
+.html {
+	height: 100%;
+	margin: 0;
+}
+.body {
+	background: var(--bg);
+	color: white;
+	height: 100%;
+	margin: 0;
+}
+.root {
+	min-height: 100%;
+}
