@@ -1,13 +1,21 @@
 import { SagaIterator, Task } from 'redux-saga';
+import { spawn, fork, join, call } from 'redux-saga/effects';
 import { connectionWorker, connectionClient } from '../store/actions';
 import handleWorkerConnection from './worker';
 import { take } from '../../common/utils/effects';
-import { spawn, fork, join, call } from 'redux-saga/effects';
 import handlePersist from './persist';
 import taskDistributer from './worker/taskDistributer';
 import handlePlatformTasks from './platformTasks';
 import stdinReader from './stdin';
 import handleClientConnection from './client';
+
+function* shallowExceptions<F extends (...args: any) => SagaIterator<any>>(func: F, onException: (e: Error) => void, ...args: Parameters<F>): SagaIterator<void> {
+	try {
+		yield call(func, ...args);
+	} catch(e) {
+		onException(e);
+	}
+}
 
 function* spawnHelper(toKill: Task | undefined, action: ReturnType<typeof connectionWorker>) {
 	if (toKill) {
@@ -36,7 +44,9 @@ function* startWorkerListener(): SagaIterator {
 function* startClientListener(): SagaIterator {
 	while (true) {
 		const action: ReturnType<typeof connectionClient> = yield take(connectionClient);
-		yield fork(handleClientConnection, action);
+		yield fork(shallowExceptions, handleClientConnection, (e) => {
+			console.warn('Client connection warning: ', e);
+		}, action);
 	}
 }
 
