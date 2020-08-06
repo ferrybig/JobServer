@@ -133,12 +133,16 @@ function makeClientHandlers<V extends Record<any, views.View<any, any, any, any>
 			if (index >= 0) {
 				subscription.followers.splice(index, 1);
 				if (subscription.followers.length === 0) {
-					server?.sendPacket({
-						type: 'entity-end',
-						requestId: subscription.requestId
-					});
-					delete subscriptionMap[subscription.requestId];
-					delete handlerMap[subscription.key];
+					window.setTimeout(() => {
+						if (subscription.followers.length === 0 && handlerMap[subscription.key] === subscription) {
+							server?.sendPacket({
+								type: 'entity-end',
+								requestId: subscription.requestId
+							});
+							delete subscriptionMap[subscription.requestId];
+							delete handlerMap[subscription.key];
+						}
+					}, 100);
 				}
 			}
 		};
