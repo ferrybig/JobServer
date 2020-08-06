@@ -16,7 +16,7 @@ type ActionMap<P extends any[], A extends { type: string, (...args: any): any } 
 
 type AllActions = ReturnType<Values<typeof actions>>;
 
-export type Follower = Iterator<EntityDataPacket['data'][], void, [State, AllActions]>;
+export type Follower = Iterator<EntityDataPacket['data'][], void, [AllActions, State]>;
 
 type ServerView<V extends views.View<any, any, any, any>> = {
 	select: (state: State, options: Parameters<V['argsHandler']>) => views.AllDataForView<V> | null;
@@ -105,7 +105,7 @@ function makePacketsForSingle<T extends object>(initialValue: T, newValue: T, ac
 }
 function makePacketsForList<T extends object>(initialValue: T[], newValue: T[], action: AllActions, packets: WriteOnlyArray<SubscriptionListChangeData>) {
 	const difference = initialValue.length - newValue.length;
-	if (difference !== 0 || initialValue[0] !== newValue[0]) {
+	if (difference !== 0 || !shallowEquals(initialValue[0], newValue[0])) {
 		packets.push({
 			type: 'replace',
 			data: newValue,
@@ -115,7 +115,7 @@ function makePacketsForList<T extends object>(initialValue: T[], newValue: T[], 
 	if (action.type === 'update') {
 		let hasSend = false;
 		for (let i = 0; i < initialValue.length; i++) {
-			if (initialValue[i] !== newValue[i]) {
+			if (!shallowEquals(initialValue[i], newValue[i])) {
 				hasSend = true;
 				packets.push({
 					type: 'update',
@@ -161,7 +161,7 @@ function attachFollower<V extends views.View<NetworkEntity<any, any, any>>>(view
 				data: filteredBaseValue,
 			}];
 			while (true) {
-				const [state, action] = yield packets;
+				const [action, state] = yield packets;
 				packets.length = 0;
 				const filterStatus = executeFilter(view.updateMap, action, args);
 				if (!filterStatus) {
