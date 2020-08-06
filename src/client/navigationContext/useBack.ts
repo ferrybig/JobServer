@@ -1,7 +1,7 @@
 import { useContext, useLayoutEffect } from 'react';
 import { navigationContext } from '.';
 
-export default function useBack(path: string) {
+export default function useBack(path: string | null) {
 	const contextValue = useContext(navigationContext);
 	useLayoutEffect(() => contextValue.setValues({ backLink: path }), [contextValue, path]);
 }
