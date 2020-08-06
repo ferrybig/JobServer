@@ -54,7 +54,7 @@ const NavigationContextProvider: FC = ({ children }): JSX.Element => {
 		setValues(newValues) {
 			const counts: Partial<RefCounts> = {};
 			let modified = false;
-			const clone = {...values.current};
+			const clone = { ...values.current };
 			for (const [key, value] of Object.entries(newValues) as [keyof ContextValue, any][]) {
 				if (values.current[key] !== value) {
 					clone[key] = value;
@@ -68,7 +68,7 @@ const NavigationContextProvider: FC = ({ children }): JSX.Element => {
 			}
 			return () => {
 				let modified = false;
-				const clone = {...values.current};
+				const clone = { ...values.current };
 				for (const key of Object.keys(newValues) as (keyof ContextValue)[]) {
 					if (counts[key] === refCounts.current[key]) {
 						if (values.current[key] !== DEFAULT_CONTEXT_VALUE[key] as any) {

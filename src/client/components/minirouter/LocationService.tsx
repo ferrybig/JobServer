@@ -1,12 +1,12 @@
 import React, { createContext, useState, useContext, FC, useLayoutEffect } from 'react';
 
-export interface HookedLocationService {
-	useLocationService(): string;
-	useUpdate(): [(path: string) => void, (path: string) => string];
-}
-
 interface UpdateOptions {
 	replace?: boolean,
+}
+
+export interface HookedLocationService {
+	useLocationService(): string;
+	useUpdate(): [(path: string, options?: UpdateOptions) => void, (path: string) => string];
 }
 
 export interface LocationService extends HookedLocationService {
@@ -51,10 +51,11 @@ export const hashLocation: LocationService = makeSimpleLocationService({
 		};
 	},
 	update(path, options = {}) {
+		const historyIndex = Number(window.history.state) || 0;
 		if (options.replace) {
-			window.history.replaceState(null, '', `#!${path}`);
+			window.history.replaceState(historyIndex, '', `#!${path}`);
 		} else {
-			window.history.pushState(null, '', `#!${path}`);
+			window.history.pushState(historyIndex + 1, '', `#!${path}`);
 		}
 		window.dispatchEvent(new PopStateEvent('popstate'));
 	},

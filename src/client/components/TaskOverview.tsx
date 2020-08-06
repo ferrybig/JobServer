@@ -16,7 +16,7 @@ const TaskOverview: FC<Props> = ({
 	deploymentInformationId
 }): JSX.Element => {
 	useBack(deploymentInformationId ? tasks.toPath({}) : null);
-	useTitle(deploymentInformationId ? "Tasks for deployment " + deploymentInformationId : "All tasks");
+	useTitle(deploymentInformationId ? 'Tasks for deployment ' + deploymentInformationId : 'All tasks');
 	const wrappedView = useCallback((subscribe: (data: ViewData<typeof clientViews.taskList> | ViewData<typeof clientViews.taskByDeploymentId> | null) => void): () => void => {
 		if (deploymentInformationId) {
 			return clientViews.taskByDeploymentId(subscribe, deploymentInformationId);

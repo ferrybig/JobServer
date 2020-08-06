@@ -7,6 +7,7 @@
 	color: var(--color);
 	height: 100%;
 	margin: 0;
+	font-family: Ubuntu;
 }
 .root {
 	min-height: 100%;

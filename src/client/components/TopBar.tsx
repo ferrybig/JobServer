@@ -5,7 +5,6 @@ import Link from './minirouter/Link';
 
 const TopBar: FC = (): JSX.Element => {
 	const values = useNavigationContextValues();
-	console.log(values);
 
 	return (
 		<header className={classes.root}>
@@ -13,7 +12,7 @@ const TopBar: FC = (): JSX.Element => {
 				<div className={classes.backLink}>
 					{values.backLink && (
 						<Link path={values.backLink} className={classes.backLinkElement}>
-							&lt;-
+							←
 						</Link>
 					)}
 				</div>

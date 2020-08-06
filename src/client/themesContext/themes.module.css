@@ -4,6 +4,7 @@
 	--main: hsl(263, 100%, 75%);
 	--main-light: hsl(263, 100%, 80%);
 	--main-dark: hsl(263, 100%, 70%);
+	--fade: rga(127, 127, 127, 0.5);
 }
 .dark {
 }
