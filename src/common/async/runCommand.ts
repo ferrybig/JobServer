@@ -10,7 +10,7 @@ interface Options {
 function startProcess(command: string, args: string[], options: Options, resolve: (err: any, process: ChildProcess) => void) {
 	function start(stdIn: number | null) {
 		if (options.logger) {
-			options.logger('\n$ ' + command + ' "' + args.join('" "') + '"\n');
+			options.logger('\n$ "' + [command, ...args].join('" "') + '"\n');
 		}
 		const proc = spawn(command, args, {
 			cwd: options.cwd,
