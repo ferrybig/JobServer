@@ -1,15 +1,12 @@
 import React, { ReactNode, ReactHTML, HTMLAttributes, useCallback } from 'react';
 import { contextLocation } from './LocationService';
-import { RouteDefinication } from './route';
 
-export default function Link<R>({ route, props, children, tag, onClick, ...rest }: {
-	route: RouteDefinication<any, R>,
-	props: R,
+export default function Link({ path, children, tag, onClick, ...rest }: {
+	path: string,
 	children: ReactNode,
 	tag?: keyof ReactHTML,
 } & HTMLAttributes<HTMLElement>): JSX.Element | null {
 	const [update, format] = contextLocation.useUpdate();
-	const path = route.toPath(props);
 	const realTag = tag || 'a' as const;
 	const realOnClick = useCallback((e: React.MouseEvent<HTMLElement, MouseEvent>) => {
 		if (onClick) {
@@ -26,4 +23,3 @@ export default function Link<R>({ route, props, children, tag, onClick, ...rest 
 		...rest,
 	}, children);
 }
-
