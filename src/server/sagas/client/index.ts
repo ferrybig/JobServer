@@ -1,6 +1,6 @@
 import { connectionClient } from '../../store/actions';
 import makeWebSocketChannel from '../../../common/sagas/makeWebSocketConnection';
-import { call, fork, put, select, take as sagaTake, cancel } from 'redux-saga/effects';
+import { call, fork, put, select, take as sagaTake, cancel, all } from 'redux-saga/effects';
 import { Channel, EventChannel, SagaIterator, Task } from 'redux-saga';
 import timeoutHandler from '../timeoutHandler';
 import { ClientToServerPacket, ServerToClientPacket } from '../../../common/packets/clientPackets';
@@ -116,5 +116,6 @@ export default function* handleClientConnection({ payload }: ReturnType<typeof c
 		payload.webSocket.terminate();
 		outgoing.close();
 		incoming.close();
+		yield all(Object.values(map).map(e => cancel(e)));
 	}
 }
