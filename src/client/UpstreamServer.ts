@@ -1,5 +1,7 @@
 import { ServerToClientPacket, ClientToServerPacket } from '../common/packets/clientPackets';
 import assertNever from '../common/utils/assertNever';
+import { addToFollowerArray } from '../common/utils/addToFollowerArray';
+import callArray from '../common/utils/callArray';
 
 type ServerState = 'connected' | 'connectionLost';
 
@@ -41,13 +43,7 @@ export class UpstreamServer {
 		};
 	}
 	public registerStateHandler(type: ServerState, onEvent: () => void): () => void {
-		this.serverStateMap[type].push(onEvent);
-		return () => {
-			const index = this.serverStateMap[type].indexOf(onEvent);
-			if (index >= 0) {
-				this.serverStateMap[type].splice(index, 1);
-			}
-		};
+		return addToFollowerArray(this.serverStateMap[type], onEvent);
 	}
 	public sendPacket(packet: ClientToServerPacket) {
 		if (this.isConnected && this.socket) {
@@ -81,9 +77,7 @@ export class UpstreamServer {
 			const connection = new WebSocket(this.socketUrl);
 			connection.addEventListener('open', (e) => {
 				this.isConnected = true;
-				for (const follower of this.serverStateMap.connected) {
-					follower();
-				}
+				callArray(this.serverStateMap.connected);
 			});
 			connection.addEventListener('message', (e) => {
 				console.info('S>C: ' + e.data);
@@ -101,9 +95,7 @@ export class UpstreamServer {
 				console.log('Connection closed', e.wasClean, e.code, e.reason);
 				if (this.isConnected) {
 					this.isConnected = false;
-					for (const follower of this.serverStateMap.connectionLost) {
-						follower();
-					}
+					callArray(this.serverStateMap.connectionLost);
 				}
 				this.scheduleReconnect();
 			});
