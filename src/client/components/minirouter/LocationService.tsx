@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext, FC } from 'react';
+import React, { createContext, useState, useContext, FC, useLayoutEffect } from 'react';
 
 export interface HookedLocationService {
 	useLocationService(): string;
@@ -21,7 +21,7 @@ export function makeSimpleLocationService(service: Pick<LocationService, Exclude
 		...service,
 		useLocationService() {
 			const [currentLocation, setCurrentLocation] = useState(service.get);
-			useEffect(() => {
+			useLayoutEffect(() => {
 				return service.subscribe(() => {
 					setCurrentLocation(service.get());
 				});
@@ -69,7 +69,7 @@ export const contextLocation: HookedLocationService = {
 	useLocationService() {
 		const service = useContext(LOCATION_CONTEXT);
 		const [currentLocation, setCurrentLocation] = useState(service.get);
-		useEffect(() => {
+		useLayoutEffect(() => {
 			return service.subscribe(() => {
 				setCurrentLocation(service.get());
 			});
