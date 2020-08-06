@@ -1,0 +1,9 @@
+.light {
+	--bg: rgb(255, 255, 255);
+	--color: rgb(5, 5, 5);
+	--main: hsl(263, 100%, 75%);
+	--main-light: hsl(263, 100%, 80%);
+	--main-dark: hsl(263, 100%, 70%);
+}
+.dark {
+}
