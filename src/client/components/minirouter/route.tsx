@@ -155,7 +155,7 @@ function makeRouteMatcher<K extends string>(
 		const argIndex = i - 1;
 		const isLastToken = i === templatePath.length - 1;
 		constructed += `(${options.regexTokenProvider(args[argIndex], argIndex, isLastToken, options)})`;
-		constructed += templatePath[i];
+		constructed += escapeRegExp(templatePath[i]);
 		debugValue += `\${'${args[argIndex]}'}`;
 		debugValue += templatePath.raw[i];
 		priority += 0.1 + templatePath[i].length;
