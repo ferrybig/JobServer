@@ -6,6 +6,7 @@ import statusClasses from '../themesContext/status';
 import RouteLink from './minirouter/RouteLink';
 import { taskInfo } from '../routes';
 import { TaskTimer } from './Timer';
+import Card from './Card';
 
 interface Props {
 	task: (typeof task)['examples']['short'];
@@ -21,7 +22,9 @@ const ListItemTask: FC<Props> = ({
 			<div className={classes.actions}>
 				<TaskTimer task={task}/>
 			</div>
-			<div className={classes.status}>{task.status}</div>
+			<div className={classes.status}>
+				<Card>{task.status}</Card>
+			</div>
 		</ListItem>
 	);
 };
