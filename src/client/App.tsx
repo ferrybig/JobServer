@@ -3,11 +3,13 @@ import classes from './App.module.css';
 import * as routes from './routes';
 import makeRouter from './components/minirouter/makeRouter';
 import TopBar from './components/TopBar';
-import NavigationContextProvider from './navigationContext';
+import NavigationContext, { makeNavigationContext } from './navigationContext';
 import RootThemeInjector from './themesContext/RootThemeInjector';
-import ThemeContextProdivder from './themesContext';
+import ThemeContext, { makeThemeProvider } from './themesContext';
 
 const Router = makeRouter(Object.values(routes));
+const NavigationContextValue = makeNavigationContext();
+const ThemeContextValue = makeThemeProvider();
 
 const App: FC = (): JSX.Element => {
 	useLayoutEffect(() => {
@@ -20,15 +22,15 @@ const App: FC = (): JSX.Element => {
 	}, []);
 
 	return (
-		<NavigationContextProvider>
-			<ThemeContextProdivder>
+		<NavigationContext.Provider value={NavigationContextValue}>
+			<ThemeContext.Provider value={ThemeContextValue}>
 				<RootThemeInjector/>
 				<div className={classes.root}>
 					<TopBar/>
 					<Router/>
 				</div>
-			</ThemeContextProdivder>
-		</NavigationContextProvider>
+			</ThemeContext.Provider>
+		</NavigationContext.Provider>
 	);
 };
 

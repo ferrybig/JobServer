@@ -1,7 +1,7 @@
 import { useContext, useLayoutEffect } from 'react';
-import { navigationContext } from '.';
+import NavigationContext from '.';
 
 export default function useTitle(pageName: string) {
-	const contextValue = useContext(navigationContext);
+	const contextValue = useContext(NavigationContext);
 	useLayoutEffect(() => contextValue.setValues({ pageName }), [contextValue, pageName]);
 }
