@@ -1,0 +1,12 @@
+.title {
+	grid-area: title;
+}
+.subTitle {
+	grid-area: subtitle;
+}
+.actions {
+	grid-area: actions;
+}
+.status {
+	grid-area: status;
+}

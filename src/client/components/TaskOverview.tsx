@@ -2,10 +2,11 @@ import React, { FC, useCallback } from 'react';
 import { tasksForDeploymentInformation, tasks } from '../routes';
 import useView from '../views/useView';
 import clientViews, { ViewData } from '../views/views';
-import Debug from './Debug';
 import RouteLink from './minirouter/RouteLink';
 import useBack from '../navigationContext/useBack';
 import useTitle from '../navigationContext/useTitle';
+import OverviewList from './OverviewList';
+import ListItemTask from './ListItemTask';
 //import classes from './TaskOverview.module.css';
 
 interface Props {
@@ -25,7 +26,7 @@ const TaskOverview: FC<Props> = ({
 		}
 	}, [deploymentInformationId]);
 
-	const { data, status } = useView(wrappedView, []);
+	const viewData = useView(wrappedView, []);
 
 	return (
 		<div >
@@ -37,7 +38,7 @@ const TaskOverview: FC<Props> = ({
 				Test link.
 				<code>ssss</code>
 			</RouteLink>
-			<Debug data={data} status={status}/>
+			<OverviewList list={viewData} item={(task) => <ListItemTask key={task.id} task={task}/>}/>
 		</div>
 	);
 };
