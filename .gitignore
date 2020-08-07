@@ -7,3 +7,4 @@
 /env/server.env
 /env/server-state.json
 /repo.bundle
+/dist
