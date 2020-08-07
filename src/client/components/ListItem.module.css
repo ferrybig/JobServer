@@ -5,20 +5,25 @@
 		"m1 title actions m2" 50%
 		"m1 subtitle status m2" 50% /
 		auto minmax(0, 824px) 200px auto;
-	border: 2px inset var(--fade-low);
+	border: 2px inset var(--fade--low);
 	box-sizing: border-box;
+	text-decoration: none;
+	color: var(--color);
 }
 .root::before {
 	content: '';
 	grid-area: m1;
 	display: block;
-	background: var(--fade-bg);
+	background: var(--fade--bg);
 	border-right: 2px solid var(--fade);
 }
 .root::after {
 	content: '';
 	grid-area: m2;
 	display: block;
-	background: var(--fade-bg);
+	background: var(--fade--bg);
 	border-left: 2px solid var(--fade);
+}
+.root:hover {
+	opacity: 0.9;
 }

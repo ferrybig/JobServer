@@ -1,12 +1,15 @@
 .title {
 	grid-area: title;
+	font-weight: 700;
 }
 .subTitle {
 	grid-area: subtitle;
 }
 .actions {
 	grid-area: actions;
+	text-align: right;
 }
 .status {
 	grid-area: status;
+	text-align: right;
 }

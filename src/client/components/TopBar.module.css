@@ -7,8 +7,8 @@
 	left: 0;
 	right: 0;
 	height: 48px;
-	background: var(--main-light);
-	border-bottom: 2px solid var(--main);
+	background: var(--primary--light);
+	border-bottom: 2px solid var(--primary);
 	display: flex;
 	justify-content: center;
 	align-items: center;

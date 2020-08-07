@@ -64,7 +64,7 @@ export const deploymentInformation = defineNetworkEntity<DeploymentInformation>(
 );
 export const task = defineNetworkEntity<Task>()(
 	['id', 'workerId', 'status', 'log', 'taskInformationId', 'deploymentId', 'startTime', 'buildTime', 'endTime'],
-	['id', 'status', 'taskInformationId', 'deploymentId', 'startTime', 'buildTime'],
+	['id', 'status', 'taskInformationId', 'deploymentId', 'startTime', 'buildTime', 'endTime'],
 	{
 		id: '',
 		outputFile: null,
