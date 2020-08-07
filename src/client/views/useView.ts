@@ -41,7 +41,7 @@ export function useOptionalView<A extends string[], D, R>(
 					data,
 				});
 			}
-		}, ...options as unknown as A);
+		}, ...options as string[] as A);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [view, setValue, ...options]); // TODO use JSON.stringify here if we want to support length changing of the options list
 	return value;
