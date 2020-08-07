@@ -1,0 +1,27 @@
+.init {
+	background: var(--status-init);
+}
+.approved {
+	background: var(--status-approved);
+}
+.running {
+	background: var(--status-running);
+}
+.uploading {
+	background: var(--status-uploading);
+}
+.success {
+	background: var(--status-success);
+}
+.error {
+	background: var(--status-error);
+}
+.cancelled {
+	background: var(--status-cancelled);
+}
+.pending {
+	background: var(--status-pending);
+}
+.timeout {
+	background: var(--status-timeout);
+}

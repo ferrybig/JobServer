@@ -4,7 +4,22 @@
 	--main: hsl(263, 100%, 75%);
 	--main-light: hsl(263, 100%, 80%);
 	--main-dark: hsl(263, 100%, 70%);
-	--fade: rga(127, 127, 127, 0.5);
+
+	--fade-low: rgba(127, 127, 127, 0.125);
+	--fade: rgba(127, 127, 127, 0.25);
+	--fade-high: rgba(127, 127, 127, 0.5);
+	--fade-bg: rgba(255, 255, 255, 0.5);
+
+	--status-init: hsl(231, 100%, 85%);
+	--status-approved: hsl(211, 100%, 85%);
+	--status-pending: hsl(211, 100%, 85%);
+	--status-running: hsl(201, 100%, 85%);
+	--status-error: hsl(0, 100%, 78%);
+	--status-timeout: hsl(0, 100%, 78%);
+	--status-cancelled: hsl(0, 100%, 85%);
+	--status-success: hsl(113, 100%, 85%);
+	--status-uploading: hsl(113, 100%, 78%);
 }
 .dark {
+	color:
 }
