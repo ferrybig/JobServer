@@ -72,6 +72,7 @@ interface CrudStore<D extends Definition, A extends ActionTypes> {
 		[M in keyof D]: Reducer<CrudState<Parameters<D[M]>[0], ReturnType<D[M]>>, RemapType<BaseActions<M, Parameters<D[M]>[0], ReturnType<D[M]>>, A>>
 	};
 	keys: (keyof D)[];
+	getIdFromEntity: D;
 }
 
 function checkMappedActionType<M extends ValidKeyof, P, I extends ValidKeyof, T extends ActionType, A extends ActionTypes>(actionTypes: A, action: RemapType<BaseActions<M, P, I>, A>, type: T, module: M): action is Extract<BaseActions<M, P, I>, { type: T }> {
@@ -343,6 +344,7 @@ export default function makeCrudModules<D extends Definition, A extends ActionTy
 		actions: actions as any,
 		reducers: Object.fromEntries(Object.entries(definitions).map(([module, getKey]): [keyof D, Reducer<any, any>] => [module, makeReducer(module, getKey, actionTypes)])) as Record<keyof D, Reducer<any, any>>,
 		keys: Object.keys(definitions),
+		getIdFromEntity: definitions,
 	};
 }
 

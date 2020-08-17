@@ -6,6 +6,7 @@ export const {
 	actions,
 	reducers,
 	keys: moduleKeys,
+	getIdFromEntity,
 } = makeCrudModules({
 	workers: keyByIdField<Worker>(),
 	task: keyByIdField<Task>(),
