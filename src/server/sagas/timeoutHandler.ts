@@ -11,7 +11,7 @@ export default function* (webSocket: NodeWebSocket): SagaIterator<never> {
 			if (tick < 0) {
 				emitter('timeout');
 			}
-		}, 30000);
+		}, 60000);
 		return onEvent(webSocket, {
 			close() {
 				emitter(END);
