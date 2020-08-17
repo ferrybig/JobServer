@@ -1,4 +1,4 @@
-type Limit = string | number
+type Limit = Exclude<PropertyKey, symbol>;
 
 interface Tester<T extends Limit>{
 	(toTest: Limit): toTest is T;
