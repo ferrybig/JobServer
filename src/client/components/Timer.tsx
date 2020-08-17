@@ -33,10 +33,11 @@ const Timer: FC<Props> = ({
 	const asSec = Math.round(timeElapsed / 1000);
 	const sec = asSec % 60;
 	const min = Math.floor(asSec / 60);
+	const formatted = timeElapsed.toLocaleString('en-us'); // Use language context here
 
 	return (
-		<span className={classes.root} title={title ? `${title}: ${timeElapsed}ms` : `${timeElapsed}ms`}>
-			{timeElapsed < 0 ? '??:??' : `${min < 10 && '0'}${min}:${sec < 10 && '0'}${sec}`}
+		<span className={classes.root} title={title ? `${title}: ${formatted}ms` : `${formatted}ms`}>
+			{timeElapsed < 0 ? '??:??' : `${min < 10 ? '0' : ''}${min}:${sec < 10 ? '0' : ''}${sec}`}
 		</span>
 	);
 };
