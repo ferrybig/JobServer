@@ -65,7 +65,7 @@ webSocketServer.on('connection', (webSocket, req) => {
 	} else { //TODO add websocket event for a client
 		webSocket.terminate();
 	}
-	
+
 });
 
 app.put('/uploads/:token', uploadPage);

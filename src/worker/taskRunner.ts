@@ -11,11 +11,11 @@ function buildScriptToDockerFile(buildScript: string[]) {
 
 export default class TaskRunner {
 	private repoAccessor: RepoAccessor;
-	
+
 	constructor(repoAccessor: RepoAccessor) {
 		this.repoAccessor = repoAccessor;
 	}
-	
+
 	async run(task: BuildTask, outputFile: string, logger?: (ouput: string) => void) {
 		await tmpFileBlock(async (tmp) => {
 			//await writeFile(tmp, buildScriptToDockerFile(task.buildScript));

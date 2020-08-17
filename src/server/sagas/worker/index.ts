@@ -271,7 +271,7 @@ function* handleNoTaskAfterSubmit(socket: Socket, packet: TaskError | TaskFinish
 	return call(handleIdleTask, socket);
 }
 function* handleInitTask(socket: Socket): SagaIterator<CallEffect> {
-	
+
 	const currentTaskId = socket.worker.currentTask;
 	const currentTask: Task | null = currentTaskId !== null ? yield select(getOrNull, 'task', currentTaskId) : null;
 	const packet: WorkerToServerPacketNoPing = yield call(receivePacket, socket);

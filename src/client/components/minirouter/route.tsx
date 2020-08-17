@@ -17,7 +17,7 @@ export class RouteDefinicationDefiner<P, I> {
 	}
 	public render<C = P>(render: (props: C) => null | JSX.Element): RouteDefinication<Pick<C, Exclude<keyof C, keyof P>>, I> {
 		const transform = this.pathTransform;
-		
+
 		let matchedProps: P | null;
 
 		function doRender(extraProps: Pick<C, Exclude<keyof C, keyof P>>) {
