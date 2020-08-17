@@ -219,6 +219,7 @@ export default class UpstreamConnection {
 							'X-length': String(lastRead),
 						}
 					});
+					console.log('Upload bytes ' + currentOffset + ' to ' + (currentOffset + lastRead) + '; Remaining: ' + (state.data.fileSize -  (currentOffset + lastRead)));
 					if (!result.ok) {
 						throw new Error('http status not ok: ' + result.status);
 					}
