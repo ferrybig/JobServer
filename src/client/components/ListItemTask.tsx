@@ -1,6 +1,6 @@
 import React, { FC, memo } from 'react';
 import classes from './ListItemTask.module.css';
-import { task } from '../../common/views/types';
+import { taskShort, ReturnedValueOrMore } from '../../common/views/types';
 import ListItem from './ListItem';
 import statusClasses from '../themesContext/status';
 import RouteLink from './minirouter/RouteLink';
@@ -9,7 +9,7 @@ import { TaskTimer } from './Timer';
 import Card from './Card';
 
 interface Props {
-	task: (typeof task)['examples']['short'];
+	task: ReturnedValueOrMore<typeof taskShort>
 }
 
 const ListItemTask: FC<Props> = ({

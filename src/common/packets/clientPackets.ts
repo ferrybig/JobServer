@@ -15,7 +15,7 @@ export interface EntityRequestPacket {
 export interface EntityDataPacket {
 	type: 'entity-data',
 	requestId: number,
-	data: SubscriptionListChangeData | SubscriptionSingleChangeData,
+	data: SubscriptionListChangeData<any> | SubscriptionSingleChangeData<any>,
 }
 export interface EntityEndPacket {
 	type: 'entity-end',
@@ -46,30 +46,30 @@ export interface AuthResponsePacket {
 }
 
 
-export type SubscriptionListChangeData = {
+export type SubscriptionListChangeData<F> = {
 	type: 'replace',
-	data: any[],
+	data: F[],
 } | {
 	type: 'delete',
 	index: number
 } | {
 	type: 'update',
 	index: number
-	data: any,
+	data: Partial<F>,
 } | {
 	type: 'insert',
 	index: number
-	data: any,
+	data: F,
 };
-export type SubscriptionSingleChangeData = {
+export type SubscriptionSingleChangeData<F> = {
 	type: 'replace',
-	data: any,
+	data: F,
 } | {
 	type: 'update',
-	data: Partial<any>,
+	data: Partial<F>,
 } | {
 	type: 'concat',
-	data: Partial<any>,
+	data: { [K in keyof F]?: F[K] extends string ? Extract<string, F[K]> : never },
 };
 
 export type ClientToServerPacket = PingPacket | AuthRequestPacket | AuthSolutionPacket | EntityRequestPacket | EntityEndPacket

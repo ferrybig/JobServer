@@ -65,7 +65,15 @@ export default function* handleClientConnection({ payload }: ReturnType<typeof c
 				if (!view) {
 					throw new Error('Missing view id: ' + packet.viewId);
 				}
-				const generator = view.makeFollower(yield select(), {}, packet.args as any);
+				const args = packet.args;
+				if (!view.view.argsValidator(args)) {
+					yield* sendPacket(outgoing, {
+						type: 'entity-end',
+						requestId: packet.requestId,
+					});
+					break;
+				}
+				const generator = view.makeFollower(yield select(), {}, args as any);
 				const result = generator.next();
 				if (result.done) {
 					// Generator returned without yielding something... Highly unusual, maybe its done later for permission isues?

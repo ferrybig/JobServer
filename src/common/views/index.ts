@@ -1,41 +1,59 @@
-import { NetworkEntity, task } from './types';
+import * as types from './types';
+import { SubscriptionListChangeData, SubscriptionSingleChangeData } from '../packets/clientPackets';
 
-type Form = keyof NetworkEntity<any, any, any>['examples'];
-
-export interface View<O extends NetworkEntity<any, any, any>, F extends Form = Form, T extends 'list' | 'single' = 'list' | 'single', A extends string[] = []> {
-	entityData: O;
-	form: F;
-	type: T;
-	argsHandler: (...args: A) => A;
+type TypeMethod<I, O> = {
+	format(input: I): O;
+	formatPartial(input: Partial<I>): Partial<O>;
+	isKeyAllowed(key: PropertyKey): boolean;
 }
 
-const DEFAULT_ARG_HANDLER = <T extends string[]>(...args: T): T => args;
-const args = <A extends string[]>(): (...args: A) => A => DEFAULT_ARG_HANDLER;
+export interface View<T extends 'single' | 'list', I extends object, O extends object, A extends string[]> {
+	type: T,
+	parser: TypeMethod<I, O>,
+	argsValidator: (args: string[]) => args is A;
+}
+export type AnyView = View<'single' | 'list', object, object, string[]>;
 
-function makeView<
-	O extends NetworkEntity<any, any, any>,
-	F extends Form,
-	T extends 'list' | 'single',
-	A extends string[] = []
->(entityData: O, form: F, type: T, argsHandler: (...args: A) => A): View<O, F, T, A> {
+export type ViewType<V extends AnyView> = V extends View<infer R, any, any, any> ? R : never;
+export type ViewInput<V extends AnyView> = V extends View<any, infer R, any, any> ? R : never;
+export type ViewOutput<V extends AnyView> = V extends View<any, any, infer R, any> ? R : never;
+export type ViewArgs<V extends AnyView> = V extends View<any, any, any, infer R> ? R : never;
+
+export type PacketsForView<V extends AnyView> =
+	V['type'] extends 'single' ? SubscriptionSingleChangeData<ViewOutput<V>> :
+	V['type'] extends 'list' ? SubscriptionListChangeData<ViewOutput<V>> :
+	unknown;
+export type InitPacketsForView<V extends AnyView> =
+	Extract<PacketsForView<V>, { type: 'replace' }>
+
+export type ClientDataForView<V extends AnyView> =
+	V['type'] extends 'single' ? ViewOutput<V> :
+	V['type'] extends 'list' ? ViewOutput<V>[] :
+	unknown;
+export type ServerDataForView<V extends AnyView> =
+	V['type'] extends 'single' ? ViewInput<V> :
+	V['type'] extends 'list' ? ViewInput<V>[] :
+	unknown;
+
+function makeView<T extends 'single' | 'list', I extends object, O extends object, A extends string[]>(viewType: T, type: TypeMethod<I, O>, argsValidator: (args: string[]) => args is A): View<T, I, O, A> {
 	return {
-		entityData,
-		form,
-		type,
-		argsHandler,
+		type: viewType,
+		parser: type,
+		argsValidator,
 	};
 }
 
-export type DataForView<V extends View<any>> =
-	V['type'] extends 'list' ? V['entityData']['examples'][V['form']][] :
-	V['type'] extends 'single' ? V['entityData']['examples'][V['form']] :
-	never;
-export type AllDataForView<V extends View<any>> =
-	V['type'] extends 'list' ? V['entityData']['examples']['all'][] :
-	V['type'] extends 'single' ? V['entityData']['examples']['all'] :
-	never;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const arg0 = (args: string[]): args is [] => args.length === 0;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const arg1 = (args: string[]): args is [string] => args.length === 1;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const arg2 = (args: string[]): args is [string, string] => args.length === 2;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const arg3 = (args: string[]): args is [string, string, string] => args.length === 3;
 
-export const taskGet = makeView(task, 'full', 'single', args<[string]>());
-export const taskList = makeView(task, 'short', 'list', args<[]>());
-//export const taskByRepo = makeView(task, 'short', 'list', args<[string]>());
-export const taskByDeploymentId = makeView(task, 'short', 'list', args<[string]>());
+export const taskGet = makeView('single', types.taskFull, arg1);
+export const taskList = makeView('list', types.taskShort, arg0);
+export const taskListPerDeplyoment = makeView('list', types.taskShort, arg1);
+export const taskListPerRepo = makeView('list', types.taskShort, arg1);
+export const taskListPerSite = makeView('list', types.taskShort, arg1);

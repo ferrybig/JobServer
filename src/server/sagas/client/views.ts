@@ -5,10 +5,8 @@ import * as actions from '../../store/actions';
 import Values from '../../../common/utils/Values';
 import { ModuleKeys } from '../../store/crud';
 import { EntityDataPacket, SubscriptionSingleChangeData, SubscriptionListChangeData } from '../../../common/packets/clientPackets';
-import { NetworkEntity } from '../../../common/views/types';
 import assertNever from '../../../common/utils/assertNever';
-import pick from '../../../common/utils/pick';
-import { referenceEquals, shallowEquals, genericShallowEquals } from '../../../common/utils/equals';
+import { AnyView, ViewArgs, ServerDataForView, View } from '../../../common/views';
 
 type ActionMap<P extends any[], A extends { type: string, (...args: any): any } = Values<typeof actions>> = {
 	[K in A['type']]?: true | ((action: ReturnType<Extract<A, { type: K }>>, ...args: P) => boolean)
@@ -18,27 +16,11 @@ type AllActions = ReturnType<Values<typeof actions>>;
 
 export type Follower = Iterator<EntityDataPacket['data'][], void, [AllActions, State]>;
 
-type ServerView<V extends views.View<any, any, any, any>> = {
-	select: (state: State, options: Parameters<V['argsHandler']>) => views.AllDataForView<V> | null;
-	entityData: V['entityData'],
-	form: V['form'],
-	type: V['type'],
-	updateMap: ActionMap<Parameters<V['argsHandler']>>,
-	makeFollower(initState: State, permissions: Record<string, boolean>, options: Parameters<V['argsHandler']>): Follower
-}
-
-type WriteOnlyArray<T> = {
-	push(data: T): void;
-}
-
-function filterByNetworkEntity(keys: string[] | null, input: any): any {
-	if (keys === null) {
-		return input;
-	}
-	if (Array.isArray(input)) {
-		return input.map(e => pick(e, keys));
-	}
-	return pick(input, keys);
+type ServerView<V extends AnyView> = {
+	select: (state: State, args: ViewArgs<V>) => ServerDataForView<V> | null;
+	view: V
+	updateMap: ActionMap<ViewArgs<V>>,
+	makeFollower(initState: State, permissions: Record<string, boolean>, args: ViewArgs<V>): Follower
 }
 
 function executeFilter<A extends any[]>(updateMap: ActionMap<A>, action: AllActions, args: A): boolean {
@@ -55,150 +37,165 @@ function executeFilter<A extends any[]>(updateMap: ActionMap<A>, action: AllActi
 	}
 }
 
-function compareEquality<T>(a: T, b: T, shallow: boolean): boolean {
-	if (Array.isArray(a)) {
-		if (shallow) {
-			return genericShallowEquals(a, b, shallowEquals);
-		} else {
-			return genericShallowEquals(a, b, referenceEquals);
-		}
-	} else {
-		if (shallow) {
-			return shallowEquals(a, b);
-		} else {
-			return referenceEquals(a, b);
-		}
-	}
+function filterObject<T>(obj: Partial<T>, check: (key: keyof T) => boolean): Partial<T> {
+	return Object.fromEntries(Object.entries(obj).filter(([key]) => check(key as keyof T))) as Partial<T>;
 }
 
-function makePacketsForSingle<T extends object>(initialValue: T, newValue: T, action: AllActions, packets: WriteOnlyArray<SubscriptionSingleChangeData>) {
-	const allowedKeys: Partial<Record<string, true>> = Object.fromEntries(Object.keys(initialValue).map(e => [e, true]));
-	switch (action.type) {
-	case 'update':
-		packets.push({
-			type: 'update',
-			data: newValue,
-		});
-		break;
-	case 'concat':
-		if (allowedKeys[action.payload.field]) {
-			packets.push({
-				type: 'concat',
-				data: action.payload,
-			});
-		}
-		break;
-	default:
-		const changes: Partial<Record<keyof T, any>> = {};
-		for (const [key, value] of Object.entries(initialValue)) {
-			const bValue = newValue[key as keyof T];
-			if (value !== bValue) {
-				changes[key as keyof T] = bValue;
-			}
-		}
-		packets.push({
-			type: 'update',
-			data: changes,
-		});
-		break;
-	}
-}
-function makePacketsForList<T extends object>(initialValue: T[], newValue: T[], action: AllActions, packets: WriteOnlyArray<SubscriptionListChangeData>) {
-	const difference = initialValue.length - newValue.length;
-	if (difference !== 0 || !shallowEquals(initialValue[0], newValue[0])) {
-		packets.push({
-			type: 'replace',
-			data: newValue,
-		});
-		return;
-	}
-	if (action.type === 'update') {
-		let hasSend = false;
-		for (let i = 0; i < initialValue.length; i++) {
-			if (!shallowEquals(initialValue[i], newValue[i])) {
-				hasSend = true;
-				packets.push({
-					type: 'update',
-					index: i,
-					data: newValue[i],
-				});
-			}
-		}
-		if (hasSend) {
+const followerMap: {
+	[T in AnyView['type']]: <V extends View<T, object, object, string[]> = View<T, object, object, string[]>>(serverView: Omit<ServerView<V>, 'makeFollower'>, initState: State, args: ViewArgs<V>) => Follower
+} = {
+	*single(serverView, initState, args) {
+		let baseValue = serverView.select(initState, args);
+		if (baseValue === null) {
 			return;
 		}
-	}
-	packets.push({
-		type: 'replace',
-		data: newValue,
-	});
-	return;
-}
-function makePackets(view: Pick<views.View<NetworkEntity<any, any, any>>, 'type'>, initialValue: any, newValue: any, action: AllActions, packets: EntityDataPacket['data'][]) {
-	switch (view.type) {
-	case 'single':
-		return makePacketsForSingle(initialValue, newValue, action, packets);
-	case 'list':
-		return makePacketsForList(initialValue, newValue, action, packets);
-	default:
-		return assertNever(view.type);
-	}
-}
-
-function attachFollower<V extends views.View<NetworkEntity<any, any, any>>>(view: Omit<ServerView<V>, 'makeFollower'>): ServerView<V> {
-	return {
-		*makeFollower(initState, permissions, args) {
-			const form: views.View<any>['form'] = view.form;
-			const usedKeys =
-				form === 'all' ? null :
-				form === 'full' ? view.entityData.fullKeys :
-				form === 'short' ? view.entityData.shortKeys :
-				assertNever(form);
-			let baseValue = view.select(initState, args);
-			let filteredBaseValue = filterByNetworkEntity(usedKeys, baseValue);
-			const packets: EntityDataPacket['data'][] = [{
-				type: 'replace',
-				data: filteredBaseValue,
-			}];
-			while (true) {
-				const [action, state] = yield packets;
-				packets.length = 0;
-				const filterStatus = executeFilter(view.updateMap, action, args);
-				if (!filterStatus) {
-					continue;
-				}
-				const newBaseValue = view.select(state, args);
-				if (newBaseValue === null) {
-					return;
-				}
-				if (compareEquality(baseValue, newBaseValue, false)) {
-					// Our update map lied to us! No changes have been applied to the store in our interests. Glad we checked it
-					continue;
-				}
-				baseValue = newBaseValue;
-				const newFilteredBaseValue = filterByNetworkEntity(usedKeys, newBaseValue);
-				if (compareEquality(filteredBaseValue, newFilteredBaseValue, true)) {
-					// After filtering away the bad keys, we have no changes. Don't do anything.
-					continue;
-				}
-				makePackets(view, filteredBaseValue, newFilteredBaseValue, action, packets);
-				filteredBaseValue = newFilteredBaseValue;
+		const packets: SubscriptionSingleChangeData<any>[] = [{
+			type: 'replace',
+			data: serverView.view.parser.format(baseValue as any),
+		}];
+		while (true) {
+			const [action, state] = yield packets;
+			packets.length = 0;
+			const filterStatus = executeFilter(serverView.updateMap, action, args);
+			if (!filterStatus) {
+				continue;
 			}
+			const newBaseValue = serverView.select(state, args);
+			if (newBaseValue === null) {
+				return;
+			}
+			switch (action.type) {
+			case 'update':
+				packets.push({
+					type: 'update',
+					data: serverView.view.parser.formatPartial(baseValue as any),
+				});
+				break;
+			case 'concat':
+				if (serverView.view.parser.isKeyAllowed(action.payload.field)) {
+					packets.push({
+						type: 'concat',
+						data: {
+							[action.payload.field]: action.payload.data,
+						},
+					});
+				}
+				break;
+			default:
+				const changes: Partial<Record<string, any>> = {};
+				for (const [key, value] of Object.entries(newBaseValue as object)) {
+					const bValue = baseValue[key as keyof typeof baseValue];
+					if (value !== bValue) {
+						changes[key] = value;
+					}
+				}
+				packets.push({
+					type: 'update',
+					data: changes,
+				});
+				break;
+			}
+			baseValue = newBaseValue;
+		}
+	},
+	*list(serverView, initState, args) {
+		let baseValue = serverView.select(initState, args) as object[] | null;
+		if (baseValue === null) {
+			return;
+		}
+		const packets: SubscriptionListChangeData<any>[] = [{
+			type: 'replace',
+			data: baseValue.map(serverView.view.parser.format),
+		}];
+		while (true) {
+			const [action, state] = yield packets;
+			packets.length = 0;
+			const filterStatus = executeFilter(serverView.updateMap, action, args);
+			if (!filterStatus) {
+				continue;
+			}
+			console.log('Updating list for ', action);
+			const newBaseValue = serverView.select(state, args) as object[] | null;
+			if (newBaseValue === null) {
+				return;
+			}
+			let gaveUp = false;
+			switch (action.type) {
+			case 'update':
+				if (newBaseValue.length !== baseValue.length) {
+					gaveUp = true;
+					break;
+				}
+				for (let i = 0; i < baseValue.length; i++) {
+					if (baseValue[i] !== newBaseValue[i]) {
+						packets.push({
+							type: 'update',
+							index: i,
+							data: filterObject(newBaseValue[i], serverView.view.parser.isKeyAllowed as (key: string | symbol | number) => boolean),
+						});
+					}
+				}
+				break;
+			default:
+				for (let i = 0, j = 0; i < baseValue.length || j < newBaseValue.length; i++, j++) {
+					if (baseValue[i] !== newBaseValue[j]) {
+						if (baseValue[i + 1] === newBaseValue[j] || newBaseValue[j] === undefined) {
+							// delete
+							if (j < newBaseValue.length) {
+								packets.push({
+									type: 'delete',
+									index: j,
+								});
+							}
+							j--;
+						} else if (baseValue[i] === newBaseValue[j + 1] || baseValue[i] === undefined) {
+							packets.push({
+								type: 'insert',
+								index: j,
+								data: serverView.view.parser.format(newBaseValue[j]),
+							});
+							i--;
+						} else if (newBaseValue[j] !== undefined || baseValue[i] !== undefined) {
+							packets.push({
+								type: 'update',
+								index: j,
+								data: filterObject(newBaseValue[j], serverView.view.parser.isKeyAllowed as (key: string | symbol | number) => boolean),
+							});
+						}
+					}
+				}
+			}
+			if (gaveUp) {
+				packets.length = 0;
+				packets.push({
+					type: 'replace',
+					data: baseValue.map(serverView.view.parser.format),
+				});
+			}
+			baseValue = newBaseValue;
+		}
+	},
+};
+
+
+function attachFollower<V extends AnyView>(view: Omit<ServerView<V>, 'makeFollower'>): ServerView<V> {
+	return {
+		makeFollower(initState, permissions, args) {
+			const creator = followerMap[view.view.type] as <V extends AnyView>(serverView: Omit<ServerView<V>, 'makeFollower'>, initState: State, args: ViewArgs<V>) => Follower;
+			return creator(view, initState, args);
 		},
 		...view,
 	};
 }
 
-function makeServerView<V extends views.View<any, any, any, any>>(view: V, options: Omit<ServerView<V>, 'type' | 'form'  | 'entityData' | 'makeFollower'>): ServerView<V> {
+function makeServerView<V extends AnyView>(view: V, options: Omit<ServerView<V>, 'view' | 'makeFollower'>): ServerView<V> {
 	return attachFollower({
-		form: view.form,
-		type: view.type,
-		entityData: view.entityData,
+		view,
 		...options,
 	});
 }
-function makeServerViews<V extends Record<string, views.View<any, any, any, any>>>(views: V, options: {[K in keyof V]: Omit<ServerView<V[K]>, 'type' | 'form'  | 'entityData' | 'makeFollower'>}): { [K in keyof V]: ServerView<V[K]> } {
-	return Object.fromEntries(Object.entries(views).map(([key, value]) => [key, makeServerView(value, options[key])])) as { [K in keyof V]: ServerView<V[K]> };
+function makeServerViews<V extends Record<string, AnyView>>(views: V, options: {[K in keyof V]: Omit<ServerView<V[K]>, 'view' | 'makeFollower'>}): { [K in keyof V]: ServerView<V[K]> } {
+	return Object.fromEntries(Object.entries(views).map(([key, view]) => [key, makeServerView(view, options[key])])) as { [K in keyof V]: ServerView<V[K]> };
 }
 
 function listActionMap(module: ModuleKeys): ActionMap<[]> {
@@ -232,6 +229,12 @@ function singleActionMap(module: ModuleKeys): ActionMap<[string]> {
 		// Skip persist, as we have no way of knowing swhich field contains the key, let alone which computed entity
 	};
 }
+const nullImplementation = {
+	select() {
+		return null;
+	},
+	updateMap: {},
+};
 
 const serverViews = makeServerViews(views, {
 	taskGet: {
@@ -246,12 +249,14 @@ const serverViews = makeServerViews(views, {
 		},
 		updateMap: listActionMap('task'),
 	},
-	taskByDeploymentId: {
+	taskListPerDeplyoment: {
 		select(state, [id]) {
 			return filter(state, 'task', (e) => e.deploymentId === id);
 		},
 		updateMap: listActionMap('task'),
 	},
+	taskListPerRepo: nullImplementation,
+	taskListPerSite: nullImplementation,
 });
 
 export default serverViews;

@@ -1,99 +1,71 @@
-import { Repo, Deployment, DeploymentInformation, Task, TaskInformation } from '../types';
+import { Task } from '../types';
 import pick from '../utils/pick';
 
-export interface NetworkEntity<B extends object, F extends keyof B, S extends F> {
-	examples: {
-		all: B;
-		full: Pick<B, F>;
-		short: Pick<B, S>;
-	}
-	shortKeys: S[],
-	fullKeys: F[],
+type Form = 'short' | 'full' | 'all';
+
+
+type SubType<M extends object, F extends Form, T extends object> = {
+	format: (input: M) => T & { _form: F },
+	formatPartial: (input: Partial<M>) => Partial<T> & { _form: F },
+	isKeyAllowed: (key: PropertyKey) => boolean;
 }
 
-function defineNetworkEntity<B extends object>(): <F extends keyof B, S extends F>(fullKeys: F[], shortkeys: S[], example: B) => NetworkEntity<B, F, S> {
-	return <F extends keyof B, S extends F>(fullKeys: F[], shortKeys: S[], example: B): NetworkEntity<B, F, S> => {
-		return {
-			shortKeys,
-			fullKeys,
-			examples: {
-				all: example,
-				full: pick(example, fullKeys),
-				short: pick(example, shortKeys),
-			},
-		};
+type Factory<T extends object> = <K1 extends keyof T, K2 extends K1>(full: K1[], short: K2[]) => {
+	short: SubType<T, 'short', Pick<T, K2>>,
+	full: SubType<T, 'full', Pick<T, K1>>,
+	all: SubType<T, 'all', T>,
+}
+
+function makeSubtypeFunction<M extends object, F extends Form, K extends (keyof M)[] | null>(form: F, keys: K): SubType<M, F, K extends keyof M ? Pick<M, K> : M> {
+	return {
+		format: (val): (K extends keyof M ? Pick<M, K> : M) & { _form: F } => {
+			if (keys === null) {
+				return {
+					_form: form,
+					...val,
+				} as unknown as (K extends keyof M ? Pick<M, K> : M) & { _form: F };
+			}
+			return pick(val, keys as (keyof M)[], {
+				_form: form,
+			}) as (K extends keyof M ? Pick<M, K> : M) & { _form: F };
+		},
+		formatPartial: (val): (K extends keyof M ? Pick<M, K> : M) & { _form: F } => {
+			if (keys === null) {
+				return {
+					_form: form,
+					...val,
+				} as unknown as (K extends keyof M ? Pick<M, K> : M) & { _form: F };
+			}
+			return pick(val, keys as (keyof M)[], {
+				_form: form,
+			}) as (K extends keyof M ? Pick<M, K> : M) & { _form: F };
+		},
+		isKeyAllowed(key) {
+			return keys === null || keys.includes(key as keyof M);
+		},
 	};
 }
 
-export const repository = defineNetworkEntity<Repo>()(
-	['id', 'url'],
-	['id', 'url'],
-	{
-		id: '',
-		url: 'git://',
-		secret: '',
-		outputDir: '',
-	}
-);
-export const deployment = defineNetworkEntity<Deployment>()(
-	['id', 'commit', 'branch', 'status', 'deploymentInformationId', 'timestamp', 'sequenceId', 'deployed'],
-	['id', 'commit', 'branch', 'status', 'deploymentInformationId', 'timestamp', 'sequenceId', 'deployed'],
-	{
-		id: '',
-		commit: '',
-		branch: '',
-		outputDir: '',
-		status: 'pending',
-		deploymentInformationId: '',
-		timestamp: 0,
-		sequenceId: 0,
-		deployed: false,
-	}
-);
-export const deploymentInformation = defineNetworkEntity<DeploymentInformation>()(
-	['id', 'name', 'pattern', 'repoId'],
-	['id', 'name', 'pattern', 'repoId'],
-	{
-		id: '',
-		name: 'Loading deployment information...',
-		pattern: 'refs/heads/.*',
-		outputDir: '',
-		repoId: '',
-		deleted: false,
-	}
-);
-export const task = defineNetworkEntity<Task>()(
+function makeTypeDefinition<T extends object>(): Factory<T> {
+	return <K1 extends keyof T, K2 extends K1>(full: K1[], short: K2[]): {
+		short: SubType<T, 'short', Pick<T, K2>>,
+		full: SubType<T, 'full', Pick<T, K1>>,
+		all: SubType<T, 'all', T>,
+	} => ({
+		short: makeSubtypeFunction('short', short) as SubType<T, 'short', Pick<T, K2>>,
+		full: makeSubtypeFunction('full', full) as SubType<T, 'full', Pick<T, K1>>,
+		all: makeSubtypeFunction('all', null) as SubType<T, 'all', T>,
+	});
+}
+
+export type ReturnedValue<S extends SubType<any, any, any>> = ReturnType<S['format']>;
+export type ReturnedValueOrMore<S extends SubType<any, any, any>> = Omit<ReturnedValue<S>, '_form'>;
+
+export const {
+	short: taskShort,
+	full: taskFull,
+	all: taskAll,
+} = makeTypeDefinition<Task>()(
 	['id', 'workerId', 'status', 'log', 'taskInformationId', 'deploymentId', 'startTime', 'buildTime', 'endTime'],
 	['id', 'status', 'taskInformationId', 'deploymentId', 'startTime', 'buildTime', 'endTime'],
-	{
-		id: '',
-		outputFile: null,
-		workerId: null,
-		status: 'init',
-		log: '',
-		taskInformationId: '',
-		deploymentId: '',
-		startTime: 0,
-		buildTime: 0,
-		endTime: 0,
-	}
 );
-export const taskInformation = defineNetworkEntity<TaskInformation>()(
-	['id', 'name', 'buildScript', 'buildScriptType', 'deploymentInformationId', 'sequenceId', 'deploymentType', 'sitePath', 'siteId'],
-	['id', 'name', 'sequenceId', 'sitePath', 'siteId'],
-	{
-		id: '',
-		name: 'Example task information',
-		buildScript: [],
-		buildScriptType: 'docker',
-		deploymentInformationId: '',
-		sequenceId: 0,
-		deploymentDir: '',
-		deploymentType: 'static-extract',
-		deploymentInstructions: '',
-		deleted: false,
-		sitePath: '',
-		siteId: null,
-	}
-);
-
