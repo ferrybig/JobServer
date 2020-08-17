@@ -7,13 +7,14 @@
     "test": "test"
   },
   "scripts": {
+    "build": "npm run client-build && npm run worker-build && npm run server-build",
     "client-build": "react-scripts build && rm -rf dist/client && mv build dist/client",
     "client-start": "react-scripts start",
     "worker-build": "tsc src/worker/index.ts --outDir dist/worker/ --esModuleInterop --lib dom,dom.iterable,esnext",
     "worker-run": "npm run worker-build && node dist/worker/worker/index.js",
     "server-build": "tsc src/server/index.ts --outDir dist/server/ --downlevelIteration true --esModuleInterop --lib dom,dom.iterable,esnext",
     "server-run": "npm run server-build && node dist/server/server/index.js",
-    "server-mock-webhook": "curl -v -X POST --upload-file test/gh-wh-payload-1.json -H 'X-GitHub-Event: push' -H 'X-GitHub-Delivery: xxxx' -H 'X-Hub-Signature: sha1=d44d20fd29c4174d927e93ba5013a827963f0928' -H 'content-type: application/json' http://localhost:5000/webhook/2",
+    "server-mock-webhook": "curl -v -X POST --upload-file test/gh-wh-payload-1.json -H 'X-GitHub-Event: push' -H 'X-GitHub-Delivery: xxxx' -H 'X-Hub-Signature: sha1=d44d20fd29c4174d927e93ba5013a827963f0928' -H 'content-type: application/json' http://localhost:5000/webhook/1",
     "lint": "eslint --ext js,jsx,ts,tsx src --fix"
   },
   "author": "",
