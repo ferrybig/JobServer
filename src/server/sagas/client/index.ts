@@ -1,37 +1,43 @@
 import { connectionClient } from '../../store/actions';
 import makeWebSocketChannel from '../../../common/sagas/makeWebSocketConnection';
-import { call, fork, put, select, take as sagaTake, cancel, all } from 'redux-saga/effects';
-import { Channel, EventChannel, SagaIterator, Task } from 'redux-saga';
+import { call, fork, put, select, take as sagaTake, cancel, all, actionChannel } from 'redux-saga/effects';
+import { Channel, EventChannel, SagaIterator, Task, buffers } from 'redux-saga';
 import timeoutHandler from '../timeoutHandler';
 import { ClientToServerPacket, ServerToClientPacket } from '../../../common/packets/clientPackets';
 import { take } from '../../../common/utils/effects';
 import serverViews, { Follower } from './views';
 import assertNever from '../../../common/utils/assertNever';
+import { AnyAction } from 'redux';
 
 function* sendPacket(outgoing: Channel<string>, packet: ServerToClientPacket) {
 	yield put(outgoing, JSON.stringify(packet));
 }
 
 function* followerWatcher(outgoing: Channel<string>, iterator: Follower, requestId: number): SagaIterator<void> {
-	while (true) {
-		const action = yield sagaTake();
-		const state = yield select();
-		const packets = iterator.next([action, state]);
-		if (packets.done) {
-			yield* sendPacket(outgoing, {
-				type: 'entity-end',
-				requestId: requestId,
-			});
-			return;
-		} else {
-			for (const packet of packets.value) {
+	const channel: Channel<AnyAction> = yield actionChannel(() => true, buffers.sliding(16));
+	try {
+		while (true) {
+			const action = yield take(channel);
+			const state = yield select();
+			const packets = iterator.next([action, state]);
+			if (packets.done) {
 				yield* sendPacket(outgoing, {
-					type: 'entity-data',
+					type: 'entity-end',
 					requestId: requestId,
-					data: packet,
 				});
+				return;
+			} else {
+				for (const packet of packets.value) {
+					yield* sendPacket(outgoing, {
+						type: 'entity-data',
+						requestId: requestId,
+						data: packet,
+					});
+				}
 			}
 		}
+	} finally {
+		channel.close();
 	}
 }
 
