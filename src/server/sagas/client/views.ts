@@ -3,7 +3,7 @@ import { State } from '../../store/reducer';
 import { getOrNull, allValues, filter } from '../../store/selectors';
 import * as actions from '../../store/actions';
 import Values from '../../../common/utils/Values';
-import { ModuleKeys } from '../../store/crud';
+import { ModuleKeys, getIdFromEntity } from '../../store/crud';
 import { EntityDataPacket, SubscriptionSingleChangeData, SubscriptionListChangeData } from '../../../common/packets/clientPackets';
 import assertNever from '../../../common/utils/assertNever';
 import { AnyView, ViewArgs, ServerDataForView, View } from '../../../common/views';
@@ -37,12 +37,16 @@ function executeFilter<A extends any[]>(updateMap: ActionMap<A>, action: AllActi
 	}
 }
 
-function filterObject<T>(obj: Partial<T>, check: (key: keyof T) => boolean): Partial<T> {
-	return Object.fromEntries(Object.entries(obj).filter(([key]) => check(key as keyof T))) as Partial<T>;
+function filterObject<T extends object>(obj: Partial<T>, check: (key: keyof T) => boolean, old: T): Partial<T> {
+	return Object.fromEntries(Object.entries(obj).filter(([key, value]) => check(key as keyof T) && !Object.is(value, (old as any)[key]))) as Partial<T>;
 }
 
 const followerMap: {
-	[T in AnyView['type']]: <V extends View<T, object, object, string[]> = View<T, object, object, string[]>>(serverView: Omit<ServerView<V>, 'makeFollower'>, initState: State, args: ViewArgs<V>) => Follower
+	[T in AnyView['type']]: <V extends View<T, object, object, string[]> = View<T, object, object, string[]>>(
+		serverView: Omit<ServerView<V>, 'makeFollower'>,
+		initState: State,
+		args: ViewArgs<V>
+	) => Follower
 } = {
 	*single(serverView, initState, args) {
 		let baseValue = serverView.select(initState, args);
@@ -114,7 +118,6 @@ const followerMap: {
 			if (!filterStatus) {
 				continue;
 			}
-			console.log('Updating list for ', action);
 			const newBaseValue = serverView.select(state, args) as object[] | null;
 			if (newBaseValue === null) {
 				return;
@@ -131,7 +134,7 @@ const followerMap: {
 							packets.push({
 								type: 'update',
 								index: i,
-								data: filterObject(newBaseValue[i], serverView.view.parser.isKeyAllowed as (key: string | symbol | number) => boolean),
+								data: filterObject(newBaseValue[i], serverView.view.parser.isKeyAllowed, baseValue[i]),
 							});
 						}
 					}
@@ -159,7 +162,7 @@ const followerMap: {
 								packets.push({
 									type: 'update',
 									index: j,
-									data: filterObject(newBaseValue[j], serverView.view.parser.isKeyAllowed as (key: string | symbol | number) => boolean),
+									data: filterObject(newBaseValue[j], serverView.view.parser.isKeyAllowed, baseValue[i]),
 								});
 							}
 						}
@@ -236,13 +239,23 @@ const nullImplementation = {
 	updateMap: {},
 };
 
-const serverViews = makeServerViews(views, {
-	taskGet: {
-		select(state, [id]) {
-			return getOrNull(state, 'task', id);
+function makeGetView<K extends keyof typeof getIdFromEntity>(module: K) {
+	return {
+		select(state: State, [id]: [string]): Parameters<(typeof getIdFromEntity)[K]>[0] | null {
+			return getOrNull(state as any, module, id as any);
 		},
 		updateMap: singleActionMap('task'),
-	},
+	};
+}
+
+const serverViews = makeServerViews(views, {
+	deploymentGet: makeGetView('deployment'),
+	deploymentInformationGet: makeGetView('deploymentInformation'),
+	taskInformationGet: makeGetView('taskInformation'),
+	repoGet: makeGetView('repo'),
+	siteGet: makeGetView('site'),
+	taskGet: makeGetView('task'),
+
 	taskList: {
 		select(state) {
 			return allValues(state, 'task');

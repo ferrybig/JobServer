@@ -66,8 +66,12 @@ function subscriptionUpdater<V extends AnyView>(subscription: SubscriptionHandle
 	}
 }
 
+export interface ViewOptions {
+	noSubscribe?: boolean;
+}
+
 interface ClientView<V extends AnyView> {
-	(subscribe: (data: ClientDataForView<V> | null) => void, ...options: ViewArgs<V>): () => void;
+	(subscribe: (data: ClientDataForView<V> | null) => void, options?: ViewOptions, ...args: ViewArgs<V>): () => void;
 }
 interface SubscriptionHandler<V extends AnyView> {
 	key: string;
@@ -150,8 +154,8 @@ function makeClientHandlers<V extends Record<any, views.View<any, any, any, any>
 	}
 	const clientViews: Partial<{ [K in keyof V]: ClientView<V[K]> }> = {};
 	for (const [key, value] of Object.entries(views)) {
-		clientViews[key as keyof V] = ((handler: (data: ClientDataForView<V[keyof V]> | null) => void, ...args: string[]) => {
-			const wantsSubscription = true;
+		clientViews[key as keyof V] = ((handler: (data: ClientDataForView<V[keyof V]> | null) => void, options: ViewOptions = {}, ...args: string[]) => {
+			const wantsSubscription = !(options.noSubscribe ?? false);
 			const subscription = getOrCreateSubscriptionHandler(key, value, args, wantsSubscription);
 
 			if (subscription.hasReceivedData) {
@@ -160,18 +164,8 @@ function makeClientHandlers<V extends Record<any, views.View<any, any, any, any>
 					return () => {};
 				}
 			}
-			if (wantsSubscription) {
-				subscription.followers.push(handler);
-				return unsubscribeHandler(subscription, handler);
-			} else {
-				let unsubscribe: () => void;
-				const newHandler = (data: ClientDataForView<V[keyof V]> | null) => {
-					handler(data);
-					unsubscribe();
-				};
-				subscription.followers.push(newHandler);
-				return unsubscribeHandler(subscription, newHandler);
-			}
+			subscription.followers.push(handler);
+			return unsubscribeHandler(subscription, handler);
 		}) as any;
 	}
 	return {

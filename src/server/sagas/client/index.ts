@@ -1,6 +1,6 @@
 import { connectionClient } from '../../store/actions';
 import makeWebSocketChannel from '../../../common/sagas/makeWebSocketConnection';
-import { call, fork, put, select, take as sagaTake, cancel, all, actionChannel } from 'redux-saga/effects';
+import { call, fork, put, select, cancel, all, actionChannel } from 'redux-saga/effects';
 import { Channel, EventChannel, SagaIterator, Task, buffers } from 'redux-saga';
 import timeoutHandler from '../timeoutHandler';
 import { ClientToServerPacket, ServerToClientPacket } from '../../../common/packets/clientPackets';

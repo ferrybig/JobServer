@@ -52,7 +52,13 @@ const arg2 = (args: string[]): args is [string, string] => args.length === 2;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const arg3 = (args: string[]): args is [string, string, string] => args.length === 3;
 
+export const deploymentGet = makeView('single', types.deploymentFull, arg1);
+export const deploymentInformationGet = makeView('single', types.deploymentInformationFull, arg1);
+export const taskInformationGet = makeView('single', types.taskInformationFull, arg1);
+export const repoGet = makeView('single', types.repoFull, arg1);
+export const siteGet = makeView('single', types.siteFull, arg1);
 export const taskGet = makeView('single', types.taskFull, arg1);
+
 export const taskList = makeView('list', types.taskShort, arg0);
 export const taskListPerDeplyoment = makeView('list', types.taskShort, arg1);
 export const taskListPerRepo = makeView('list', types.taskShort, arg1);

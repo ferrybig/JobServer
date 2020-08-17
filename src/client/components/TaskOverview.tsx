@@ -1,7 +1,7 @@
 import React, { FC, useCallback } from 'react';
 import { tasksForDeploymentInformation, tasks } from '../routes';
 import useView from '../views/useView';
-import clientViews, { ViewData } from '../views/views';
+import clientViews, { ViewData, ViewOptions } from '../views/views';
 import RouteLink from './minirouter/RouteLink';
 import useBack from '../navigationContext/useBack';
 import useTitle from '../navigationContext/useTitle';
@@ -18,15 +18,15 @@ const TaskOverview: FC<Props> = ({
 }): JSX.Element => {
 	useBack(deploymentInformationId ? tasks.toPath({}) : null);
 	useTitle(deploymentInformationId ? 'Tasks for deployment ' + deploymentInformationId : 'All tasks');
-	const wrappedView = useCallback((subscribe: (data: ViewData<typeof clientViews.taskList> | ViewData<typeof clientViews.taskListPerDeplyoment> | null) => void): () => void => {
+	const wrappedView = useCallback((subscribe: (data: ViewData<typeof clientViews.taskList> | ViewData<typeof clientViews.taskListPerDeplyoment> | null) => void, options: ViewOptions): () => void => {
 		if (deploymentInformationId) {
-			return clientViews.taskListPerDeplyoment(subscribe, deploymentInformationId);
+			return clientViews.taskListPerDeplyoment(subscribe, options, deploymentInformationId);
 		} else {
-			return clientViews.taskList(subscribe);
+			return clientViews.taskList(subscribe, options);
 		}
 	}, [deploymentInformationId]);
 
-	const viewData = useView(wrappedView, []);
+	const viewData = useView(wrappedView, { defaultValue: [] });
 
 	return (
 		<div >

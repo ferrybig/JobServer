@@ -1,4 +1,4 @@
-import { Task } from '../types';
+import { Task, Repo, Deployment, DeploymentInformation, TaskInformation, Site } from '../types';
 import pick from '../utils/pick';
 
 type Form = 'short' | 'full' | 'all';
@@ -69,3 +69,49 @@ export const {
 	['id', 'workerId', 'status', 'log', 'taskInformationId', 'deploymentId', 'startTime', 'buildTime', 'endTime'],
 	['id', 'status', 'taskInformationId', 'deploymentId', 'startTime', 'buildTime', 'endTime'],
 );
+
+export const {
+	short: repoShort,
+	full: repoFull,
+	all: repoAll,
+} = makeTypeDefinition<Repo>()(
+	['id', 'url'],
+	['id', 'url'],
+);
+
+export const {
+	short: deploymentShort,
+	full: deploymentFull,
+	all: deploymentAll,
+} = makeTypeDefinition<Deployment>()(
+	['id', 'commit', 'branch', 'status', 'deploymentInformationId', 'timestamp', 'sequenceId', 'deployed'],
+	['id', 'commit', 'branch', 'status', 'deploymentInformationId', 'timestamp', 'sequenceId', 'deployed'],
+);
+
+export const {
+	short: deploymentInformationShort,
+	full: deploymentInformationFull,
+	all: deploymentInformationAll,
+} = makeTypeDefinition<DeploymentInformation>()(
+	['id', 'name', 'pattern', 'repoId'],
+	['id', 'name', 'pattern', 'repoId'],
+);
+
+export const {
+	short: taskInformationShort,
+	full: taskInformationFull,
+	all: taskInformationAll,
+} = makeTypeDefinition<TaskInformation>()(
+	['id', 'name', 'buildScript', 'buildScriptType', 'deploymentInformationId', 'sequenceId', 'deploymentType', 'sitePath', 'siteId'],
+	['id', 'name', 'sequenceId', 'sitePath', 'siteId'],
+);
+
+export const {
+	short: siteShort,
+	full: siteFull,
+	all: siteAll,
+} = makeTypeDefinition<Site>()(
+	['id', 'name', 'configBlob', 'aliasses', 'ssl', 'noSsl', 'default'],
+	['id', 'name', 'aliasses', 'default'],
+);
+

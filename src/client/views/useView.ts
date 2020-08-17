@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ViewOptions } from './views';
 
 export type UseView<D, R> = {
 	status: 'loading';
@@ -12,24 +13,41 @@ export type UseView<D, R> = {
 };
 
 type MapArguments<A extends string[]> =
-	A extends [] ? [] :
-	A extends [string] ? [string | null] :
-	A extends [string, string] ? [string | null, string | null] :
-	A extends [string, string, string] ? [string | null, string | null, string | null] :
-	A extends [string, string, string, string] ? [string | null, string | null, string | null, string | null] :
+	/* 0 */ A extends [] ? [] :
+	/* 1 */ A extends [string] ? [string | null] :
+	/* 2 */ A extends [string, string] ? [string | null, string | null] :
+	/* 3 */ A extends [string, string, string] ? [string | null, string | null, string | null] :
+	/* 4 */ A extends [string, string, string, string] ? [string | null, string | null, string | null, string | null] :
 	(string | null)[];
 
-export function useOptionalView<A extends string[], D, R>(
-	view: (handler: (data: D | null) => void, ...options: A) => () => void,
-	defaultValue: R,
-	...options: MapArguments<A>
+interface ViewOptionsWithDefault<R> extends ViewOptions {
+	defaultValue: R;
+}
+
+export default function useView<A extends string[], D, R>(
+	view: (handler: (data: D | null) => void, options: ViewOptions, ...args: A) => () => void,
+	options: ViewOptionsWithDefault<R>,
+	...args: MapArguments<A>
+): UseView<D, R>;
+export default function useView<A extends string[], D>(
+	view: (handler: (data: D | null) => void, options: ViewOptions, ...args: A) => () => void,
+	options: ViewOptions,
+	...args: MapArguments<A>
+): UseView<D, null>;
+export default function useView<A extends string[], D, R>(
+	view: (handler: (data: D | null) => void, options: ViewOptions, ...args: A) => () => void,
+	options: ViewOptions | ViewOptionsWithDefault<R>,
+	...args: MapArguments<A>
 ): UseView<D, R> {
+	const {
+		noSubscribe
+	} = options;
 	const [value, setValue] = useState<UseView<D, R>>({
 		status: 'loading',
-		data: defaultValue,
+		data: 'defaultValue' in options ? options.defaultValue : (null as unknown as R),
 	});
 	useEffect(() => {
-		if (options.indexOf(null)) {
+		if (args.indexOf(null) >= 0) {
 			return;
 		}
 		return view((data: D | null) => {
@@ -41,34 +59,8 @@ export function useOptionalView<A extends string[], D, R>(
 					data,
 				});
 			}
-		}, ...options as string[] as A);
+		}, { noSubscribe }, ...args as string[] as A);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [view, setValue, ...options]); // TODO use JSON.stringify here if we want to support length changing of the options list
-	return value;
-}
-
-
-export default function useView<A extends string[], D, R>(
-	view: (handler: (data: D | null) => void, ...options: A) => () => void,
-	defaultValue: R,
-	...options: A
-): UseView<D, R> {
-	const [value, setValue] = useState<UseView<D, R>>({
-		status: 'loading',
-		data: defaultValue,
-	});
-	useEffect(() => {
-		return view((data: D | null) => {
-			if (data === null) {
-				setValue((oldState) => oldState.status === 'loading' ? { ...oldState, status: 'not-found' } : oldState);
-			} else {
-				setValue({
-					status: 'success',
-					data,
-				});
-			}
-		}, ...options);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [view, setValue, ...options]); // TODO use JSON.stringify here if we want to support length changing of the options list
+	}, [view, setValue, noSubscribe, ...args]); // TODO use JSON.stringify here if we want to support length changing of the options list
 	return value;
 }
