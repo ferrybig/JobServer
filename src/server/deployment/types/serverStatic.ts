@@ -48,17 +48,17 @@ const deployment: DeploymentService = {
 			l.gzipStatic('on');
 			for (const line of data.taskInformation.deploymentInstructions.split('\n')) {
 				switch (line) {
-				case '':
-					// Do nothing
-					break;
-				case 'autoindex':
-					l.autoindex('on');
-					break;
-				case 'spa':
-					l.tryFiles('$url', 'index.html', '=404');
-					break;
-				default:
-					l.comment('Unknown option ' + line);
+					case '':
+						// Do nothing
+						break;
+					case 'autoindex':
+						l.autoindex('on');
+						break;
+					case 'spa':
+						l.tryFiles('$url', 'index.html', '=404');
+						break;
+					default:
+						l.comment('Unknown option ' + line);
 				}
 			}
 		});

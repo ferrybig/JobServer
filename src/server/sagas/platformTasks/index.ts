@@ -48,11 +48,11 @@ function* executeTask(task: PlatformTask, timestampService: () => number = () =>
 			});
 			let promise: Promise<StrictEffect>;
 			switch (task.type) {
-			case 'deployment':
-				promise = handleDeploymentTask(task, options);
-				break;
-			default:
-				promise = assertNever(task.type);
+				case 'deployment':
+					promise = handleDeploymentTask(task, options);
+					break;
+				default:
+					promise = assertNever(task.type);
 			}
 			promise.finally(() => options.flush()).then((d) => emit({
 				type: 'final',
@@ -70,31 +70,31 @@ function* executeTask(task: PlatformTask, timestampService: () => number = () =>
 			do {
 				const packet: MessageType = yield take(channel);
 				switch (packet.type) {
-				case 'log':
-					yield put(crudConcat('platformTask', {
-						id: task.id,
-						field: 'log',
-						data: packet.data,
-					}));
-					break;
-				case 'warning':
-					yield put(crudConcat('platformTask', {
-						id: task.id,
-						field: 'warnings',
-						data: '\n' + packet.data + '\n' + packet.data?.stack + '\n',
-					}));
-					break;
-				case 'final':
-					hasEnded = true;
-					if (packet.data) {
-						yield packet.data;
-					}
-					break;
-				case 'final-error':
-					hasEnded = true;
-					throw packet.data;
-				default:
-					return assertNever(packet);
+					case 'log':
+						yield put(crudConcat('platformTask', {
+							id: task.id,
+							field: 'log',
+							data: packet.data,
+						}));
+						break;
+					case 'warning':
+						yield put(crudConcat('platformTask', {
+							id: task.id,
+							field: 'warnings',
+							data: '\n' + packet.data + '\n' + packet.data?.stack + '\n',
+						}));
+						break;
+					case 'final':
+						hasEnded = true;
+						if (packet.data) {
+							yield packet.data;
+						}
+						break;
+					case 'final-error':
+						hasEnded = true;
+						throw packet.data;
+					default:
+						return assertNever(packet);
 				}
 			} while (!hasEnded);
 		} finally {

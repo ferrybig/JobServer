@@ -80,30 +80,30 @@ export default class UpstreamConnection {
 	}
 	private sendPacketForState() {
 		switch (this.state.type) {
-		case 'uploading':
-			this.sendMessage({
-				type: 'taskFinished',
-				payload: {
-					taskId: this.state.data.taskId,
-					log: this.state.data.log,
-					fileSize: this.state.data.fileSize,
-				},
-			});
-			break;
-		case 'error':
-			this.sendMessage({
-				type: 'taskError',
-				payload: {
-					taskId: this.state.data.taskId,
-					log: this.state.data.log,
-				},
-			});
-			break;
-		case 'request-task':
-			this.sendMessage({
-				type: 'taskRequest',
-			});
-			break;
+			case 'uploading':
+				this.sendMessage({
+					type: 'taskFinished',
+					payload: {
+						taskId: this.state.data.taskId,
+						log: this.state.data.log,
+						fileSize: this.state.data.fileSize,
+					},
+				});
+				break;
+			case 'error':
+				this.sendMessage({
+					type: 'taskError',
+					payload: {
+						taskId: this.state.data.taskId,
+						log: this.state.data.log,
+					},
+				});
+				break;
+			case 'request-task':
+				this.sendMessage({
+					type: 'taskRequest',
+				});
+				break;
 
 		}
 	}
@@ -122,47 +122,47 @@ export default class UpstreamConnection {
 			console.debug('S>C: ' + e.data);
 			const packet: ServerToWorkerPacket = JSON.parse(e.data);
 			switch (packet.type) {
-			case 'taskReceived':
-				if (this.state.type === 'request-task') {
-					const oldState = this.state;
-					this.state = {
-						type: 'executing-task',
-						data: {
-							log: '',
-							taskId: packet.payload.task.id,
-						},
-					};
-					oldState.data.done(packet.payload.task);
-				} else {
-					throw new Error('Invalid state for received packet');
-				}
-				break;
-			case 'taskStartUpload':
-				if (this.state.type === 'uploading') {
-					this.startUpload(packet.payload.offset, packet.payload.url).catch((e) => {
-						console.error('Error during uploading: ', e);
+				case 'taskReceived':
+					if (this.state.type === 'request-task') {
+						const oldState = this.state;
+						this.state = {
+							type: 'executing-task',
+							data: {
+								log: '',
+								taskId: packet.payload.task.id,
+							},
+						};
+						oldState.data.done(packet.payload.task);
+					} else {
+						throw new Error('Invalid state for received packet');
+					}
+					break;
+				case 'taskStartUpload':
+					if (this.state.type === 'uploading') {
+						this.startUpload(packet.payload.offset, packet.payload.url).catch((e) => {
+							console.error('Error during uploading: ', e);
 
-					});
-				} else {
-					throw new Error('Invalid state for received packet');
-				}
-				break;
-			case 'pong':
-				break;
-			case 'taskResultUploaded':
-				if (this.state.type === 'uploading' || this.state.type === 'error') {
-					const oldState = this.state;
-					this.state = {
-						type: 'idle',
-						data: null,
-					};
-					oldState.data.done();
-				} else {
-					throw new Error('Invalid state for received packet');
-				}
-				break;
-			default:
-				return assertNever(packet);
+						});
+					} else {
+						throw new Error('Invalid state for received packet');
+					}
+					break;
+				case 'pong':
+					break;
+				case 'taskResultUploaded':
+					if (this.state.type === 'uploading' || this.state.type === 'error') {
+						const oldState = this.state;
+						this.state = {
+							type: 'idle',
+							data: null,
+						};
+						oldState.data.done();
+					} else {
+						throw new Error('Invalid state for received packet');
+					}
+					break;
+				default:
+					return assertNever(packet);
 
 			}
 		});

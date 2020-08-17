@@ -46,28 +46,28 @@ export default Timer;
 
 export const TaskTimer: FC<{task: Pick<Task, 'status' | 'startTime' | 'buildTime' | 'endTime'>}> = ({ task }): JSX.Element | null => {
 	switch (task.status) {
-	case 'init':
-	case 'approved':
-	case 'cancelled':
-		return null;
-	case 'running':
-		return <Timer startTime={task.startTime} endTime={null} title="Building"/>;
-	case 'error':
-	case 'timeout':
-		return <Timer startTime={task.startTime} endTime={task.endTime} title="Building"/>;
-	case 'uploading':
-		return <>
-			<Timer startTime={task.startTime} endTime={task.buildTime} title="Building"/>
-			{' '}
-			<Timer startTime={task.buildTime} endTime={null} title="Uploading"/>
-		</>;
-	case 'success':
-		return <>
-			<Timer startTime={task.startTime} endTime={task.buildTime} title="Building"/>
-			{' '}
-			<Timer startTime={task.buildTime} endTime={task.endTime} title="Uploading"/>
-		</>;
-	default:
-		return assertNever(task.status);
+		case 'init':
+		case 'approved':
+		case 'cancelled':
+			return null;
+		case 'running':
+			return <Timer startTime={task.startTime} endTime={null} title="Building"/>;
+		case 'error':
+		case 'timeout':
+			return <Timer startTime={task.startTime} endTime={task.endTime} title="Building"/>;
+		case 'uploading':
+			return <>
+				<Timer startTime={task.startTime} endTime={task.buildTime} title="Building"/>
+				{' '}
+				<Timer startTime={task.buildTime} endTime={null} title="Uploading"/>
+			</>;
+		case 'success':
+			return <>
+				<Timer startTime={task.startTime} endTime={task.buildTime} title="Building"/>
+				{' '}
+				<Timer startTime={task.buildTime} endTime={task.endTime} title="Uploading"/>
+			</>;
+		default:
+			return assertNever(task.status);
 	}
 };

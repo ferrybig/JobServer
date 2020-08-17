@@ -26,21 +26,21 @@ export default function* taskDistributer(timestampService: () => number = () => 
 	while (true) {
 		const action: EVENTS_CHILD = yield take(EVENTS_CHILD);
 		switch (action.type) {
-		case 'update':
-			if (action.module === 'task') {
-				if ((action.payload.data as Partial<Task>).status === 'approved') {
-					hasNewTasks = true;
+			case 'update':
+				if (action.module === 'task') {
+					if ((action.payload.data as Partial<Task>).status === 'approved') {
+						hasNewTasks = true;
+					}
 				}
-			}
-			break;
-		case 'workerAwaitsTask':
-			set.add(action.payload);
-			break;
-		case 'workerDisconnected':
-			set.delete(action.payload);
-			break;
-		default:
-			return assertNever(action);
+				break;
+			case 'workerAwaitsTask':
+				set.add(action.payload);
+				break;
+			case 'workerDisconnected':
+				set.delete(action.payload);
+				break;
+			default:
+				return assertNever(action);
 		}
 		while (hasNewTasks && set.size > 0) {
 			const newTask: Task | null = yield select(findNextPendingTask);

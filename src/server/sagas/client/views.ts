@@ -26,14 +26,14 @@ type ServerView<V extends AnyView> = {
 function executeFilter<A extends any[]>(updateMap: ActionMap<A>, action: AllActions, args: A): boolean {
 	const filter = updateMap[action?.type];
 	switch (typeof filter) {
-	case 'boolean':
-		return filter;
-	case 'function':
-		return filter(action as any, ...args);
-	case 'undefined':
-		return false;
-	default:
-		return assertNever(filter);
+		case 'boolean':
+			return filter;
+		case 'function':
+			return filter(action as any, ...args);
+		case 'undefined':
+			return false;
+		default:
+			return assertNever(filter);
 	}
 }
 
@@ -65,35 +65,35 @@ const followerMap: {
 				return;
 			}
 			switch (action.type) {
-			case 'update':
-				packets.push({
-					type: 'update',
-					data: serverView.view.parser.formatPartial(baseValue as any),
-				});
-				break;
-			case 'concat':
-				if (serverView.view.parser.isKeyAllowed(action.payload.field)) {
+				case 'update':
 					packets.push({
-						type: 'concat',
-						data: {
-							[action.payload.field]: action.payload.data,
-						},
+						type: 'update',
+						data: serverView.view.parser.formatPartial(baseValue as any),
 					});
-				}
-				break;
-			default:
-				const changes: Partial<Record<string, any>> = {};
-				for (const [key, value] of Object.entries(newBaseValue as object)) {
-					const bValue = baseValue[key as keyof typeof baseValue];
-					if (value !== bValue) {
-						changes[key] = value;
+					break;
+				case 'concat':
+					if (serverView.view.parser.isKeyAllowed(action.payload.field)) {
+						packets.push({
+							type: 'concat',
+							data: {
+								[action.payload.field]: action.payload.data,
+							},
+						});
 					}
-				}
-				packets.push({
-					type: 'update',
-					data: changes,
-				});
-				break;
+					break;
+				default:
+					const changes: Partial<Record<string, any>> = {};
+					for (const [key, value] of Object.entries(newBaseValue as object)) {
+						const bValue = baseValue[key as keyof typeof baseValue];
+						if (value !== bValue) {
+							changes[key] = value;
+						}
+					}
+					packets.push({
+						type: 'update',
+						data: changes,
+					});
+					break;
 			}
 			baseValue = newBaseValue;
 		}
@@ -121,49 +121,49 @@ const followerMap: {
 			}
 			let gaveUp = false;
 			switch (action.type) {
-			case 'update':
-				if (newBaseValue.length !== baseValue.length) {
-					gaveUp = true;
-					break;
-				}
-				for (let i = 0; i < baseValue.length; i++) {
-					if (baseValue[i] !== newBaseValue[i]) {
-						packets.push({
-							type: 'update',
-							index: i,
-							data: filterObject(newBaseValue[i], serverView.view.parser.isKeyAllowed as (key: string | symbol | number) => boolean),
-						});
+				case 'update':
+					if (newBaseValue.length !== baseValue.length) {
+						gaveUp = true;
+						break;
 					}
-				}
-				break;
-			default:
-				for (let i = 0, j = 0; i < baseValue.length || j < newBaseValue.length; i++, j++) {
-					if (baseValue[i] !== newBaseValue[j]) {
-						if (baseValue[i + 1] === newBaseValue[j] || newBaseValue[j] === undefined) {
-							// delete
-							if (j < newBaseValue.length) {
-								packets.push({
-									type: 'delete',
-									index: j,
-								});
-							}
-							j--;
-						} else if (baseValue[i] === newBaseValue[j + 1] || baseValue[i] === undefined) {
-							packets.push({
-								type: 'insert',
-								index: j,
-								data: serverView.view.parser.format(newBaseValue[j]),
-							});
-							i--;
-						} else if (newBaseValue[j] !== undefined || baseValue[i] !== undefined) {
+					for (let i = 0; i < baseValue.length; i++) {
+						if (baseValue[i] !== newBaseValue[i]) {
 							packets.push({
 								type: 'update',
-								index: j,
-								data: filterObject(newBaseValue[j], serverView.view.parser.isKeyAllowed as (key: string | symbol | number) => boolean),
+								index: i,
+								data: filterObject(newBaseValue[i], serverView.view.parser.isKeyAllowed as (key: string | symbol | number) => boolean),
 							});
 						}
 					}
-				}
+					break;
+				default:
+					for (let i = 0, j = 0; i < baseValue.length || j < newBaseValue.length; i++, j++) {
+						if (baseValue[i] !== newBaseValue[j]) {
+							if (baseValue[i + 1] === newBaseValue[j] || newBaseValue[j] === undefined) {
+								// delete
+								if (j < newBaseValue.length) {
+									packets.push({
+										type: 'delete',
+										index: j,
+									});
+								}
+								j--;
+							} else if (baseValue[i] === newBaseValue[j + 1] || baseValue[i] === undefined) {
+								packets.push({
+									type: 'insert',
+									index: j,
+									data: serverView.view.parser.format(newBaseValue[j]),
+								});
+								i--;
+							} else if (newBaseValue[j] !== undefined || baseValue[i] !== undefined) {
+								packets.push({
+									type: 'update',
+									index: j,
+									data: filterObject(newBaseValue[j], serverView.view.parser.isKeyAllowed as (key: string | symbol | number) => boolean),
+								});
+							}
+						}
+					}
 			}
 			if (gaveUp) {
 				packets.length = 0;

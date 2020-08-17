@@ -13,7 +13,8 @@
 				"FunctionExpression": {
 					"parameters": "first"
 				},
-				"flatTernaryExpressions": true
+				"flatTernaryExpressions": true,
+				"SwitchCase": 1
 			}
 		],
 		"comma-dangle": [

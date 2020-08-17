@@ -11,50 +11,50 @@ const subscriptionUpdaters: {
 	single(subscription, data) {
 		subscription.hasReceivedData = true;
 		switch (data.type) {
-		case 'replace':
-			subscription.value = data.data;
-			break;
-		case 'update':
-			subscription.value = {
-				...throwIfNotDefined(subscription.value),
-				...data.data,
-			};
-			break;
-		case 'concat':
-			const copy = {
-				...throwIfNotDefined(subscription.value),
-			};
-			for (const [key, value] of Object.entries(data.data)) {
-				copy[key] = value;
-			}
-			subscription.value = copy;
-			break;
-		default:
-			return assertNever(data);
+			case 'replace':
+				subscription.value = data.data;
+				break;
+			case 'update':
+				subscription.value = {
+					...throwIfNotDefined(subscription.value),
+					...data.data,
+				};
+				break;
+			case 'concat':
+				const copy = {
+					...throwIfNotDefined(subscription.value),
+				};
+				for (const [key, value] of Object.entries(data.data)) {
+					copy[key] = value;
+				}
+				subscription.value = copy;
+				break;
+			default:
+				return assertNever(data);
 		}
 	},
 	list(subscription, data) {
 		switch (data.type) {
-		case 'replace':
-			subscription.value = data.data;
-			break;
-		case 'delete':
-			const array1 = [...throwIfNotDefined(subscription.value)];
-			array1.splice(data.index, 1);
-			subscription.value = array1;
-			break;
-		case 'update':
-			const array2 = [...throwIfNotDefined(subscription.value)];
-			array2[data.index] = data.data;
-			subscription.value = array2;
-			break;
-		case 'insert':
-			const array3 = [...throwIfNotDefined(subscription.value)];
-			array3.splice(data.index, 0, data.data);
-			subscription.value = array3;
-			break;
-		default:
-			return assertNever(data);
+			case 'replace':
+				subscription.value = data.data;
+				break;
+			case 'delete':
+				const array1 = [...throwIfNotDefined(subscription.value)];
+				array1.splice(data.index, 1);
+				subscription.value = array1;
+				break;
+			case 'update':
+				const array2 = [...throwIfNotDefined(subscription.value)];
+				array2[data.index] = data.data;
+				subscription.value = array2;
+				break;
+			case 'insert':
+				const array3 = [...throwIfNotDefined(subscription.value)];
+				array3.splice(data.index, 0, data.data);
+				subscription.value = array3;
+				break;
+			default:
+				return assertNever(data);
 		}
 	}
 };

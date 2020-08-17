@@ -129,21 +129,21 @@ function* handleWaitingForTask(socket: Socket, packet: TaskRequest): SagaIterato
 function* handleRunningTask(socket: Socket, task: Task): SagaIterator<CallEffect> {
 	const packet: WorkerToServerPacketNoPing = yield call(receivePacket, socket);
 	switch (packet.type) {
-	case 'taskProgressAppend':
-		yield put(crudConcat('task', {
-			id: task.id,
-			field: 'log',
-			data: packet.payload.logPart,
-		}));
-		return call(handleRunningTask, socket, task);
-	case 'taskFinished':
-		return call(handleUploadingTask, socket, task, packet);
-	case 'taskError':
-		return call(handleErrorTask, socket, task, packet);
-	case 'taskRequest':
-		return call(disconnectInvalidSequence, socket, packet);
-	default:
-		return assertNever(packet);
+		case 'taskProgressAppend':
+			yield put(crudConcat('task', {
+				id: task.id,
+				field: 'log',
+				data: packet.payload.logPart,
+			}));
+			return call(handleRunningTask, socket, task);
+		case 'taskFinished':
+			return call(handleUploadingTask, socket, task, packet);
+		case 'taskError':
+			return call(handleErrorTask, socket, task, packet);
+		case 'taskRequest':
+			return call(disconnectInvalidSequence, socket, packet);
+		default:
+			return assertNever(packet);
 	}
 }
 function* handleUploadingTask(socket: Socket, task: Task, packet: TaskFinished, timestampService: () => number = () => Date.now()): SagaIterator<CallEffect> {
@@ -250,14 +250,14 @@ function* handleErrorTask(socket: Socket, task: Task, packet: TaskError, timesta
 function* handleIdleTask(socket: Socket): SagaIterator<CallEffect> {
 	const packet: WorkerToServerPacketNoPing = yield call(receivePacket, socket);
 	switch (packet.type) {
-	case 'taskRequest':
-		return call(handleWaitingForTask, socket, packet);
-	case 'taskFinished':
-	case 'taskError':
-	case 'taskProgressAppend':
-		return call(disconnectInvalidSequence, socket, packet);
-	default:
-		return assertNever(packet);
+		case 'taskRequest':
+			return call(handleWaitingForTask, socket, packet);
+		case 'taskFinished':
+		case 'taskError':
+		case 'taskProgressAppend':
+			return call(disconnectInvalidSequence, socket, packet);
+		default:
+			return assertNever(packet);
 	}
 }
 function* handleNoTaskAfterSubmit(socket: Socket, packet: TaskError | TaskFinished): SagaIterator<CallEffect> {
@@ -276,22 +276,22 @@ function* handleInitTask(socket: Socket): SagaIterator<CallEffect> {
 	const currentTask: Task | null = currentTaskId !== null ? yield select(getOrNull, 'task', currentTaskId) : null;
 	const packet: WorkerToServerPacketNoPing = yield call(receivePacket, socket);
 	switch (packet.type) {
-	case 'taskRequest':
-		return call(handleWaitingForTask, socket, packet);
-	case 'taskFinished':
-		if (!currentTask) {
-			return call(handleNoTaskAfterSubmit, socket, packet);
-		}
-		return call(handleUploadingTask, socket, currentTask, packet);
-	case 'taskError':
-		if (!currentTask) {
-			return call(handleNoTaskAfterSubmit, socket, packet);
-		}
-		return call(handleErrorTask, socket, currentTask, packet);
-	case 'taskProgressAppend':
-		return call(disconnectInvalidSequence, socket, packet);
-	default:
-		return assertNever(packet);
+		case 'taskRequest':
+			return call(handleWaitingForTask, socket, packet);
+		case 'taskFinished':
+			if (!currentTask) {
+				return call(handleNoTaskAfterSubmit, socket, packet);
+			}
+			return call(handleUploadingTask, socket, currentTask, packet);
+		case 'taskError':
+			if (!currentTask) {
+				return call(handleNoTaskAfterSubmit, socket, packet);
+			}
+			return call(handleErrorTask, socket, currentTask, packet);
+		case 'taskProgressAppend':
+			return call(disconnectInvalidSequence, socket, packet);
+		default:
+			return assertNever(packet);
 	}
 }
 

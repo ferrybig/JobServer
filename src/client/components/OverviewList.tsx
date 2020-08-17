@@ -28,37 +28,37 @@ const OverviewList = <I,>({
 	reverse,
 }: Props<I>): JSX.Element => {
 	switch (list.status) {
-	case 'loading':
-		return (
-			<div className={classes.list}>
-				<div className={classes.listItemLoading}/>
-				<div className={classes.listItemLoading}/>
-				<div className={classes.listItemLoading}/>
-				<div className={classes.listItemLoading}/>
-			</div>
-		);
-	case 'success':
-		return (
-			<div className={classes.list}>
-				{mapList(list.data, item, !!reverse)}
-			</div>
-		);
-	case 'not-found':
-		return (
-			<div className={classes.list}>
-				<div className={classes.listItemLoaded}/>
-				<div className={classes.listItemLoaded}/>
-				<div className={classes.listItemLoaded}/>
-				<div className={classes.listItemLoaded}/>
-				{!hideNotFound && (
-					<div className={classes.notFound}>
+		case 'loading':
+			return (
+				<div className={classes.list}>
+					<div className={classes.listItemLoading}/>
+					<div className={classes.listItemLoading}/>
+					<div className={classes.listItemLoading}/>
+					<div className={classes.listItemLoading}/>
+				</div>
+			);
+		case 'success':
+			return (
+				<div className={classes.list}>
+					{mapList(list.data, item, !!reverse)}
+				</div>
+			);
+		case 'not-found':
+			return (
+				<div className={classes.list}>
+					<div className={classes.listItemLoaded}/>
+					<div className={classes.listItemLoaded}/>
+					<div className={classes.listItemLoaded}/>
+					<div className={classes.listItemLoaded}/>
+					{!hideNotFound && (
+						<div className={classes.notFound}>
 							This item cannot be found!
-					</div>
-				)}
-			</div>
-		);
-	default:
-		return assertNever(list);
+						</div>
+					)}
+				</div>
+			);
+		default:
+			return assertNever(list);
 	}
 };
 

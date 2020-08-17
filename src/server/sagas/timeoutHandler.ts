@@ -27,10 +27,10 @@ export default function* (webSocket: NodeWebSocket): SagaIterator<never> {
 	while (true) {
 		const packet: 'timeout' = yield take(channel);
 		switch (packet) {
-		case 'timeout':
-			throw new Error('Connection timed out');
-		default:
-			return assertNever(packet);
+			case 'timeout':
+				throw new Error('Connection timed out');
+			default:
+				return assertNever(packet);
 		}
 	}
 }

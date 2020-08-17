@@ -48,19 +48,19 @@ function* planDeployment(force: boolean): SagaIterator<void> {
 
 function* shouldStartDeployment(a: EVENTS_CHILD, localState: { numbers: ReturnType<typeof getDeploymentNumbers>}): SagaIterator<boolean | 'force'> {
 	switch (a.type) {
-	case 'update':
-		if (a.module === 'deployment') {
-			const newDeploymentState = yield select(getDeploymentNumbers);
-			if (!shallowEquals(localState.numbers, newDeploymentState)) {
-				localState.numbers = newDeploymentState;
-				return true;
+		case 'update':
+			if (a.module === 'deployment') {
+				const newDeploymentState = yield select(getDeploymentNumbers);
+				if (!shallowEquals(localState.numbers, newDeploymentState)) {
+					localState.numbers = newDeploymentState;
+					return true;
+				}
 			}
-		}
-		return false;
-	case 'triggerPlatformTask':
-		return 'force';
-	default:
-		return assertNever(a);
+			return false;
+		case 'triggerPlatformTask':
+			return 'force';
+		default:
+			return assertNever(a);
 	}
 }
 

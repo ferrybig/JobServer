@@ -28,80 +28,80 @@ export default makeWebhookHandler((req) => {
 	extra: repo,
 }, req, res, next) => {
 	switch (body.type) {
-	case 'ping':
-		res.statusCode = 204;
-		res.send('');
-		break;
-	case 'push':
-		if (body.data.deleted) {
+		case 'ping':
+			res.statusCode = 204;
+			res.send('');
+			break;
+		case 'push':
+			if (body.data.deleted) {
+				res.statusCode = 200;
+				res.header('content-type', 'text/plain');
+				res.send('(Not handing pushed for deleted branches)\n');
+				break;
+			}
+			const ref = body.data.ref;
+			const commit = body.data.after;
+			const matchedDeploymentInformations = filter(
+				store.getState(),
+				'deploymentInformation',
+				(d) => d.repoId === repo.id && new RegExp(`^${d.pattern}$`).test(ref)
+			);
+			const taskIds: Task['id'][] = [];
+			for (const matched of matchedDeploymentInformations) {
+				const sequenceId = computeSequenceId(matched.id);
+				const taskInformations = filter(store.getState(), 'taskInformation', (d) => d.deploymentInformationId === matched.id);
+				if (taskInformations.length === 0) {
+					console.warn('Deployment information ' + matched.id + ' has no valid tasks');
+				}
+				const newDeployment: Deployment = {
+					id: uuid(),
+					commit,
+					branch: ref,
+					outputDir: matched.outputDir ? join(matched.outputDir, `${sequenceId}`) : null,
+					status: 'pending',
+					deploymentInformationId: matched.id,
+					timestamp: Date.now(),
+					sequenceId,
+					deployed: false,
+				};
+				store.dispatch(crudPersist('deployment', newDeployment));
+				for (const taskInformation of taskInformations) {
+					const newTask: Task = {
+						id: uuid(),
+						outputFile: newDeployment.outputDir ? join(newDeployment.outputDir, `${taskInformation.sequenceId}.tgz`) : null,
+						workerId: null,
+						status: 'init',
+						log: '',
+						taskInformationId: taskInformation.id,
+						deploymentId: newDeployment.id,
+						startTime: 0,
+						buildTime: 0,
+						endTime: 0,
+					};
+					store.dispatch(crudPersist('task', newTask));
+					taskIds.push(newTask.id);
+				}
+			}
+			// TODO Approve all tasks for now
+			for (const taskId of taskIds) {
+				store.dispatch(crudUpdate('task', {
+					id: taskId,
+					data: {
+						status: 'approved',
+					}
+				}));
+			}
+
 			res.statusCode = 200;
 			res.header('content-type', 'text/plain');
-			res.send('(Not handing pushed for deleted branches)\n');
+			res.send('Matched deployments: ' + matchedDeploymentInformations.length + '\n');
 			break;
-		}
-		const ref = body.data.ref;
-		const commit = body.data.after;
-		const matchedDeploymentInformations = filter(
-			store.getState(),
-			'deploymentInformation',
-			(d) => d.repoId === repo.id && new RegExp(`^${d.pattern}$`).test(ref)
-		);
-		const taskIds: Task['id'][] = [];
-		for (const matched of matchedDeploymentInformations) {
-			const sequenceId = computeSequenceId(matched.id);
-			const taskInformations = filter(store.getState(), 'taskInformation', (d) => d.deploymentInformationId === matched.id);
-			if (taskInformations.length === 0) {
-				console.warn('Deployment information ' + matched.id + ' has no valid tasks');
-			}
-			const newDeployment: Deployment = {
-				id: uuid(),
-				commit,
-				branch: ref,
-				outputDir: matched.outputDir ? join(matched.outputDir, `${sequenceId}`) : null,
-				status: 'pending',
-				deploymentInformationId: matched.id,
-				timestamp: Date.now(),
-				sequenceId,
-				deployed: false,
-			};
-			store.dispatch(crudPersist('deployment', newDeployment));
-			for (const taskInformation of taskInformations) {
-				const newTask: Task = {
-					id: uuid(),
-					outputFile: newDeployment.outputDir ? join(newDeployment.outputDir, `${taskInformation.sequenceId}.tgz`) : null,
-					workerId: null,
-					status: 'init',
-					log: '',
-					taskInformationId: taskInformation.id,
-					deploymentId: newDeployment.id,
-					startTime: 0,
-					buildTime: 0,
-					endTime: 0,
-				};
-				store.dispatch(crudPersist('task', newTask));
-				taskIds.push(newTask.id);
-			}
-		}
-		// TODO Approve all tasks for now
-		for (const taskId of taskIds) {
-			store.dispatch(crudUpdate('task', {
-				id: taskId,
-				data: {
-					status: 'approved',
-				}
-			}));
-		}
-
-		res.statusCode = 200;
-		res.header('content-type', 'text/plain');
-		res.send('Matched deployments: ' + matchedDeploymentInformations.length + '\n');
-		break;
-	case '?':
-		res.statusCode = 400;
-		res.header('content-type', 'text/plain');
-		res.send('Unknown event: ' + body.originalType + '\n');
-		break;
-	default:
-		return assertNever(body);
+		case '?':
+			res.statusCode = 400;
+			res.header('content-type', 'text/plain');
+			res.send('Unknown event: ' + body.originalType + '\n');
+			break;
+		default:
+			return assertNever(body);
 	}
 });
