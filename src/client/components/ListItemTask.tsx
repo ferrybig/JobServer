@@ -9,7 +9,7 @@ import { TaskTimer } from './Timer';
 import Card from './Card';
 
 interface Props {
-	task: ReturnedValueOrMore<typeof taskShort>
+	task: ReturnedValueOrMore<typeof taskShort>;
 }
 
 const ListItemTask: FC<Props> = ({

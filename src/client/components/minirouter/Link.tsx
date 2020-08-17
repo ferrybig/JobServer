@@ -2,9 +2,9 @@ import React, { ReactNode, ReactHTML, HTMLAttributes, useCallback } from 'react'
 import { contextLocation } from './LocationService';
 
 export default function Link({ path, children, tag, onClick, ...rest }: {
-	path: string,
-	children: ReactNode,
-	tag?: keyof ReactHTML,
+	path: string;
+	children: ReactNode;
+	tag?: keyof ReactHTML;
 } & HTMLAttributes<HTMLElement>): JSX.Element | null {
 	const [update, format] = contextLocation.useUpdate();
 	const realTag = tag || 'a' as const;

@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, FC, useLayoutEffect } from 'react';
 
 interface UpdateOptions {
-	replace?: boolean,
+	replace?: boolean;
 }
 
 export interface HookedLocationService {

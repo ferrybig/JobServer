@@ -12,20 +12,20 @@ import taskPlanner from './taskPlanner';
 import debounce from '../../../common/utils/debounce';
 
 type MessageType = {
-	type: 'log',
-	data: string,
+	type: 'log';
+	data: string;
 } | {
-	type: 'warning',
-	data: Error,
+	type: 'warning';
+	data: Error;
 } | {
-	type: 'final-error',
-	data: Error,
+	type: 'final-error';
+	data: Error;
 } | {
-	type: 'final',
-	data: StrictEffect | null,
+	type: 'final';
+	data: StrictEffect | null;
 }
 
-const STRING_CONCAT = ([a] : [string], [b]: [string]): [string] => [b + a];
+const STRING_CONCAT = ([a]: [string], [b]: [string]): [string] => [b + a];
 
 function debouncedTaskOptions(options: TaskOptions): TaskOptions & { flush(): void } {
 	const logger = debounce(options.logger, 500, STRING_CONCAT);

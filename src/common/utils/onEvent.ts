@@ -7,10 +7,10 @@ type TargetToMapType<T> =
 //	T extends RTCDataChannel ? RTCDataChannelEventMap :
 //	T extends RTCPeerConnection ? RTCPeerConnectionEventMap :
 	T extends NodeWebSocket ? {
-		message: { data: any; type: string; target: NodeWebSocket },
-		close: { wasClean: boolean; code: number; reason: string; target: NodeWebSocket; },
-		error: { error: any, message: any, type: string, target: NodeWebSocket },
-		open: { target: NodeWebSocket }
+		message: { data: any; type: string; target: NodeWebSocket };
+		close: { wasClean: boolean; code: number; reason: string; target: NodeWebSocket };
+		error: { error: any; message: any; type: string; target: NodeWebSocket };
+		open: { target: NodeWebSocket };
 	} :
 	//	T extends MediaStream ? MediaStreamEventMap :
 	//	T extends MediaStreamTrack ? MediaStreamTrackEventMap :
@@ -22,8 +22,8 @@ type TargetToMapType<T> =
 type MapTypesToMap<O extends Record<string,any>, T> = { [K in keyof O]?: (this: T, event: O[K]) => void };
 
 export default function onEvent<T extends {
-	addEventListener(event: string, callback: (this: T, event: any) => void): void,
-	removeEventListener(event: string, callback: (this: T, event: any) => void): void,
+	addEventListener(event: string, callback: (this: T, event: any) => void): void;
+	removeEventListener(event: string, callback: (this: T, event: any) => void): void;
 }>(
 	target: T,
 	map: MapTypesToMap<TargetToMapType<T>, T>,

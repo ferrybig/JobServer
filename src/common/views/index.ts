@@ -8,8 +8,8 @@ type TypeMethod<I, O> = {
 }
 
 export interface View<T extends 'single' | 'list', I extends object, O extends object, A extends string[]> {
-	type: T,
-	parser: TypeMethod<I, O>,
+	type: T;
+	parser: TypeMethod<I, O>;
 	argsValidator: (args: string[]) => args is A;
 }
 export type AnyView = View<'single' | 'list', object, object, string[]>;

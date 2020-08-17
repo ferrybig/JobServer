@@ -6,18 +6,18 @@ type UnionToIntersection<T> =
 type FilterUndefined<T> = T extends undefined ? never : T
 
 interface ReducerType<P> {
-	(...arg: any[]): { type: string, payload: P }
-	type: string
+	(...arg: any[]): { type: string; payload: P };
+	type: string;
 }
 type DeepReducerType = readonly [{
-	(...arg: any[]): { type: string, payload: any } // TODO destroy this any, it is causing to many mistakes
-	type: string
+	(...arg: any[]): { type: string; payload: any }; // TODO destroy this any, it is causing to many mistakes
+	type: string;
 }, string]
 
 interface ActionMap<T, I> {
-	persist?: ReducerType<T>,
-	destroy?: ReducerType<I>,
-	unpersist?: DeepReducerType,
+	persist?: ReducerType<T>;
+	destroy?: ReducerType<I>;
+	unpersist?: DeepReducerType;
 }
 
 export interface CrudState<T, I extends string | number> {
@@ -29,7 +29,7 @@ type MapActionMapDefinition<
 	T,
 	I extends string | number,
 	D extends ReducerType<any> | DeepReducerType | undefined
-> = D extends (...arg: any[]) => { type: infer R, payload: infer P } ? {
+> = D extends (...arg: any[]) => { type: infer R; payload: infer P } ? {
 	[K in (R extends string ? R : never)]: <S extends CrudState<T, I>>(state: S, action: { payload: P }) => S & CrudState<T, I>
 } : D extends readonly [(...arg: any[]) => { type: infer R }, infer K1] ? {
 	[K in (R extends string ? R : never)]: <S extends CrudState<T, I>>(state: S, action: { payload: { [K2 in (K1 extends string ? K1 : never)]: T[] | undefined } }) => S & CrudState<T, I>

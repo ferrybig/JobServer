@@ -6,7 +6,7 @@ import loopedChannel, { InferRest } from './loopedChannel';
 type ActionPattern = ((action: AnyAction) => boolean)
 | ((action: AnyAction) => action is any)
 | { type: string }[]
-| { type: string, (...args: any[]): AnyAction }[];
+| { type: string; (...args: any[]): AnyAction }[];
 
 function isActionList(patterns: ActionPattern): patterns is { type: string }[] {
 	return Array.isArray(patterns);
@@ -14,7 +14,7 @@ function isActionList(patterns: ActionPattern): patterns is { type: string }[] {
 
 type ActionType<T extends ActionPattern> =
 	T extends (arg: any) => arg is infer R ? R :
-	T extends { type: string, (...args: any[]): infer R }[] ? R :
+	T extends { type: string; (...args: any[]): infer R }[] ? R :
 	AnyAction;
 
 export default function loopedActionChannel<
@@ -24,10 +24,10 @@ export default function loopedActionChannel<
 	pattern: T,
 	handler: H,
 	{ buffer, ...options }: {
-		killLast?: boolean,
-		nonBlocking?: boolean,
-		buffer?: Buffer<ActionType<T>>,
-		doFork?: boolean,
+		killLast?: boolean;
+		nonBlocking?: boolean;
+		buffer?: Buffer<ActionType<T>>;
+		doFork?: boolean;
 	} = {},
 	...args: InferRest<H>
 ): CallEffect | ForkEffect {

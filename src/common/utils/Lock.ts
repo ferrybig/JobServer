@@ -1,7 +1,7 @@
 const NO_OP = () => {};
 
 export default class Lock {
-	private locked: boolean = false;
+	private locked = false;
 	private pendingLockers: (() => void)[] = [];
 	private onLock: () => void
 	private onUnlock: () => void

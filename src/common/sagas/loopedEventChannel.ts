@@ -8,10 +8,10 @@ export default function loopedEventChannel<
 	subscribe: Subscribe<InferType<H>>,
 	handler: H,
 	{ buffer, ...options }: {
-		killLast?: boolean,
-		nonBlocking?: boolean,
-		buffer?: Buffer<InferType<H>>,
-		doFork?: boolean,
+		killLast?: boolean;
+		nonBlocking?: boolean;
+		buffer?: Buffer<InferType<H>>;
+		doFork?: boolean;
 	} = {},
 	...args: InferRest<H>
 ): CallEffect | ForkEffect {

@@ -95,12 +95,12 @@ export class RouteDefinicationDefiner<P, I> {
 export interface RouteDefinication<P, I> {
 	tryRender(path: string): ((extraProps: P) => JSX.Element | null) | null;
 	toPath(props: I): string;
-	priority: number,
-	debugValue: string,
+	priority: number;
+	debugValue: string;
 }
 
 type GetInverseMapping<T> = T extends ((props: infer P) => string) ? P : never;
-export function customRoute<P, I extends ((props: any) => string) | null>(converter: (path: string) => P | null, inverseMapping: I, priority: number = 99999): RouteDefinicationDefiner<P, GetInverseMapping<I>> {
+export function customRoute<P, I extends ((props: any) => string) | null>(converter: (path: string) => P | null, inverseMapping: I, priority = 99999): RouteDefinicationDefiner<P, GetInverseMapping<I>> {
 	return new RouteDefinicationDefiner(
 		converter,
 		(inverseMapping || (() => { throw new Error('toPath not provided for this custom route'); })) as (arg: GetInverseMapping<I>) => string,
@@ -109,12 +109,12 @@ export function customRoute<P, I extends ((props: any) => string) | null>(conver
 }
 
 interface RouteMatherOptions<K extends string | number | symbol = string | number | symbol> {
-	readonly exact?: boolean,
-	readonly lastOptional?: boolean,
-	readonly tokenDoesMatchSlash?: boolean,
-	readonly priorityAdjustMent?: number,
-	readonly generateDebugValue?: boolean,
-	readonly regexTokenProvider?: (key: K, index: number, isLast: boolean, options: RouteMatherOptions<K>) => string
+	readonly exact?: boolean;
+	readonly lastOptional?: boolean;
+	readonly tokenDoesMatchSlash?: boolean;
+	readonly priorityAdjustMent?: number;
+	readonly generateDebugValue?: boolean;
+	readonly regexTokenProvider?: (key: K, index: number, isLast: boolean, options: RouteMatherOptions<K>) => string;
 }
 
 export const DEFAULT_ROUTE_OPTIONS: Required<RouteMatherOptions> = {
@@ -189,7 +189,7 @@ function makeRouteMatcher<K extends string>(
 }
 
 interface RouteFinaliser<P, I> {
-	(options?: RouteMatherOptions<keyof P>): RouteDefinicationDefiner<P, I>
+	(options?: RouteMatherOptions<keyof P>): RouteDefinicationDefiner<P, I>;
 }
 
 export default function route<K extends string>(templatePath: TemplateStringsArray, ...args: K[]): RouteFinaliser<

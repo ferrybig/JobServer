@@ -8,8 +8,8 @@ function* loopedChannelInternal(
 	channelOrFactory: AnyChannel | CallEffect<AnyChannel> | ActionChannelEffect,
 	handler: (packet: any, ...args: any[]) => void,
 	options: {
-		killLast?: boolean,
-		nonBlocking?: boolean,
+		killLast?: boolean;
+		nonBlocking?: boolean;
 	} = {},
 	args: any[]
 ) {
@@ -44,9 +44,9 @@ export default function loopedChannel<T, H extends (packet: T, ...args: any[]) =
 	channel: AnyChannel | CallEffect<AnyChannel> | ActionChannelEffect,
 	handler: H,
 	options: {
-		killLast?: boolean,
-		nonBlocking?: boolean,
-		doFork?: boolean
+		killLast?: boolean;
+		nonBlocking?: boolean;
+		doFork?: boolean;
 	} = {},
 	...args: InferRest<H>
 ): CallEffect | ForkEffect {

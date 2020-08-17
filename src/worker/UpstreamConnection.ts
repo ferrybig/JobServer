@@ -6,33 +6,33 @@ import { stat, open } from '../common/async/fs';
 import assertNever from '../common/utils/assertNever';
 
 interface LocalState<T extends string, D = null> {
-	type: T,
-	data: D,
+	type: T;
+	data: D;
 }
 
 type InternalState = LocalState<'idle', null>
 | LocalState<'request-task', {
-	done: (task: BuildTask) => void
+	done: (task: BuildTask) => void;
 }>
 | LocalState<'executing-task', {
-	log: string,
-	taskId: BuildTask['id'],
+	log: string;
+	taskId: BuildTask['id'];
 }>
 | LocalState<'executing-task-no-log', {
-	log: string,
-	taskId: BuildTask['id'],
+	log: string;
+	taskId: BuildTask['id'];
 }>
 | LocalState<'uploading', {
-	log: string,
-	resultFile: string,
-	fileSize: number,
-	taskId: BuildTask['id'],
-	done: () => void,
+	log: string;
+	resultFile: string;
+	fileSize: number;
+	taskId: BuildTask['id'];
+	done: () => void;
 }>
 | LocalState<'error', {
-	log: string,
-	taskId: BuildTask['id'],
-	done: () => void,
+	log: string;
+	taskId: BuildTask['id'];
+	done: () => void;
 }>;
 
 const RECONNECT_TIMEOUT = 10000;
@@ -41,10 +41,10 @@ const CHUNK_SIZE = 1 * 1024 * 1024;
 
 export default class UpstreamConnection {
 	private state: InternalState = { type: 'idle', data: null };
-	private isConnected: boolean = false;
+	private isConnected = false;
 	// During uploading, automatic reconnection is disabled
-	private isUploading: boolean = false;
-	private closed: boolean = false;
+	private isUploading = false;
+	private closed = false;
 	private socket: NodeWebSocket;
 	private socketUrl: string;
 	private pingInterval: NodeJS.Timeout;
@@ -232,7 +232,7 @@ export default class UpstreamConnection {
 		}
 	}
 
-	public addTaskLog(logPart: string, shouldSend: boolean = true) {
+	public addTaskLog(logPart: string, shouldSend = true) {
 		if (this.state.type === 'executing-task' || this.state.type === 'executing-task-no-log') {
 			this.state.data.log += logPart;
 			if (this.state.type === 'executing-task' && shouldSend) {

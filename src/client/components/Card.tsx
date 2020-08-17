@@ -2,7 +2,7 @@ import React, { FC, ReactNode } from 'react';
 import classes from './Card.module.css';
 
 interface Props {
-	children?: ReactNode,
+	children?: ReactNode;
 }
 
 const Card: FC<Props> = ({

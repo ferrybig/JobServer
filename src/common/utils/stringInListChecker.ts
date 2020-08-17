@@ -1,8 +1,8 @@
 type Limit = string | number
 
 interface Tester<T extends Limit>{
-	(toTest: Limit): toTest is T,
-	types: readonly T[],
+	(toTest: Limit): toTest is T;
+	types: readonly T[];
 }
 
 export default function stringInListChecker<T extends Limit>(map: Record<T, true>): Tester<T> {

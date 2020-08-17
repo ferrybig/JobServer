@@ -40,7 +40,7 @@ function* pingHandler(socket: Socket): SagaIterator<never> {
 function* tryUpdateDeployment(deploymentId: Deployment['id']) {
 	const deployment: Deployment = yield select(get, 'deployment', deploymentId);
 	const subTasks: Task[] = yield select(s => filter(s, 'task', t => t.deploymentId === deploymentId));
-	let newStatus: Deployment['status'] = pickFirstNonNullCount(subTasks, 'status', {
+	const newStatus: Deployment['status'] = pickFirstNonNullCount(subTasks, 'status', {
 		init: 'pending',
 		success: 'success',
 		error: 'error',
@@ -84,10 +84,10 @@ function* getOrCreatePendingFileForFile(outputFile: string, fileSize: number): S
 }
 
 interface Socket {
-	incoming: EventChannel<string>,
-	outgoing: Channel<string>,
-	worker: Worker,
-	baseUrl: string,
+	incoming: EventChannel<string>;
+	outgoing: Channel<string>;
+	worker: Worker;
+	baseUrl: string;
 }
 function disconnectInvalidSequence(socket: Socket, packet: WorkerToServerPacket): never {
 	throw new Error('Connection for worker ' + socket.worker.id + ' send invalid packet: ' + JSON.stringify(packet));

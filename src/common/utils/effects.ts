@@ -21,7 +21,7 @@ export function take(filter: FilterArray | BaseTypes): TakeEffect {
 
 
 export function takeFiltered<
-	K extends string, V, A extends {type: string, (...args: any): { type: string, payload: Record<K, V> }},
+	K extends string, V, A extends {type: string; (...args: any): { type: string; payload: Record<K, V> }},
 >(
 	actions: A[], key: K, value: V
 ): TakeEffect {

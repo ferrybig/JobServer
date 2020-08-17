@@ -4,8 +4,8 @@ import callArray from '../../common/utils/callArray';
 import subscriptionDebug from '../../common/utils/subscriptionDebug';
 
 export interface ContextValue {
-	backLink: string | null,
-	pageName: string,
+	backLink: string | null;
+	pageName: string;
 }
 
 const DEFAULT_CONTEXT_VALUE: ContextValue = {
@@ -14,9 +14,9 @@ const DEFAULT_CONTEXT_VALUE: ContextValue = {
 };
 
 interface NavigationContext {
-	getValue(): ContextValue,
-	onUpdate(follower: () => void): () => void
-	setValues(values: Partial<ContextValue>): () => void
+	getValue(): ContextValue;
+	onUpdate(follower: () => void): () => void;
+	setValues(values: Partial<ContextValue>): () => void;
 }
 type RefCounts = Record<keyof ContextValue, number>;
 

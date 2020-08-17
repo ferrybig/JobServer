@@ -3,7 +3,7 @@ import { AnyAction } from 'redux';
 
 export interface ActionMapper<
 	S,
-	A extends { type: string, payload: any }
+	A extends { type: string; payload: any }
 > {
 	type: A['type'];
 	typeMapper: Record<string, (state: S, originalAction: AnyAction) => A>;
@@ -20,7 +20,7 @@ export default function mappedAction<
 	T extends string,
 	A extends Record<string, ActionCreator<any, any>>,
 	M extends {
-		[K in A[keyof A]['type']]: (state: S, action: ExtractAction<FilterExtends<A[keyof A], { type: K }>>) => { type: T, payload: any }
+		[K in A[keyof A]['type']]: (state: S, action: ExtractAction<FilterExtends<A[keyof A], { type: K }>>) => { type: T; payload: any }
 	}
 >(
 	type: T,

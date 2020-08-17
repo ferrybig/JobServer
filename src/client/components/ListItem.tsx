@@ -9,7 +9,7 @@ interface ChildrenProps {
 interface Props {
 	children: ReactNode;
 	className?: string;
-	renderRoot?: (props: ChildrenProps & HTMLAttributes<HTMLElement>) => JSX.Element | null
+	renderRoot?: (props: ChildrenProps & HTMLAttributes<HTMLElement>) => JSX.Element | null;
 }
 
 function DefaultRootRenderer({ className, children, ...rest }: ChildrenProps & HTMLAttributes<HTMLElement>): JSX.Element | null {

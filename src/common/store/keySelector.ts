@@ -2,8 +2,8 @@ type Arg1<F extends (...args: any[]) => any> = F extends (first: infer R, ...arg
 type StripArg1<F extends (...args: any[]) => any> = F extends (first: any, ...args: infer R) => any ? R : never;
 
 interface ThenableSelector<S, K extends keyof S> {
-	(state: S): S[K],
-	connect<F extends (state: S[K], ...rest: A) => any, A extends any[]>(next: F): (state: Record<K, Arg1<F>>, ...rest: StripArg1<F>) => ReturnType<F>
+	(state: S): S[K];
+	connect<F extends (state: S[K], ...rest: A) => any, A extends any[]>(next: F): (state: Record<K, Arg1<F>>, ...rest: StripArg1<F>) => ReturnType<F>;
 }
 
 export function keySelector<S>(): <K extends keyof S>(key: K) => ThenableSelector<S, K> {

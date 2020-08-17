@@ -20,10 +20,10 @@ type Themes = keyof typeof themes;
 const defaultTheme: Themes = 'light'; // TODO Test using prefers dark mode
 
 interface ThemeContext {
-	getValue(): Themes,
-	getClassname(): string,
-	onUpdate(follower: () => void): () => void
-	setValue(theme: Themes): void
+	getValue(): Themes;
+	getClassname(): string;
+	onUpdate(follower: () => void): () => void;
+	setValue(theme: Themes): void;
 }
 
 const ThemeContext = createContext<ThemeContext>({

@@ -1,7 +1,7 @@
 interface SimpleArray<T> {
 	push(item: T): number;
 	indexOf(item: T): number;
-	splice(index: number, count: 1): T[],
+	splice(index: number, count: 1): T[];
 }
 
 export function addToFollowerArray<F extends (...args: any[]) => any>(array: SimpleArray<F>, newElement: F): () => void {

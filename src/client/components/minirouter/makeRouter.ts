@@ -11,9 +11,9 @@ function sortRoutes<R extends RouteDefinication<any, any>>(routes: R[]): R[] {
 }
 
 interface RouterOptions {
-	readonly locationService?: HookedLocationService,
-	readonly autoSort?: boolean,
-	readonly debug?: boolean,
+	readonly locationService?: HookedLocationService;
+	readonly autoSort?: boolean;
+	readonly debug?: boolean;
 }
 
 export const DEFAULT_ROUTER_OPTIONS: Readonly<Required<RouterOptions>> = {

@@ -5,6 +5,6 @@ interface SimpleAbortSignal {
 export default interface TaskOptions {
 	logger: (log: string) => void;
 	warnings: (error: Error) => void;
-	abortSignal: SimpleAbortSignal,
+	abortSignal: SimpleAbortSignal;
 	// eslint-disable-next-line semi
 }

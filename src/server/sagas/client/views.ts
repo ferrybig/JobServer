@@ -8,7 +8,7 @@ import { EntityDataPacket, SubscriptionSingleChangeData, SubscriptionListChangeD
 import assertNever from '../../../common/utils/assertNever';
 import { AnyView, ViewArgs, ServerDataForView, View } from '../../../common/views';
 
-type ActionMap<P extends any[], A extends { type: string, (...args: any): any } = Values<typeof actions>> = {
+type ActionMap<P extends any[], A extends { type: string; (...args: any): any } = Values<typeof actions>> = {
 	[K in A['type']]?: true | ((action: ReturnType<Extract<A, { type: K }>>, ...args: P) => boolean)
 }
 
@@ -18,9 +18,9 @@ export type Follower = Iterator<EntityDataPacket['data'][], void, [AllActions, S
 
 type ServerView<V extends AnyView> = {
 	select: (state: State, args: ViewArgs<V>) => ServerDataForView<V> | null;
-	view: V
-	updateMap: ActionMap<ViewArgs<V>>,
-	makeFollower(initState: State, permissions: Record<string, boolean>, args: ViewArgs<V>): Follower
+	view: V;
+	updateMap: ActionMap<ViewArgs<V>>;
+	makeFollower(initState: State, permissions: Record<string, boolean>, args: ViewArgs<V>): Follower;
 }
 
 function executeFilter<A extends any[]>(updateMap: ActionMap<A>, action: AllActions, args: A): boolean {

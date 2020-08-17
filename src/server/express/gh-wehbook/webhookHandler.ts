@@ -33,11 +33,11 @@ function valueNotArray<T>(input: T): T extends any[] ? undefined : T {
 export default function makeWebhookHandler<T>(
 	getSecret: (req: Request) => [string, T] | string | undefined,
 	handleWebhook: (data: {
-		body: Webhook,
-		secret: string,
-		extra: T,
-		deliveryUUID: string,
-		signature: string,
+		body: Webhook;
+		secret: string;
+		extra: T;
+		deliveryUUID: string;
+		signature: string;
 	}, req: Request, res: Response, next: NextFunction) => void
 ): (req: Request, res: Response, next: NextFunction) => void {
 	return (req, res, next) => {

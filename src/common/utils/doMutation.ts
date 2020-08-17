@@ -5,11 +5,11 @@ type OnlyUndefinedValues<O> = Values<{ [K in keyof O]: SelectIfUndefined<O[K], K
 type RemoveUndefined<T> = T extends undefined ? never : T;
 
 interface MutationBase<S, R> {
-	<K extends keyof S>(key: K): MutationBase<RemoveUndefined<S[K]>, R>,
-	set<K extends keyof S>(key: K, value: S[K]): R,
-	update<K extends keyof S>(key: K, value: (input: RemoveUndefined<S[K]>) => S[K] | undefined): R,
-	delete<K extends OnlyUndefinedValues<S>>(key: K): R,
-	batch(...operations: ((input: MutationBase<S, S>) => S)[]): R,
+	<K extends keyof S>(key: K): MutationBase<RemoveUndefined<S[K]>, R>;
+	set<K extends keyof S>(key: K, value: S[K]): R;
+	update<K extends keyof S>(key: K, value: (input: RemoveUndefined<S[K]>) => S[K] | undefined): R;
+	delete<K extends OnlyUndefinedValues<S>>(key: K): R;
+	batch(...operations: ((input: MutationBase<S, S>) => S)[]): R;
 }
 function makeVoidMutationBase<S, R>(_: S, rootState: R): MutationBase<S, R> {
 	function voidMutationSelecter<K extends keyof S>(_: K): MutationBase<RemoveUndefined<S[K]>, R> {

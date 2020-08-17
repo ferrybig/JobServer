@@ -19,9 +19,9 @@ interface SimpleAbortSignal {
 }
 
 async function tryAllOrDeconstructLoop<T, R>(array: T[], callback: {
-	onInit(value: T, index: number, list: T[]): Promise<void>
-	inner(): Promise<R>
-	onDestroy(value: T, index: number, list: T[]): Promise<void>
+	onInit(value: T, index: number, list: T[]): Promise<void>;
+	inner(): Promise<R>;
+	onDestroy(value: T, index: number, list: T[]): Promise<void>;
 }, onSuppressedError: (error: Error) => void = (e) => console.warn(e)): Promise<R> {
 	if (array.length === 0) {
 		return callback.inner();
@@ -55,7 +55,7 @@ function writeConfigFor(state: Pick<State, 'nginxConfig'>, topic: Site | NginxCo
 }
 
 interface Options {
-	abortSignal?: SimpleAbortSignal,
+	abortSignal?: SimpleAbortSignal;
 	logger?: (log: string) => void;
 	warnings?: (error: Error) => void;
 }

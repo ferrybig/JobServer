@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 
 export type UseView<D, R> = {
-	status: 'loading',
-	data: R,
+	status: 'loading';
+	data: R;
 } | {
-	status: 'success',
-	data: D,
+	status: 'success';
+	data: D;
 } | {
-	status: 'not-found',
-	data: R,
+	status: 'not-found';
+	data: R;
 };
 
 type MapArguments<A extends string[]> =

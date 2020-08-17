@@ -55,7 +55,7 @@ export interface DeploymentService {
 	/**
 	 * Generates a config blob for NGINX
 	 */
-	generateConfigBlob(data: DeploymentData, site: Site, options?: DeploymentServiceOptions): Promise<string> | string
+	generateConfigBlob(data: DeploymentData, site: Site, options?: DeploymentServiceOptions): Promise<string> | string;
 }
 
 export type DeploymentServiceForTask = {
@@ -66,8 +66,8 @@ export function rawDeploymentDataIsDeploymentData(a: RawDeploymentData): a is De
 	return a.taskInformation.deploymentDir !== null && a.task.outputFile !== null;
 }
 export interface DeploymentChangeSet {
-	existingSituation: DeploymentData[],
-	toDelete: DeploymentData[],
-	toCreate: DeploymentData[],
-	newSituation: DeploymentData[],
+	existingSituation: DeploymentData[];
+	toDelete: DeploymentData[];
+	toCreate: DeploymentData[];
+	newSituation: DeploymentData[];
 }

@@ -5,15 +5,15 @@ type Form = 'short' | 'full' | 'all';
 
 
 type SubType<M extends object, F extends Form, T extends object> = {
-	format: (input: M) => T & { _form: F },
-	formatPartial: (input: Partial<M>) => Partial<T> & { _form: F },
+	format: (input: M) => T & { _form: F };
+	formatPartial: (input: Partial<M>) => Partial<T> & { _form: F };
 	isKeyAllowed: (key: PropertyKey) => boolean;
 }
 
 type Factory<T extends object> = <K1 extends keyof T, K2 extends K1>(full: K1[], short: K2[]) => {
-	short: SubType<T, 'short', Pick<T, K2>>,
-	full: SubType<T, 'full', Pick<T, K1>>,
-	all: SubType<T, 'all', T>,
+	short: SubType<T, 'short', Pick<T, K2>>;
+	full: SubType<T, 'full', Pick<T, K1>>;
+	all: SubType<T, 'all', T>;
 }
 
 function makeSubtypeFunction<M extends object, F extends Form, K extends (keyof M)[] | null>(form: F, keys: K): SubType<M, F, K extends keyof M ? Pick<M, K> : M> {
@@ -48,9 +48,9 @@ function makeSubtypeFunction<M extends object, F extends Form, K extends (keyof 
 
 function makeTypeDefinition<T extends object>(): Factory<T> {
 	return <K1 extends keyof T, K2 extends K1>(full: K1[], short: K2[]): {
-		short: SubType<T, 'short', Pick<T, K2>>,
-		full: SubType<T, 'full', Pick<T, K1>>,
-		all: SubType<T, 'all', T>,
+		short: SubType<T, 'short', Pick<T, K2>>;
+		full: SubType<T, 'full', Pick<T, K1>>;
+		all: SubType<T, 'all', T>;
 	} => ({
 		short: makeSubtypeFunction('short', short) as SubType<T, 'short', Pick<T, K2>>,
 		full: makeSubtypeFunction('full', full) as SubType<T, 'full', Pick<T, K1>>,

@@ -4,8 +4,8 @@ export default function debounce<T extends (...args: any) => any>(
 	combine: (newParameters: Parameters<T>, oldParameters: Parameters<T>) => Parameters<T> = (newParameters) => newParameters
 ): ((...args: Parameters<T>) => void) & { flush(): void } {
 	let nextCall: {
-		timer: ReturnType<typeof setTimeout>,
-		args: Parameters<T>
+		timer: ReturnType<typeof setTimeout>;
+		args: Parameters<T>;
 	} | null = null;
 	const flush = (): void => {
 		if (nextCall) {

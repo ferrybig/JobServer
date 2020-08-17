@@ -2,9 +2,9 @@ import { spawn, ChildProcess } from 'child_process';
 import { open, close } from 'fs';
 
 interface Options {
-	logger?: (str: string) => void,
-	cwd?: string,
-	stdin?: string,
+	logger?: (str: string) => void;
+	cwd?: string;
+	stdin?: string;
 }
 
 function startProcess(command: string, args: string[], options: Options, resolve: (err: any, process: ChildProcess) => void) {

@@ -67,23 +67,23 @@ function subscriptionUpdater<V extends AnyView>(subscription: SubscriptionHandle
 }
 
 interface ClientView<V extends AnyView> {
-	(subscribe: (data: ClientDataForView<V> | null) => void, ...options: ViewArgs<V>):() => void
+	(subscribe: (data: ClientDataForView<V> | null) => void, ...options: ViewArgs<V>): () => void;
 }
 interface SubscriptionHandler<V extends AnyView> {
-	key: string,
+	key: string;
 	requestId: number;
 	followers: ((data: ClientDataForView<V> | null) => void)[];
 	args: string[];
 	value: ClientDataForView<V> | null;
 	view: V;
 	wantsSubscription: boolean;
-	viewName: string,
-	hasReceivedData: boolean,
+	viewName: string;
+	hasReceivedData: boolean;
 }
 
-function makeClientHandlers<V extends Record<any, views.View<any, any, any, any>>>(views: V, options: {}): { clientViews: { [K in keyof V]: ClientView<V[K]> }, register(server: UpstreamServer): void  } {
-	let subscriptionMap: Partial<Record<number, SubscriptionHandler<any>>> = {};
-	let handlerMap: Partial<Record<string, SubscriptionHandler<any>>> = {};
+function makeClientHandlers<V extends Record<any, views.View<any, any, any, any>>>(views: V, options: {}): { clientViews: { [K in keyof V]: ClientView<V[K]> }; register(server: UpstreamServer): void  } {
+	const subscriptionMap: Partial<Record<number, SubscriptionHandler<any>>> = {};
+	const handlerMap: Partial<Record<string, SubscriptionHandler<any>>> = {};
 	let newRequestId = 0;
 
 	let server: UpstreamServer | null = null;
