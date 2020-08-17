@@ -45,7 +45,7 @@ const subscriptionUpdaters: {
 				break;
 			case 'update':
 				const array2 = [...throwIfNotDefined(subscription.value)];
-				array2[data.index] = data.data;
+				array2[data.index] = { ...array2[data.index], ...data.data };
 				subscription.value = array2;
 				break;
 			case 'insert':
