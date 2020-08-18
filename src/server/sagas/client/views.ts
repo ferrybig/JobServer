@@ -10,7 +10,7 @@ import { AnyView, ViewArgs, ServerDataForView, View } from '../../../common/view
 
 type ActionMap<P extends any[], A extends { type: string; (...args: any): any } = Values<typeof actions>> = {
 	[K in A['type']]?: true | ((action: ReturnType<Extract<A, { type: K }>>, ...args: P) => boolean)
-}
+};
 
 type AllActions = ReturnType<Values<typeof actions>>;
 
@@ -21,7 +21,7 @@ type ServerView<V extends AnyView> = {
 	view: V;
 	updateMap: ActionMap<ViewArgs<V>>;
 	makeFollower(initState: State, permissions: Record<string, boolean>, args: ViewArgs<V>): Follower;
-}
+};
 
 function executeFilter<A extends any[]>(updateMap: ActionMap<A>, action: AllActions, args: A): boolean {
 	const filter = updateMap[action?.type];

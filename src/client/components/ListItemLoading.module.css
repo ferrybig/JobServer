@@ -1,0 +1,15 @@
+.root {
+	background: linear-gradient(90deg, var(--secondary--light) 49%, var(--fade--high) 49.9%, var(--fade--high) 50.1%, var(--secondary--light) 51%) var(--secondary--light);
+    animation: loading-indicator 3s ease infinite;
+	background-size: 50% 100%;
+	background-repeat: repeat-y;
+}
+.fade {
+	opacity: 0.8;
+}
+
+@keyframes loading-indicator {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}

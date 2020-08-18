@@ -2,6 +2,7 @@ import React from 'react';
 import classes from './OverviewList.module.css';
 import { UseView } from '../views/useView';
 import assertNever from '../../common/utils/assertNever';
+import { ListItemLoadingChain } from './ListItemLoading';
 
 interface Props<I> {
 	list: UseView<I[], any>;
@@ -31,10 +32,7 @@ const OverviewList = <I,>({
 		case 'loading':
 			return (
 				<div className={classes.list}>
-					<div className={classes.listItemLoading}/>
-					<div className={classes.listItemLoading}/>
-					<div className={classes.listItemLoading}/>
-					<div className={classes.listItemLoading}/>
+					<ListItemLoadingChain/>
 				</div>
 			);
 		case 'success':
