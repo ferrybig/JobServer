@@ -7,6 +7,7 @@ import useBack from '../context/navigation/useBack';
 import useTitle from '../context/navigation/useTitle';
 import OverviewList from '../components/OverviewList';
 import ListItemTask from '../components/ListItemTask';
+import FadeContainer from '../components/FadeContainer';
 
 interface Props {
 	deploymentInformationId?: string;
@@ -29,14 +30,16 @@ const TaskOverview: FC<Props> = ({
 
 	return (
 		<div >
-			{ deploymentInformationId }
-			slkkdkjdkjdf
-			<RouteLink route={tasksForDeploymentInformation} props={{
-				deploymentInformationId: deploymentInformationId === 'TEST' ? 'HI' : 'TEST'
-			}}>
-				Test link.
-				<code>ssss</code>
-			</RouteLink>
+			<FadeContainer>
+				{ deploymentInformationId }
+				slkkdkjdkjdf
+				<RouteLink route={tasksForDeploymentInformation} props={{
+					deploymentInformationId: deploymentInformationId === 'TEST' ? 'HI' : 'TEST'
+				}}>
+					Test link.
+					<code>ssss</code>
+				</RouteLink>
+			</FadeContainer>
 			<OverviewList list={viewData} reverse item={(task) => <ListItemTask key={task.id} task={task}/>}/>
 		</div>
 	);

@@ -1,5 +1,6 @@
 .light {
 	--bg: rgb(255, 255, 255);
+	--bg--alt: rgb(220, 220, 220);
 	--color: rgb(5, 5, 5);
 	--primary: hsl(263, 100%, 75%);
 	--primary--light: hsl(263, 100%, 85%);
