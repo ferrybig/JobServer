@@ -4,7 +4,7 @@
 	grid-template:
 		"m1 icon title actions m2" 50%
 		"m1 icon subtitle status m2" 50% /
-		auto 48px minmax(0, 824px) 200px auto;
+		auto 48px minmax(0, 776px) 200px auto;
 	border: 2px solid var(--fade--bg);
 	box-sizing: border-box;
 	text-decoration: none;
