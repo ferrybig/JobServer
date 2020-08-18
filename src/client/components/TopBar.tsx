@@ -1,10 +1,10 @@
 import React, { FC } from 'react';
 import classes from './TopBar.module.css';
-import { useNavigationContextValues } from '../navigationContext/useNavigationContext';
+import useNavigationContext from '../navigationContext/useNavigationContext';
 import Link from './minirouter/Link';
 
 const TopBar: FC = (): JSX.Element => {
-	const values = useNavigationContextValues();
+	const values = useNavigationContext();
 
 	return (
 		<header className={classes.root}>

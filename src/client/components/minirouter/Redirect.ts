@@ -1,14 +1,15 @@
 import { useEffect } from 'react';
-import { contextLocation } from './LocationService';
 import { RouteDefinication } from './route';
+import useLocation from '../../context/location/useLocation';
 
 export default function Redirect<R>({ route, props }: {
 	route: RouteDefinication<any, R>;
 	props: R;
 }): JSX.Element | null {
-	const [update] = contextLocation.useUpdate();
+	const locationContext = useLocation();
 	useEffect(() => {
-		update(route.toPath(props), { replace: true });
-	}, [route, props, update]);
+		// Replace if another route interaction happened last 10 sec, else push a new frame
+		locationContext.updatePath(route.toPath(props), { replace: Date.now() - locationContext.lastInteraction() < 10000 });
+	}, [route, props, locationContext]);
 	return null;
 }

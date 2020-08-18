@@ -6,8 +6,10 @@ import TopBar from './components/TopBar';
 import NavigationContext, { makeNavigationContext } from './navigationContext';
 import RootThemeInjector from './themesContext/RootThemeInjector';
 import ThemeContext, { makeThemeProvider } from './themesContext';
+import LocationContext, { makeHashLocationContext } from './context/location';
 
 const Router = makeRouter(Object.values(routes));
+const LocationContextValue = makeHashLocationContext();
 const NavigationContextValue = makeNavigationContext();
 const ThemeContextValue = makeThemeProvider();
 
@@ -22,15 +24,17 @@ const App: FC = (): JSX.Element => {
 	}, []);
 
 	return (
-		<NavigationContext.Provider value={NavigationContextValue}>
-			<ThemeContext.Provider value={ThemeContextValue}>
-				<RootThemeInjector/>
-				<div className={classes.root}>
-					<TopBar/>
-					<Router/>
-				</div>
-			</ThemeContext.Provider>
-		</NavigationContext.Provider>
+		<LocationContext.Provider value={LocationContextValue}>
+			<NavigationContext.Provider value={NavigationContextValue}>
+				<ThemeContext.Provider value={ThemeContextValue}>
+					<RootThemeInjector/>
+					<div className={classes.root}>
+						<TopBar/>
+						<Router/>
+					</div>
+				</ThemeContext.Provider>
+			</NavigationContext.Provider>
+		</LocationContext.Provider>
 	);
 };
 

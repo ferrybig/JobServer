@@ -1,12 +1,12 @@
 import React, { ReactNode, ReactHTML, HTMLAttributes, useCallback } from 'react';
-import { contextLocation } from './LocationService';
+import useLocation from '../../context/location/useLocation';
 
 export default function Link({ path, children, tag, onClick, ...rest }: {
 	path: string;
 	children: ReactNode;
 	tag?: keyof ReactHTML;
 } & HTMLAttributes<HTMLElement>): JSX.Element | null {
-	const [update, format] = contextLocation.useUpdate();
+	const { updatePath, formatHref } = useLocation();
 	const realTag = tag || 'a' as const;
 	const realOnClick = useCallback((e: React.MouseEvent<HTMLElement, MouseEvent>) => {
 		if (onClick) {
@@ -14,11 +14,11 @@ export default function Link({ path, children, tag, onClick, ...rest }: {
 		}
 		if (!e.defaultPrevented) {
 			e.preventDefault();
-			update(path);
+			updatePath(path);
 		}
-	}, [onClick, path, update]);
+	}, [onClick, path, updatePath]);
 	return React.createElement(realTag, {
-		href: realTag === 'a' ? format(path) : undefined,
+		href: realTag === 'a' ? formatHref(path) : undefined,
 		onClick: realOnClick,
 		...rest,
 	}, children);

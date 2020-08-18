@@ -1,4 +1,4 @@
-import { useThemeContext } from './useThemeContext';
+import useThemeContext from './useThemeContext';
 import { FC, useLayoutEffect } from 'react';
 
 const RootThemeInjector: FC = () => {
