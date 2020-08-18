@@ -3,15 +3,10 @@ import classes from './App.module.css';
 import * as routes from './routes';
 import makeRouter from './components/minirouter/makeRouter';
 import TopBar from './components/TopBar';
-import NavigationContext, { makeNavigationContext } from './context/navigation';
-import RootThemeInjector from './context/themes/RootThemeInjector';
-import ThemeContext, { makeThemeProvider } from './context/themes';
-import LocationContext, { makeHashLocationContext } from './context/location';
+import setupContextProvider from './context';
 
+const ContextProvider = setupContextProvider();
 const Router = makeRouter(Object.values(routes));
-const LocationContextValue = makeHashLocationContext();
-const NavigationContextValue = makeNavigationContext();
-const ThemeContextValue = makeThemeProvider();
 
 const App: FC = (): JSX.Element => {
 	useLayoutEffect(() => {
@@ -24,17 +19,12 @@ const App: FC = (): JSX.Element => {
 	}, []);
 
 	return (
-		<LocationContext.Provider value={LocationContextValue}>
-			<NavigationContext.Provider value={NavigationContextValue}>
-				<ThemeContext.Provider value={ThemeContextValue}>
-					<RootThemeInjector/>
-					<div className={classes.root}>
-						<TopBar/>
-						<Router/>
-					</div>
-				</ThemeContext.Provider>
-			</NavigationContext.Provider>
-		</LocationContext.Provider>
+		<ContextProvider>
+			<div className={classes.root}>
+				<TopBar/>
+				<Router/>
+			</div>
+		</ContextProvider>
 	);
 };
 
