@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import classes from './TopBar.module.css';
-import useNavigationContext from '../navigationContext/useNavigationContext';
+import useNavigationContext from '../context/navigation/useNavigationContext';
 import Link from './minirouter/Link';
 
 const TopBar: FC = (): JSX.Element => {

@@ -1,7 +1,7 @@
 import { createContext } from 'react';
-import { addToFollowerArray } from '../../common/utils/addToFollowerArray';
-import callArray from '../../common/utils/callArray';
-import subscriptionDebug from '../../common/utils/subscriptionDebug';
+import { addToFollowerArray } from '../../../common/utils/addToFollowerArray';
+import callArray from '../../../common/utils/callArray';
+import subscriptionDebug from '../../../common/utils/subscriptionDebug';
 
 export interface ContextValue {
 	backLink: string | null;

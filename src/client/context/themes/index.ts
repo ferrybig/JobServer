@@ -1,8 +1,8 @@
 import { createContext } from 'react';
 import classes from './themes.module.css';
-import { addToFollowerArray } from '../../common/utils/addToFollowerArray';
-import callArray from '../../common/utils/callArray';
-import subscriptionDebug from '../../common/utils/subscriptionDebug';
+import { addToFollowerArray } from '../../../common/utils/addToFollowerArray';
+import callArray from '../../../common/utils/callArray';
+import subscriptionDebug from '../../../common/utils/subscriptionDebug';
 
 function themeMap<M extends Record<string, string>>(input: M): M {
 	for (const [key, value] of Object.entries(input)) {

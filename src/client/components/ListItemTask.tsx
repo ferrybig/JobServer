@@ -2,7 +2,7 @@ import React, { FC, memo } from 'react';
 import classes from './ListItemTask.module.css';
 import { taskShort, ReturnedValueOrMore } from '../../common/views/types';
 import ListItem from './ListItem';
-import statusClasses from '../themesContext/status';
+import statusClasses from '../context/themes/status';
 import RouteLink from './minirouter/RouteLink';
 import { taskInfo } from '../routes';
 import { TaskTimer } from './Timer';

@@ -3,9 +3,9 @@ import classes from './App.module.css';
 import * as routes from './routes';
 import makeRouter from './components/minirouter/makeRouter';
 import TopBar from './components/TopBar';
-import NavigationContext, { makeNavigationContext } from './navigationContext';
-import RootThemeInjector from './themesContext/RootThemeInjector';
-import ThemeContext, { makeThemeProvider } from './themesContext';
+import NavigationContext, { makeNavigationContext } from './context/navigation';
+import RootThemeInjector from './context/themes/RootThemeInjector';
+import ThemeContext, { makeThemeProvider } from './context/themes';
 import LocationContext, { makeHashLocationContext } from './context/location';
 
 const Router = makeRouter(Object.values(routes));

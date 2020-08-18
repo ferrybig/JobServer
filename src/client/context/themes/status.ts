@@ -1,4 +1,4 @@
-import { Task, Deployment, PlatformTask } from '../../common/types';
+import { Task, Deployment, PlatformTask } from '../../../common/types';
 import classes from './statusModule/status.module.css';
 
 const statusClasses: Record<Task['status'] | Deployment['status'] | PlatformTask['status'], string> = {
