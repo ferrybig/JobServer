@@ -2,9 +2,9 @@
 	height: 48px;
 	display: grid;
 	grid-template:
-		"m1 title actions m2" 50%
-		"m1 subtitle status m2" 50% /
-		auto minmax(0, 824px) 200px auto;
+		"m1 icon title actions m2" 50%
+		"m1 icon subtitle status m2" 50% /
+		auto 48px minmax(0, 824px) 200px auto;
 	border: 2px inset var(--fade--low);
 	box-sizing: border-box;
 	text-decoration: none;

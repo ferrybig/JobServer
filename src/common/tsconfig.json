@@ -21,10 +21,7 @@
     "alwaysStrict": true,
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
-    "rootDir": "src",
-    "typeRoots": [
-      "../../node_modules/@types"
-    ]
+    "rootDir": "src"
   },
   "include": [
     ".."

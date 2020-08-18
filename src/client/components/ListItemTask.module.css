@@ -13,3 +13,8 @@
 	grid-area: status;
 	text-align: right;
 }
+.icon {
+	grid-area: icon;
+	align-self: center;
+	opacity: 0.8;
+}
