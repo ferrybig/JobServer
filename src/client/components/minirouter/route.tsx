@@ -15,21 +15,23 @@ export class RouteDefinicationDefiner<P, I> {
 	public component<C = P>(Component: ComponentType<C>): RouteDefinication<Pick<C, Exclude<keyof C, keyof P>>, I> {
 		return this.render<C>((props) => <Component {...props}/>);
 	}
-	public render<C = P>(render: (props: C) => null | JSX.Element): RouteDefinication<Pick<C, Exclude<keyof C, keyof P>>, I> {
+	public render<C = P>(render: (props: C, path: string) => null | JSX.Element): RouteDefinication<Pick<C, Exclude<keyof C, keyof P>>, I> {
 		const transform = this.pathTransform;
 
 		let matchedProps: P | null;
+		let matchedPath = '';
 
 		function doRender(extraProps: Pick<C, Exclude<keyof C, keyof P>>) {
 			return render({
 				...extraProps,
 				...matchedProps!,
-			} as unknown as C);
+			} as unknown as C, matchedPath);
 		}
 		return {
 			tryRender(path) {
 				matchedProps = transform(path);
 				if (matchedProps) {
+					matchedPath = path;
 					return doRender;
 				}
 				return null;

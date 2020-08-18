@@ -2,11 +2,11 @@ import React, { FC, useCallback } from 'react';
 import { tasksForDeploymentInformation, tasks } from '../routes';
 import useView from '../views/useView';
 import clientViews, { ViewData, ViewOptions } from '../views/views';
-import RouteLink from './minirouter/RouteLink';
+import RouteLink from '../components/minirouter/RouteLink';
 import useBack from '../navigationContext/useBack';
 import useTitle from '../navigationContext/useTitle';
-import OverviewList from './OverviewList';
-import ListItemTask from './ListItemTask';
+import OverviewList from '../components/OverviewList';
+import ListItemTask from '../components/ListItemTask';
 //import classes from './TaskOverview.module.css';
 
 interface Props {
