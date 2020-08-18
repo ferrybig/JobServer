@@ -7,7 +7,6 @@ import useBack from '../context/navigation/useBack';
 import useTitle from '../context/navigation/useTitle';
 import OverviewList from '../components/OverviewList';
 import ListItemTask from '../components/ListItemTask';
-//import classes from './TaskOverview.module.css';
 
 interface Props {
 	deploymentInformationId?: string;
@@ -38,7 +37,7 @@ const TaskOverview: FC<Props> = ({
 				Test link.
 				<code>ssss</code>
 			</RouteLink>
-			<OverviewList list={viewData} item={(task) => <ListItemTask key={task.id} task={task}/>}/>
+			<OverviewList list={viewData} reverse item={(task) => <ListItemTask key={task.id} task={task}/>}/>
 		</div>
 	);
 };
