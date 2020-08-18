@@ -13,6 +13,7 @@
 	--fade: rgba(127, 127, 127, 0.25);
 	--fade--high: rgba(127, 127, 127, 0.5);
 	--fade--bg: rgba(255, 255, 255, 0.5);
+	--fade--bg-full: rgba(255, 255, 255, 0);
 
 	--status--init: hsl(231, 100%, 85%);
 	--status--approved: hsl(211, 100%, 85%);
@@ -24,8 +25,14 @@
 	--status--success: hsl(113, 100%, 85%);
 	--status--uploading: hsl(113, 100%, 78%);
 
-	--identify-icon--bg: rgb(190, 190, 220);
-	--identify-icon--fg: rgb(100, 50, 100);
+	--identify-icon--1: hsl(0, 50%, 50%);
+	--identify-icon--2: hsl(90, 50%, 50%);
+	--identify-icon--3: hsl(180, 50%, 50%);
+	--identify-icon--4: hsl(240, 50%, 50%);
+	--identify-icon--5: hsl(0, 50%, 75%);
+	--identify-icon--6: hsl(90, 50%, 75%);
+	--identify-icon--7: hsl(180, 50%, 75%);
+	--identify-icon--8: hsl(240, 50%, 75%);
 }
 .dark {
 	color:

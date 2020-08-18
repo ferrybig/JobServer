@@ -46,13 +46,35 @@ const IdentifyIcon: FC<Props> = ({
 			console.warn('Expected hex128 to be a 32 length hex string (128 bit)', hex128);
 		}
 		const currentStyle = getComputedStyle(canvasElement);
-		const background = currentStyle.getPropertyValue('--identify-icon--bg') || 'purple';
-		const foreground = currentStyle.getPropertyValue('--identify-icon--fg') || 'green';
 		const ctx = canvasElement.getContext('2d');
 		if (!ctx) {
 			console.warn('Browser does not support 2d canvas??');
 			return;
 		}
+		let sumA = 0;
+		let sumB = 0;
+		const parsedList: number[] = new Array(CELLS * CELLS);
+		for (let z = 0; z < CELLS; z++) {
+			const halfIndex = z * CELLS;
+			for (let x = 0; x < CELLS; x+=2) {
+				// x and CELLS need to stay even here!
+				const char = hex128[(halfIndex + x) / 2] ?? `${z * 2 + (x < 4 ? 0 : 1)}`;
+				const parsed = Number.parseInt(char, 16);
+				if (Number.isNaN(parsed) || parsed < 0 || parsed > 15) {
+					console.warn('Invalid number ecountered!!', parsed, char, hex128[(halfIndex + x) / 2], hex128);
+					continue;
+				}
+				const a = parsed & 0b11;
+				const b = parsed >> 2;
+				parsedList[halfIndex + x] = a;
+				parsedList[halfIndex + x + 1] = b;
+				sumA += a;
+				sumB += b;
+			}
+		}
+		const background = currentStyle.getPropertyValue('--identify-icon--' + ((sumA & 0b11) + 1)) || 'purple';
+		const foreground = currentStyle.getPropertyValue('--identify-icon--' + ((sumB & 0b11) + 5)) || 'green';
+
 		ctx.globalAlpha = 1;
 		ctx.fillStyle = background;
 		ctx.fillRect(0, 0, SIZE, SIZE);
@@ -62,18 +84,9 @@ const IdentifyIcon: FC<Props> = ({
 			foreground,
 		});
 		for (let z = 0; z < CELLS; z++) {
-			for (let x = 0; x < CELLS; x+=2) {
-				// x and CELLS need to stay even here!
-				const char = hex128[(z * CELLS + x) / 2] ?? `${z * 2 + (x < 4 ? 0 : 1)}`;
-				const parsed = Number.parseInt(char, 16);
-				if (Number.isNaN(parsed) || parsed < 0 || parsed > 15) {
-					console.warn('Invalid number ecountered!!', parsed, char, hex128[(z * CELLS + x) / 2], hex128);
-					continue;
-				}
-				const a = parsed & 0b11;
-				const b = parsed >> 2;
-				renderCell(x, z, ctx, a);
-				renderCell(x + 1, z, ctx, b);
+			const halfIndex = z * CELLS;
+			for (let x = 0; x < CELLS; x++) {
+				renderCell(x, z, ctx, parsedList[halfIndex + x]);
 			}
 		}
 	}, [canvas, theme, canvas]);
