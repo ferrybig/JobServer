@@ -33,6 +33,6 @@ export default function loopedActionChannel<
 ): CallEffect | ForkEffect {
 	const newPattern = isActionList(pattern) ? pattern.map(e => e.type) : (pattern as (action: AnyAction) => boolean);
 	// TODO Figure out why buffers need to be resent, even thought he documentation documents it as optional
-	const channel = actionChannel(newPattern, buffer || buffers.fixed(10));
+	const channel = actionChannel(newPattern, buffer ?? buffers.fixed(10));
 	return loopedChannel<ActionType<T>, H>(channel, handler, options, ...args);
 }

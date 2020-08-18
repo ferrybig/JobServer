@@ -31,7 +31,7 @@ export default function* makeWebSocketChannel(url: string | NodeWebSocket): Saga
 				emitter(evt.data);
 			},
 			error (e) {
-				console.warn('Caught error event: ' + e);
+				console.warn('Caught error event: ', e);
 			},
 			open() {
 				console.log('Open ');

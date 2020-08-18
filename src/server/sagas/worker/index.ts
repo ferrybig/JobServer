@@ -61,7 +61,7 @@ function* tryUpdateDeployment(deploymentId: Deployment['id']) {
 	}
 }
 function* getOrCreatePendingFileForFile(outputFile: string, fileSize: number): SagaIterator<PendingUploadedFile> {
-	const pendingFile: PendingUploadedFile | null = yield select(s => find(s, 'pendingFile', ((file: PendingUploadedFile) => file.outputFile === outputFile)));
+	const pendingFile: PendingUploadedFile | null = yield select(s => find(s, 'pendingFile', (file: PendingUploadedFile) => file.outputFile === outputFile));
 	if (pendingFile) {
 		if (pendingFile.fileSize !== fileSize) {
 			yield put(crudUpdate('pendingFile', {

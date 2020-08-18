@@ -9,7 +9,7 @@ export default function subscriptionFactory<C, V>(context: Context<C>, getValue:
 			setState(getValue(contextValue));
 		}), [contextValue, setState]);
 		return state;
-	};
+	}
 	useSubscription.toString = () => `${useSubscription.name}For${context.displayName}`;
 	return useSubscription;
 }
@@ -23,7 +23,7 @@ export function subscriptionFactoryWithMemo<C, V>(context: Context<C>, getValue:
 			setState(state => shallowEquals(state, val) ? state : val);
 		}), [contextValue, setState]);
 		return state;
-	};
+	}
 	useSubscriptionWithMemo.toString = () => `${useSubscriptionWithMemo.name}For${context.displayName}`;
 	return useSubscriptionWithMemo;
 }

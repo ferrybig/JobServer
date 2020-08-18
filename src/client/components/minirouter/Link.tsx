@@ -7,7 +7,7 @@ export default function Link({ path, children, tag, onClick, ...rest }: {
 	tag?: keyof ReactHTML;
 } & HTMLAttributes<HTMLElement>): JSX.Element | null {
 	const { updatePath, formatHref } = useLocation();
-	const realTag = tag || 'a' as const;
+	const realTag = tag ?? 'a' as const;
 	const realOnClick = useCallback((e: React.MouseEvent<HTMLElement, MouseEvent>) => {
 		if (onClick) {
 			onClick(e);

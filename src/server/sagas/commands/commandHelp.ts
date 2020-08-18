@@ -6,7 +6,7 @@ export default function commandHelp(sender: CommandSender, _: string[], register
 	const entries = Object.entries(registeredCommands);
 	const longest = entries.reduce((a, b): number => Math.max(a, b[0].length), 0);
 	for (const [key, value] of entries) {
-		sender.sendMessage(` ${key}:${' '.repeat(longest - key.length)} ${value.description || '.'}`);
+		sender.sendMessage(` ${key}:${' '.repeat(longest - key.length)} ${value.description ?? '.'}`);
 	}
 }
 commandHelp.description = 'Shows this help menu';

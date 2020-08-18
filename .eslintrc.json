@@ -1,6 +1,9 @@
 {
 	"extends": ["react-app", "plugin:jsx-a11y/recommended", "plugin:@typescript-eslint/recommended"],
 	"plugins": ["jsx-a11y"],
+	"parserOptions": {
+		"project": "./tsconfig.json"
+	},
 	"rules": {
 		"@typescript-eslint/indent": [
 			"warn",
@@ -35,6 +38,13 @@
 		"@typescript-eslint/no-unused-vars": ["error"],
 		"no-trailing-spaces": ["warn"],
 		"quotes": "off",
-		"@typescript-eslint/quotes": ["error", "single"]
+		"@typescript-eslint/quotes": ["error", "single"],
+		"comma-dangle": ["warn", "only-multiline"],
+		"@typescript-eslint/no-extra-non-null-assertion": ["warn"],
+		"@typescript-eslint/no-base-to-string": ["error"],
+		"@typescript-eslint/no-throw-literal": ["error"],
+		"@typescript-eslint/no-extra-semi": ["warn"],
+		"@typescript-eslint/no-misused-promises": ["error"],
+		"@typescript-eslint/prefer-nullish-coalescing": ["error"]
 	}
 }

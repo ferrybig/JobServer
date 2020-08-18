@@ -291,7 +291,7 @@ function makeReducer<
 
 function makeAction<F, T>(actionCreator: F, type: T): F & { type: T } {
 	(actionCreator as F & { type: T }).type = type;
-	return (actionCreator as F & { type: T });
+	return actionCreator as F & { type: T };
 }
 
 export const DEFAULT_ACTION_TYPES = {

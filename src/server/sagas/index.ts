@@ -21,7 +21,7 @@ function* spawnHelper(toKill: Task | undefined, action: ReturnType<typeof connec
 	if (toKill) {
 		try {
 			yield join(toKill);
-		} catch(_) {};
+		} catch(_) {}
 	}
 	yield call(handleWorkerConnection, action.payload);
 }

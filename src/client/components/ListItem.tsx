@@ -26,7 +26,7 @@ const ListItem: FC<Props & HTMLAttributes<HTMLElement>> = ({
 	renderRoot,
 	...rest
 }): JSX.Element | null => {
-	const subRenderer = renderRoot || DefaultRootRenderer;
+	const subRenderer = renderRoot ?? DefaultRootRenderer;
 
 	return subRenderer({
 		className: className ? `${className} ${classes.root}` : classes.root,

@@ -81,7 +81,7 @@ function* executeTask(task: PlatformTask, timestampService: () => number = () =>
 						yield put(crudConcat('platformTask', {
 							id: task.id,
 							field: 'warnings',
-							data: '\n' + packet.data + '\n' + packet.data?.stack + '\n',
+							data: '\n' + packet.data?.toString() + '\n' + packet.data?.stack + '\n',
 						}));
 						break;
 					case 'final':

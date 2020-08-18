@@ -38,7 +38,7 @@ const webSocketServer = new WebSocket.Server({
 });
 
 server.on('upgrade', function upgrade(request: Request, socket: Socket, head: Buffer) {
-	const pathname = url.parse(request.url).pathname || '';
+	const pathname = url.parse(request.url).pathname ?? '';
 
 	if (pathname.startsWith('/worker/') || pathname === '/client') {
 		webSocketServer.handleUpgrade(request, socket, head, function done(ws) {

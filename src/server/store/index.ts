@@ -14,6 +14,6 @@ const store = createStore(reducer as Reducer<State, ReturnType<(typeof actions)[
 
 export function startSagas(): Task {
 	return sagaMiddleware.run(mainSaga);
-};
+}
 
 export default store;

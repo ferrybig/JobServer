@@ -65,9 +65,9 @@ type OptionsAllRequired = {
 
 export default class DeploymentRunner {
 	public run(changes: DeploymentChangeSet, state: Pick<State, 'site' | 'nginxConfig'>, options: Options = {}): Promise<void> {
-		const abortSignal = options.abortSignal || { aborted: false };
-		const logger = options.logger || (() => {});
-		const warnings = options.warnings || (() => {});
+		const abortSignal = options.abortSignal ?? { aborted: false };
+		const logger = options.logger ?? (() => {});
+		const warnings = options.warnings ?? (() => {});
 		if (abortSignal.aborted) {
 			throw new Error('Aborted');
 		}
@@ -119,7 +119,7 @@ export default class DeploymentRunner {
 			if (siteId) {
 				options.logger(`[${deployment.taskInformation.name}] generateConfigBlob`);
 				const config = `# ${deployment.taskInformation.name}\n` + await autoDeploymentService.generateConfigBlob(deployment, get(state, 'site', deployment.taskInformation.siteId));
-				configs[siteId] = (configs[siteId] || '') + config;
+				configs[siteId] = configs[siteId] ?? '' + config;
 			}
 		}
 		let config = '';
@@ -131,7 +131,7 @@ export default class DeploymentRunner {
 				config += `\tserver_name ${[site.name, ...site.aliasses].join(' ')};\n`;
 				config += `\tlisten [::]:${SSL_NGINX_PORT} ${site.default ? 'default_server' : ''} ipv6only=off ssl http2;\n`;
 				config += indent(writeConfigFor(state, site), '\t');
-				config += indent(configs[siteId] || '', '\t');
+				config += indent(configs[siteId] ?? '', '\t');
 				config += '}\n';
 			}
 			if (site.noSsl !== 'no') {
@@ -143,7 +143,7 @@ export default class DeploymentRunner {
 				if (site.noSsl === 'redirect') {
 					config += '\treturn 301 https://$host$request_uri;\n';
 				} else if (site.noSsl === 'yes') {
-					config += indent(configs[siteId] || '', '\t');
+					config += indent(configs[siteId] ?? '', '\t');
 				} else {
 					return assertNever(site.noSsl);
 				}

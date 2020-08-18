@@ -109,9 +109,9 @@ function makeClientHandlers<V extends Record<any, views.View<any, any, any, any>
 		let subscription: SubscriptionHandler<any> | null = null;
 		if (!wantsSubscription) {
 			const extraSubscriptionKey = JSON.stringify([true, viewName, ...args]);
-			subscription = handlerMap[subscriptionKey] || handlerMap[extraSubscriptionKey] || null;
+			subscription = handlerMap[subscriptionKey] ?? handlerMap[extraSubscriptionKey] ?? null;
 		} else {
-			subscription = handlerMap[subscriptionKey] || null;
+			subscription = handlerMap[subscriptionKey] ?? null;
 		}
 		if (subscription === null) {
 			const newSubscription: SubscriptionHandler<any> = {
@@ -155,7 +155,7 @@ function makeClientHandlers<V extends Record<any, views.View<any, any, any, any>
 	const clientViews: Partial<{ [K in keyof V]: ClientView<V[K]> }> = {};
 	for (const [key, value] of Object.entries(views)) {
 		clientViews[key as keyof V] = ((handler: (data: ClientDataForView<V[keyof V]> | null) => void, options: ViewOptions = {}, ...args: string[]) => {
-			const wantsSubscription = !(options.noSubscribe ?? false);
+			const wantsSubscription = !options.noSubscribe ?? false;
 			const subscription = getOrCreateSubscriptionHandler(key, value, args, wantsSubscription);
 
 			if (subscription.hasReceivedData) {
