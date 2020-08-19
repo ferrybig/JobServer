@@ -1,0 +1,15 @@
+.root {
+	width: 325px;
+	min-height: 243px;
+	margin: 8px;
+	box-sizing: border-box;
+	padding: 4px;
+	border: var(--secondary) 2px solid;
+	background: var(--secondary--light)
+}
+.container {
+	display: flex;
+	align-items: stretch;
+	justify-content: center;
+	flex-wrap: wrap;
+}

@@ -2,13 +2,13 @@
 	--bg: rgb(255, 255, 255);
 	--bg--alt: rgb(220, 220, 220);
 	--color: rgb(5, 5, 5);
-	--primary: hsl(263, 100%, 75%);
-	--primary--light: hsl(263, 100%, 85%);
-	--primary--dark: hsl(263, 100%, 65%);
+	--primary: hsl(263, 50%, 75%);
+	--primary--light: hsl(263, 50%, 85%);
+	--primary--dark: hsl(263, 50%, 65%);
 
-	--secondary: hsl(243, 100%, 75%);
-	--secondary--light: hsl(243, 100%, 85%);
-	--secondary--dark: hsl(243, 100%, 65%);
+	--secondary: hsl(243, 50%, 80%);
+	--secondary--light: hsl(243, 50%, 90%);
+	--secondary--dark: hsl(243, 50%, 70%);
 
 	--fade--low: rgba(127, 127, 127, 0.125);
 	--fade: rgba(127, 127, 127, 0.25);
@@ -36,5 +36,4 @@
 	--identify-icon--8: hsl(240, 50%, 75%);
 }
 .dark {
-	color:
 }
