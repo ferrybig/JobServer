@@ -79,10 +79,6 @@ const IdentifyIcon: FC<Props> = ({
 		ctx.fillStyle = background;
 		ctx.fillRect(0, 0, SIZE, SIZE);
 		ctx.fillStyle = foreground;
-		console.log({
-			background,
-			foreground,
-		});
 		for (let z = 0; z < CELLS; z++) {
 			const halfIndex = z * CELLS;
 			for (let x = 0; x < CELLS; x++) {
