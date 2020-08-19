@@ -161,6 +161,11 @@ export default class UpstreamConnection {
 						throw new Error('Invalid state for received packet');
 					}
 					break;
+				case 'stop':
+					console.log('Received close packet!', packet);
+					this.closed = true;
+					this.socket.close();
+					break;
 				default:
 					return assertNever(packet);
 

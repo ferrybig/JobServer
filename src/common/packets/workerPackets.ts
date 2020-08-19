@@ -51,5 +51,11 @@ export interface TaskResultUploaded {
 		taskId: BuildTask['id'];
 	};
 }
-export type ServerToWorkerPacket = TaskReceived | TaskStartUpload | PongPacket | TaskResultUploaded;
+export interface Stop {
+	type: 'stop';
+	payload: {
+		time: number;
+	};
+}
+export type ServerToWorkerPacket = TaskReceived | TaskStartUpload | PongPacket | TaskResultUploaded | Stop;
 export type WorkerToServerPacket = TaskRequest | PingPacket | TaskProgressAppend | TaskFinished | TaskError;

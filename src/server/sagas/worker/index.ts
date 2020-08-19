@@ -2,7 +2,7 @@ import { CallEffect, call, fork, put, select, cancel } from 'redux-saga/effects'
 import { SagaIterator, EventChannel, Channel } from 'redux-saga';
 import { Stats } from 'fs';
 import { v4 as uuid } from 'uuid';
-import { TaskRequest, TaskFinished, TaskError, WorkerToServerPacket, ServerToWorkerPacket, PingPacket } from '../../../common/packets/workerPackets';
+import { TaskRequest, TaskFinished, TaskError, WorkerToServerPacket, ServerToWorkerPacket, PingPacket, Stop } from '../../../common/packets/workerPackets';
 import { Worker, Task, PendingUploadedFile, Deployment } from '../../../common/types';
 import makeWebSocketChannel from '../../../common/sagas/makeWebSocketConnection';
 import timeoutHandler from '../timeoutHandler';
@@ -298,7 +298,14 @@ function* handleInitTask(socket: Socket): SagaIterator<CallEffect> {
 export default function* handleWorkerConnection(data: ReturnType<typeof connectionWorker>['payload']) {
 	const worker: Worker | undefined = yield select(getOrNull, 'workers', data.workerToken);
 	if (!worker) {
-		data.webSocket.terminate();
+		const packet: Stop = {
+			type: 'stop',
+			payload: {
+				time: 0,
+			}
+		};
+		data.webSocket.send(JSON.stringify(packet));
+		data.webSocket.close();
 		return;
 	}
 	const [incoming, outgoing]: [EventChannel<string>, Channel<string>] = yield call(makeWebSocketChannel, data.webSocket);
