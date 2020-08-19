@@ -10,13 +10,10 @@
 	grid-area: m1;
 	display: block;
 	background: linear-gradient(-90deg, var(--fade--bg-full), var(--fade--bg), var(--fade--bg));
-	border-right: 2px solid var(--fade);
 }
 .root::after {
 	content: '';
 	grid-area: m2;
 	display: block;
-	background: var(--fade--bg);
-	border-left: 2px solid var(--fade);
 	background: linear-gradient(-90deg, var(--fade--bg), var(--fade--bg), var(--fade--bg-full));
 }
