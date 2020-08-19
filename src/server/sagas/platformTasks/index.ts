@@ -10,6 +10,7 @@ import handleDeploymentTask from './deployment';
 import assertNever from '../../../common/utils/assertNever';
 import taskPlanner from './taskPlanner';
 import debounce from '../../../common/utils/debounce';
+import { State } from '../../store/reducer';
 
 type MessageType = {
 	type: 'log';
@@ -34,12 +35,13 @@ function debouncedTaskOptions(options: TaskOptions): TaskOptions & { flush(): vo
 		logger,
 		flush() {
 			logger.flush();
-		}
+		},
 	};
 }
 
 function* executeTask(task: PlatformTask, timestampService: () => number = () => Date.now()): SagaIterator  {
 	try {
+		const storeState: State = yield select();
 		const channel = eventChannel<MessageType>((emit) => {
 			const options = debouncedTaskOptions({
 				logger: (data) => emit({ type: 'log', data }),
@@ -49,7 +51,7 @@ function* executeTask(task: PlatformTask, timestampService: () => number = () =>
 			let promise: Promise<StrictEffect>;
 			switch (task.type) {
 				case 'deployment':
-					promise = handleDeploymentTask(task, options);
+					promise = handleDeploymentTask(task, options, storeState);
 					break;
 				default:
 					promise = assertNever(task.type);
