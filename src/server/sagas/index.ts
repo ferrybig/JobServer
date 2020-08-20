@@ -2,7 +2,7 @@ import { SagaIterator, Task } from 'redux-saga';
 import { spawn, fork, join, call } from 'redux-saga/effects';
 import { connectionWorker, connectionClient } from '../store/actions';
 import handleWorkerConnection from './worker';
-import { take } from '../../common/utils/effects';
+import { take } from '../../common/sagas/effects';
 import handlePersist from './persist';
 import taskDistributer from './worker/taskDistributer';
 import handlePlatformTasks from './platformTasks';

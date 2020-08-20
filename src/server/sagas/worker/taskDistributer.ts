@@ -1,7 +1,7 @@
+import { select, put } from 'redux-saga/effects';
 import { Worker, Task } from '../../../common/types';
 import { crudUpdate, workerAwaitsTask, workerDisconnected } from '../../store/actions';
-import { take } from '../../../common/utils/effects';
-import { select, put } from 'redux-saga/effects';
+import { take } from '../../../common/sagas/effects';
 import { findNextPendingTask } from '../../store/selectors';
 import assertNever from '../../../common/utils/assertNever';
 

@@ -4,7 +4,7 @@ import { select, put, call } from 'redux-saga/effects';
 import { PlatformTask } from '../../../../common/types';
 import { find, filter, getDeploymentNumbers } from '../../../store/selectors';
 import { crudPersist, crudUpdate, triggerPlatformTask } from '../../../store/actions';
-import { take } from '../../../../common/utils/effects';
+import { take } from '../../../../common/sagas/effects';
 import { shallowEquals } from '../../../../common/utils/equals';
 import assertNever from '../../../../common/utils/assertNever';
 

@@ -5,7 +5,7 @@ import { PersistStateV1 } from '../../common/types';
 import { CONFIG_PATH, CONFIG_RESET } from '../config';
 import { writeFile, readFile } from '../../common/async/fs';
 import { crudInit } from '../store/actions';
-import { take } from '../../common/utils/effects';
+import { take } from '../../common/sagas/effects';
 
 
 function* load() {
