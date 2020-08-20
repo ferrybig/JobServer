@@ -4,9 +4,14 @@ import mainSaga from '../sagas/';
 import reducer, { State } from './reducer';
 import * as actions from './actions';
 import storeLogger from '../../common/store/storeLogger';
+import AuthService from '../AuthService';
 
 
-const sagaMiddleware = createSagaMiddleware();
+const sagaMiddleware = createSagaMiddleware({
+	context: {
+		AuthService,
+	}
+});
 const logger = storeLogger();
 const middleware = [sagaMiddleware, logger];
 

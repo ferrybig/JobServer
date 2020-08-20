@@ -3,15 +3,19 @@ import express, { Request } from 'express';
 import WebSocket from 'ws';
 import url from 'url';
 import { Socket } from 'net';
+import cookieParser from 'cookie-parser';
 import './polyfill';
 import store, { startSagas } from './store';
 import { connectionWorker, connectionClient } from './store/actions';
 import { PORT } from './config';
+import stopNodeProcessOnError from '../common/utils/stopNodeProcessOnError';
+import AuthService from './AuthService';
 import uploadPage from './pages/upload';
 import webhookPage from './pages/webhook';
-import stopNodeProcessOnError from '../common/utils/stopNodeProcessOnError';
+import loginPage from './pages/login';
 
 const app = express();
+app.use(cookieParser());
 const server = createServer(app);
 
 const webSocketServer = new WebSocket.Server({
@@ -70,6 +74,7 @@ webSocketServer.on('connection', (webSocket, req) => {
 
 app.put('/uploads/:token', uploadPage);
 app.post('/webhook/:repo', webhookPage);
+loginPage(app, AuthService);
 
 server.listen(PORT, () => console.info(`Server running on port: ${PORT}`));
 

@@ -152,6 +152,7 @@ function* load() {
 				includesAfter: null,
 			}],
 			platformTask: [],
+			authorizedUser: [],
 		};
 		yield put(crudInit(state));
 		return;
@@ -172,6 +173,7 @@ function* load() {
 			site: [],
 			nginxConfig: [],
 			platformTask: [],
+			authorizedUser: [],
 		}));
 	}
 }

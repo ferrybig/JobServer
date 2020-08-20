@@ -1,6 +1,7 @@
-import { take as sagaTake, TakeEffect } from 'redux-saga/effects';
+import { take as sagaTake, TakeEffect, getContext, GetContextEffect, SetContextEffect, setContext } from 'redux-saga/effects';
 import { Channel, EventChannel } from 'redux-saga';
 import { AnyAction } from 'redux';
+import { v4 as uuid } from 'uuid';
 
 type FilterObject = { type: string } | string
 type FilterArray = FilterObject[]
@@ -39,4 +40,22 @@ export function takeFiltered<
 		const actionValue = action.payload[key];
 		return Object.is(actionValue, value);
 	});
+}
+
+interface SagaContext<T> {
+	get(): GetContextEffect;
+	set(val: T): SetContextEffect<any>;
+}
+type SagaContextValue<C extends SagaContext<any>> = C extends SagaContext<infer R> ? R : null;
+export function makeSagaContext<T>(key: string = uuid()): SagaContext<T> {
+	return {
+		get() {
+			return getContext(key);
+		},
+		set(val: T) {
+			return setContext({
+				[key]: val,
+			});
+		}
+	};
 }

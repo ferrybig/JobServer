@@ -12,6 +12,7 @@ const reducer = combineReducers({
 	site: crudReducers.site,
 	nginxConfig: crudReducers.nginxConfig,
 	platformTask: crudReducers.platformTask,
+	authorizedUser: crudReducers.authorizedUser,
 });
 
 export type State = ReturnType<typeof reducer>;

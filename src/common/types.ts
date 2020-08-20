@@ -9,7 +9,12 @@ export interface RepoDescription {
 	commit: string;
 	branch: string | null;
 }
-
+// Server crud types:
+export interface AuthorizedUser {
+	id: string;
+	email: string;
+	role: 'guest' | 'user' | 'admin';
+}
 export interface Worker {
 	id: string;
 	currentTask: Task['id'] | null;
@@ -109,6 +114,7 @@ export interface PersistStateV1 {
 	site: Site[];
 	nginxConfig: NginxConfig[];
 	platformTask: PlatformTask[];
+	authorizedUser: AuthorizedUser[];
 }
 export type PersistState = PersistStateV1;
 export interface PendingUploadedFile {

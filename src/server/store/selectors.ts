@@ -32,6 +32,7 @@ export function computePersistState(state: State): PersistStateV1 {
 		site: map(state.site),
 		nginxConfig: map(state.nginxConfig),
 		platformTask: map(state.platformTask),
+		authorizedUser: map(state.authorizedUser),
 	};
 }
 
