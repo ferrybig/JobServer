@@ -70,7 +70,6 @@ const AuthService: AuthService = {
 				statusText: 'Not authorized: no credentials',
 			}));
 		}
-		console.log(token);
 		const headers: RequestInit['headers'] = {
 			accept: 'application/vnd.github.v3+json',
 			authorization: `token ${token.token.access_token}`,
@@ -85,7 +84,6 @@ const AuthService: AuthService = {
 			...init,
 			...extraInit,
 		} : extraInit;
-		console.log(JSON.stringify(finalInit));
 		return fetch(url, finalInit).then(res => {
 			switch (res.status) {
 				case 200:
@@ -100,12 +98,10 @@ const AuthService: AuthService = {
 		});
 	},
 	async checkToken(sessionId, force = false) {
-		console.log('checkToken', sessionId, force);
 		if (!force && Date.now() - (sessionMap[sessionId]?.lastUse ?? 0) < 1000 * 60 * 10) {
 			return true;
 		}
 		const res = await AuthService.makeRequest(sessionId, 'https://api.github.com/user');
-		res.text().then(console.log);
 		return res.ok;
 	},
 	exportAsJWT(sessionId) {
