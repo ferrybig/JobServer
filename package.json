@@ -14,7 +14,7 @@
     "worker-run": "npm run worker-build && node dist/worker/worker/index.js",
     "server-build": "tsc src/server/index.ts --outDir dist/server/ --downlevelIteration true --esModuleInterop --lib dom,dom.iterable,esnext",
     "server-run": "npm run server-build && node dist/server/server/index.js",
-    "server-mock-webhook": "curl -v -X POST --upload-file test/gh-wh-payload-1.json -H 'X-GitHub-Event: push' -H 'X-GitHub-Delivery: xxxx' -H 'X-Hub-Signature: sha1=d44d20fd29c4174d927e93ba5013a827963f0928' -H 'content-type: application/json' http://localhost:5000/webhook/1",
+    "server-mock-webhook": "curl -v -X POST --upload-file test/gh-wh-payload-1.json -H 'X-GitHub-Event: push' -H 'X-GitHub-Delivery: xxxx' -H 'X-Hub-Signature: sha1=d44d20fd29c4174d927e93ba5013a827963f0928' -H 'content-type: application/json' http://localhost:5000/webhook/a187f5da-dda2-4d79-ad9f-542b98f754e1",
     "lint": "eslint --ext js,jsx,ts,tsx src --fix",
     "check-dependencies": "dpdm src/client/index.ts src/worker/index.ts src/server/index.ts"
   },
@@ -73,6 +73,6 @@
   },
   "devDependencies": {
     "@types/node": "^14.0.27",
-    "typescript": "^3.9.7"
+    "typescript": "^4.0.2"
   }
 }
