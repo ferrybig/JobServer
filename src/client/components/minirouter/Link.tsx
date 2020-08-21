@@ -9,9 +9,7 @@ export default function Link({ path, children, tag, onClick, ...rest }: {
 	const { updatePath, formatHref } = useLocation();
 	const realTag = tag ?? 'a' as const;
 	const realOnClick = useCallback((e: React.MouseEvent<HTMLElement, MouseEvent>) => {
-		if (onClick) {
-			onClick(e);
-		}
+		onClick?.(e);
 		if (!e.defaultPrevented) {
 			e.preventDefault();
 			updatePath(path);
