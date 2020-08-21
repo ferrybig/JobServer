@@ -73,6 +73,7 @@ export default function makeWebhookHandler<T>(
 		const secret = getSecret(req);
 		if (!secret) {
 			// Send error after consuming the body, this way the other side does not know the difference between signature failure and a missing secret;
+			req.on('data', () => {});
 			req.on('end', () => {
 				res.statusCode = 404;
 				res.send('');
