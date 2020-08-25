@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import App, { authContext } from './App';
 import * as serviceWorker from './serviceWorker';
 import { UpstreamServer } from './UpstreamServer';
 import { registerViewsToServer } from './views/views';
@@ -13,8 +13,7 @@ ReactDOM.render(
 );
 
 const upstreamConnection = new UpstreamServer();
-upstreamConnection.registerPacketHandler('auth-challenge', () => {});
-upstreamConnection.registerPacketHandler('auth-response', () => {});
+authContext.registerServerHandler(upstreamConnection);
 registerViewsToServer(upstreamConnection);
 upstreamConnection.startConnection('ws://localhost:5000/client');
 

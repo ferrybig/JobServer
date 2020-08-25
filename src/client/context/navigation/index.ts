@@ -1,6 +1,5 @@
 import { createContext } from 'react';
-import { addToFollowerArray } from '../../../common/utils/addToFollowerArray';
-import callArray from '../../../common/utils/callArray';
+import makeContextFollowers from '../../../common/utils/makeContextFollowers';
 import subscriptionDebug from '../../../common/utils/subscriptionDebug';
 
 export interface ContextValue {
@@ -38,7 +37,7 @@ if (process.env.NODE_ENV === 'development') {
 
 export function makeNavigationContext(): NavigationContext {
 	let values: ContextValue = DEFAULT_CONTEXT_VALUE;
-	const followers: (() => void)[] = [];
+	const { onUpdate, doUpdate } = makeContextFollowers();
 	const refCounts: RefCounts = {
 		backLink: 0,
 		pageName: 0,
@@ -47,9 +46,7 @@ export function makeNavigationContext(): NavigationContext {
 		getValue() {
 			return values;
 		},
-		onUpdate(follower) {
-			return addToFollowerArray(followers, follower);
-		},
+		onUpdate,
 		setValues(newValues) {
 			const counts: Partial<RefCounts> = {};
 			let modified = false;
@@ -63,7 +60,7 @@ export function makeNavigationContext(): NavigationContext {
 			}
 			if (modified) {
 				values = clone;
-				callArray(followers);
+				doUpdate();
 			}
 			return () => {
 				let modified = false;
@@ -78,7 +75,7 @@ export function makeNavigationContext(): NavigationContext {
 				}
 				if (modified) {
 					values = clone;
-					callArray(followers);
+					doUpdate();
 				}
 			};
 		}

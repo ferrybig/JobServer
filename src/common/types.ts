@@ -122,3 +122,9 @@ export interface PendingUploadedFile {
 	outputFile: string;
 	fileSize: number;
 }
+export type TokenResponse = { loggedIn: false } | {
+	loggedIn: true;
+	token: string;
+	avatarUrl: string;
+	name: string;
+}

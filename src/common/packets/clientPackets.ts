@@ -1,3 +1,4 @@
+import { AuthorizedUser } from '../types';
 
 export interface PingPacket {
 	type: 'ping';
@@ -27,22 +28,10 @@ export interface AuthRequestPacket {
 	type: 'auth-request';
 	token: string;
 }
-export interface AuthChallengePacket {
-	type: 'auth-challenge';
-	challenge: string;
-}
-export interface AuthSolutionPacket {
-	type: 'auth-solution';
-	solution: string;
-	email: string;
-	password: string;
-	otp: number;
-}
 export interface AuthResponsePacket {
 	type: 'auth-response';
-	token: string;
-	status: 'challenge-expired' | 'success' | 'error';
-	message: string;
+	loggedIn: boolean;
+	role: AuthorizedUser['role'];
 }
 
 
@@ -72,5 +61,5 @@ export type SubscriptionSingleChangeData<F> = {
 	data: { [K in keyof F]?: F[K] extends string ? Extract<string, F[K]> : never };
 };
 
-export type ClientToServerPacket = PingPacket | AuthRequestPacket | AuthSolutionPacket | EntityRequestPacket | EntityEndPacket
-export type ServerToClientPacket = PongPacket | AuthChallengePacket | AuthResponsePacket | EntityDataPacket | EntityEndPacket
+export type ClientToServerPacket = PingPacket | AuthRequestPacket | EntityRequestPacket | EntityEndPacket
+export type ServerToClientPacket = PongPacket | AuthResponsePacket | EntityDataPacket | EntityEndPacket

@@ -4,7 +4,7 @@ interface SimpleArray<T> {
 	splice(index: number, count: 1): T[];
 }
 
-export function addToFollowerArray<F extends (...args: any[]) => any>(array: SimpleArray<F>, newElement: F): () => void {
+export default function addToFollowerArray<F extends (...args: any[]) => any>(array: SimpleArray<F>, newElement: F): () => void {
 	array.push(newElement);
 	return () => {
 		const index = array.indexOf(newElement);

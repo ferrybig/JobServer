@@ -1,8 +1,7 @@
 import { createContext } from 'react';
-import classes from './themes.module.css';
-import { addToFollowerArray } from '../../../common/utils/addToFollowerArray';
-import callArray from '../../../common/utils/callArray';
 import subscriptionDebug from '../../../common/utils/subscriptionDebug';
+import makeContextFollowers from '../../../common/utils/makeContextFollowers';
+import classes from './themes.module.css';
 
 function themeMap<M extends Record<string, string>>(input: M): M {
 	for (const [key, value] of Object.entries(input)) {
@@ -45,7 +44,7 @@ if (process.env.NODE_ENV === 'development') {
 
 export function makeThemeProvider(): ThemeContext {
 	let currentTheme: Themes = defaultTheme;
-	const followers: (() => void)[] = [];
+	const { onUpdate, doUpdate } = makeContextFollowers();
 	const value: ThemeContext = {
 		getValue() {
 			return currentTheme;
@@ -53,13 +52,11 @@ export function makeThemeProvider(): ThemeContext {
 		getClassname() {
 			return themes[currentTheme];
 		},
-		onUpdate(follower) {
-			return addToFollowerArray(followers, follower);
-		},
+		onUpdate,
 		setValue(val) {
 			if (currentTheme !== val) {
 				currentTheme = val;
-				callArray(followers);
+				doUpdate();
 			}
 		},
 	};

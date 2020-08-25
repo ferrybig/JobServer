@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import {requestIdleCallback} from '../../../common/dom/schedule'
+import { requestIdleCallback } from '../../../common/dom/schedule';
 
 export default function useIdleEffect(callback: () => void | (() => void), deps: any[]): void {
 	useEffect(() => {

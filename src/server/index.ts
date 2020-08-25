@@ -74,7 +74,7 @@ webSocketServer.on('connection', (webSocket, req) => {
 
 app.put('/uploads/:token', uploadPage);
 app.post('/webhook/:repo', webhookPage);
-loginPage(app, AuthService);
+loginPage(app, AuthService, store);
 
 server.listen(PORT, () => console.info(`Server running on port: ${PORT}`));
 

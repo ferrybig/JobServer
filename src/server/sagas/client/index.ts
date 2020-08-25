@@ -60,7 +60,6 @@ export default function* handleClientConnection({ payload }: ReturnType<typeof c
 					}
 					break;
 				case 'auth-request':
-				case 'auth-solution':
 					// ignore for now
 					break;
 				case 'entity-request':

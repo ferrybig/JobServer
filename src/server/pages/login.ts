@@ -5,6 +5,8 @@ import { BACKEND_URL, GITHUB_CLIENT_ID, FRONTEND_URL, GITHUB_CLIENT_SECRET } fro
 import FormData from 'form-data';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import AuthService from '../AuthService';
+import { State } from '../store/reducer';
+import { find } from '../store/selectors';
 
 
 function sendFormData(url: string | FormData.SubmitOptions, data: FormData): Promise<string> {
@@ -23,6 +25,7 @@ function sendFormData(url: string | FormData.SubmitOptions, data: FormData): Pro
 
 interface UserSession {
 	state: string;
+	iframeRedirect: boolean;
 }
 
 const SESSION_COOKIE_NAME = 'APP_SESSION';
@@ -30,17 +33,18 @@ const REDIRECT_URL = BACKEND_URL + 'login/auth';
 
 const userSessionMap: Record<string, UserSession | undefined> = {};
 
-export default function registerLoginPage(app: Express, AuthService: AuthService) {
+export default function registerLoginPage(app: Express, AuthService: AuthService, store: { getState(): State }) {
 	app.get('/login/token', (req: Request, res: Response, next: NextFunction) => {
-		const sessionId = req.cookies[SESSION_COOKIE_NAME];
-		const jwt = AuthService.exportAsJWT(sessionId);
-		if (jwt) {
-			res.statusCode = 200;
-			res.send(jwt);
-		} else {
-			res.statusCode = 401;
-			res.send();
+		if (req.headers.origin && req.headers.origin !== 'http://localhost:3000') {
+			res.statusCode = 403;
+			res.send({});
 		}
+		const sessionId = req.cookies[SESSION_COOKIE_NAME];
+		const response = AuthService.exportAsTokenResponse(sessionId);
+		res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+		res.header('Access-Control-Allow-Credentials', 'true');
+		res.statusCode = response.loggedIn ? 200 : 401;
+		res.send(response);
 	});
 	app.get('/login/logout', (req: Request, res: Response, next: NextFunction) => {
 
@@ -101,8 +105,9 @@ export default function registerLoginPage(app: Express, AuthService: AuthService
 				login,
 				avatarUrl,
 				name,
+				role: find(store.getState(), 'authorizedUser', (e) => e.email === login)?.role ?? 'guest',
 			});
-			return res.redirect(FRONTEND_URL);
+			return res.redirect(FRONTEND_URL + (session.iframeRedirect ? 'login.html' : ''));
 		} catch(e) {
 			console.info('[WEB] Auth error for ' + req.ip);
 			console.error(e);
@@ -117,13 +122,14 @@ export default function registerLoginPage(app: Express, AuthService: AuthService
 		delete userSessionMap[cookie];
 		if (await AuthService.checkToken(cookie, true)) {
 			console.info('[WEB] Auth bypass for ' + req.ip);
-			return res.redirect(FRONTEND_URL);
+			return res.redirect(FRONTEND_URL + (req.query.iframe === 'true' ? 'login.html' : ''));
 		}
 		const newCookie = uuid();
 		res.cookie(SESSION_COOKIE_NAME, newCookie, { maxAge: 10 * 60 * 1000 });
 		const state = uuid();
 		userSessionMap[newCookie] = {
 			state,
+			iframeRedirect: req.query.iframe === 'true',
 		};
 
 		const params: Record<string, string> = {

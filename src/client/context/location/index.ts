@@ -1,7 +1,6 @@
 import { createContext } from 'react';
 import subscriptionDebug from '../../../common/utils/subscriptionDebug';
-import { addToFollowerArray } from '../../../common/utils/addToFollowerArray';
-import callArray from '../../../common/utils/callArray';
+import makeContextFollowers from '../../../common/utils/makeContextFollowers';
 
 interface UpdateOptions {
 	replace?: boolean;
@@ -17,7 +16,7 @@ interface LocationContext  {
 }
 
 export function makeHashLocationContext(): LocationContext {
-	const followers: (() => void)[] = [];
+	const { onUpdate, doUpdate } = makeContextFollowers();
 
 	interface HistoryState {
 		historyIndex: number;
@@ -52,9 +51,7 @@ export function makeHashLocationContext(): LocationContext {
 		lastInteraction() {
 			return getHistoryState()?.lastInteractionTime ?? 0;
 		},
-		onUpdate(follower) {
-			return addToFollowerArray(followers, follower);
-		},
+		onUpdate,
 		updatePath(path, options = {}) {
 			console.log('updatePath');
 			const state = getHistoryState();
@@ -65,7 +62,7 @@ export function makeHashLocationContext(): LocationContext {
 				currentState = makeHistoryState(state.historyIndex + 1, Date.now());
 				window.history.pushState(currentState, '', `#!${path}`);
 			}
-			callArray(followers);
+			doUpdate();
 		},
 		formatHref(path) {
 			return `#!${path}`;
@@ -81,7 +78,7 @@ export function makeHashLocationContext(): LocationContext {
 		lastPath = newPath;
 		currentState = makeHistoryState(currentState.historyIndex + 1, Date.now());
 		window.history.replaceState(currentState, '');
-		callArray(followers);
+		doUpdate();
 	});
 	window.addEventListener('popstate', () => {
 		// User did backwards or forwards navigation
@@ -93,7 +90,7 @@ export function makeHashLocationContext(): LocationContext {
 			window.history.replaceState(currentState, '');
 		}
 		lastPath = locationService.path();
-		callArray(followers);
+		doUpdate();
 	});
 
 	if (process.env.NODE_ENV === 'development') {

@@ -5,7 +5,9 @@ import makeRouter from './components/minirouter/makeRouter';
 import TopBar from './components/TopBar';
 import setupContextProvider from './context';
 
-const ContextProvider = setupContextProvider();
+const providers =  setupContextProvider();
+export const { authContext } = providers;
+
 const Router = makeRouter(Object.values(routes));
 
 const App: FC = (): JSX.Element => {
@@ -19,12 +21,12 @@ const App: FC = (): JSX.Element => {
 	}, []);
 
 	return (
-		<ContextProvider>
+		<providers.ContextProvider>
 			<div className={classes.root}>
 				<TopBar/>
 				<Router/>
 			</div>
-		</ContextProvider>
+		</providers.ContextProvider>
 	);
 };
 

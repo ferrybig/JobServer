@@ -1,6 +1,6 @@
 import { ServerToClientPacket, ClientToServerPacket } from '../common/packets/clientPackets';
 import assertNever from '../common/utils/assertNever';
-import { addToFollowerArray } from '../common/utils/addToFollowerArray';
+import addToFollowerArray from '../common/utils/addToFollowerArray';
 import callArray from '../common/utils/callArray';
 
 type ServerState = 'connected' | 'connectionLost';
@@ -13,9 +13,10 @@ const RECONNECT_TIMEOUT = 10000;
 const PING_TIMEOUT = 60000;
 
 export class UpstreamServer {
-	private packetMap: Record<ServerToClientPacket['type'], (packet: ServerToClientPacket) => void> = mapWithValue(['pong', 'auth-challenge', 'entity-data', 'entity-end', 'auth-response'], undefined as unknown as (packet: ServerToClientPacket) => void);
+	private packetMap: Record<ServerToClientPacket['type'], (packet: ServerToClientPacket) => void> = mapWithValue(['pong', 'entity-data', 'entity-end', 'auth-response'], undefined as unknown as (packet: ServerToClientPacket) => void);
 	private serverStateMap: Record<ServerState, (() => void)[]> = { connected: [], connectionLost: [] };
-	private isConnected = false;
+	private beforeConnectHandlers: (() => void)[] = [];
+	private connectionState: 'waiting' | 'connecting' | 'connecting-failed' | 'connected' = 'waiting';
 	private socketUrl = '';
 	private socket: WebSocket | null = null;
 
@@ -42,17 +43,20 @@ export class UpstreamServer {
 			}
 		};
 	}
+	public addBeforeConnectHandlers(onEvent: () => Promise<void>): () => void {
+		return addToFollowerArray(this.beforeConnectHandlers, onEvent);
+	}
 	public registerStateHandler(type: ServerState, onEvent: () => void): () => void {
 		return addToFollowerArray(this.serverStateMap[type], onEvent);
 	}
-	public sendPacket(packet: ClientToServerPacket) {
-		if (this.isConnected && this.socket) {
+	public sendPacket(packet: ClientToServerPacket): void {
+		if ((this.connectionState === 'connecting' || this.connectionState === 'connected') && this.socket) {
 			const data = JSON.stringify(packet);
 			console.info('S<C: ' + data);
 			this.socket.send(data);
 		}
 	}
-	public startConnection(socketUrl: string) {
+	public startConnection(socketUrl: string): void {
 		for (const [key, handler] of Object.entries(this.packetMap)) {
 			if (!handler) {
 				throw new Error('No handler has been provides for packet type ' + key);
@@ -62,7 +66,7 @@ export class UpstreamServer {
 		this.socket = this.setupConnection();
 	}
 
-	private scheduleReconnect() {
+	private scheduleReconnect(): void {
 		setTimeout(() => {
 			if (window.navigator.onLine === false) {
 				console.log('Refusing to connect because browser reports offline mode');
@@ -76,8 +80,16 @@ export class UpstreamServer {
 		try {
 			const connection = new WebSocket(this.socketUrl);
 			connection.addEventListener('open', (e) => {
-				this.isConnected = true;
-				callArray(this.serverStateMap.connected);
+				this.connectionState = 'connecting';
+				// Call pre-cpnnect hooks
+				Promise.all(callArray(this.beforeConnectHandlers)).then(() => {
+					this.connectionState = 'connected';
+					callArray(this.serverStateMap.connected);
+				}, (e) => {
+					console.error('Pre hooks error!', e);
+					this.connectionState = 'waiting';
+					connection.close();
+				});
 			});
 			connection.addEventListener('message', (e) => {
 				console.info('S>C: ' + e.data);
@@ -93,11 +105,22 @@ export class UpstreamServer {
 			});
 			connection.addEventListener('close', (e) => {
 				console.log('Connection closed', e.wasClean, e.code, e.reason);
-				if (this.isConnected) {
-					this.isConnected = false;
-					callArray(this.serverStateMap.connectionLost);
+				switch (this.connectionState) {
+					case 'waiting':
+						break;
+					case 'connecting-failed':
+						throw new Error('This state should never happen');
+					case 'connecting':
+						this.connectionState = 'connecting-failed';
+						break;
+					case 'connected':
+						this.connectionState = 'waiting';
+						callArray(this.serverStateMap.connectionLost);
+						this.scheduleReconnect();
+						break;
+					default:
+						return assertNever(this.connectionState);
 				}
-				this.scheduleReconnect();
 			});
 			return connection;
 		} catch(e) {

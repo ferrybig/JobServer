@@ -1,6 +1,7 @@
 import fetch, { RequestInit, Response } from 'node-fetch';
 import { sign, verify } from 'jsonwebtoken';
 import { JWT_SECRET } from './config';
+import { TokenResponse } from '../common/types';
 
 interface AccessToken {
 	readonly access_token: string;
@@ -10,7 +11,7 @@ interface AccessToken {
 interface AuthService {
 	registerToken(token: Token): void;
 	checkToken(sessionId: string, force?: boolean): Promise<boolean>;
-	exportAsJWT(sessionId: string): string | null;
+	exportAsTokenResponse(sessionId: string): TokenResponse;
 	JWTToId(sessionId: string): string;
 	getLogin(sessionId: string): Pick<SessionToken, 'lastUse' | 'login' | 'name' | 'avatarUrl'> | null;
 	unregisterSession(sessionId: string): void;
@@ -21,6 +22,7 @@ interface Token {
 	readonly token: AccessToken;
 	readonly login: string;
 	readonly name: string;
+	role: 'guest' | 'user' | 'admin';
 	avatarUrl: string;
 }
 interface SessionToken extends Token {
@@ -104,17 +106,23 @@ const AuthService: AuthService = {
 		const res = await AuthService.makeRequest(sessionId, 'https://api.github.com/user');
 		return res.ok;
 	},
-	exportAsJWT(sessionId) {
-		const token = sessionMap[sessionId];
-		if (!token) {
-			return null;
+	exportAsTokenResponse(sessionId) {
+		const session = sessionMap[sessionId];
+		if (!session) {
+			return { loggedIn: false };
 		}
-		return sign({
-			sessionId: token.sessionId,
+		const token = sign({
+			sessionId: session.sessionId,
 		}, JWT_SECRET, {
 			algorithm: ALGORITHM,
 			expiresIn: '10m',
 		});
+		return {
+			loggedIn: true,
+			token,
+			avatarUrl: session.sessionId,
+			name: session.name,
+		};
 	},
 	JWTToId(jwt) {
 		try {

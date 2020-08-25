@@ -21,7 +21,7 @@ function makeFunction<R, A extends any[], T>(thisObject: T, schedule: (this: T, 
 	return (...args) => {
 		const handle = schedule.apply(thisObject, args);
 		return () => cancel.apply(thisObject, [handle]);
-	}
+	};
 }
 
 export const requestIdleCallback = makeFunction(newWindow, newWindow.requestIdleCallback, newWindow.cancelIdleCallback);

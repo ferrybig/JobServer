@@ -1,7 +1,8 @@
 import React, { FC } from 'react';
-import classes from './TopBar.module.css';
 import useNavigationContext from '../context/navigation/useNavigationContext';
 import Link from './minirouter/Link';
+import LoginIndicator from '../context/login/LoginIndicator';
+import classes from './TopBar.module.css';
 
 const TopBar: FC = (): JSX.Element => {
 	const values = useNavigationContext();
@@ -20,7 +21,7 @@ const TopBar: FC = (): JSX.Element => {
 					{values.pageName}
 				</div>
 				<div>
-					<a href="http://localhost:5000/login/">Login</a>
+					<LoginIndicator/>
 				</div>
 			</div>
 		</header>
